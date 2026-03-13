@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "uBlock Origin",
+    "message": "uBlockForge",
     "description": "extension name."
   },
   "extShortDesc": {
-    "message": "Finally, an efficient blocker. Easy on CPU and memory.",
+    "message": "An efficient content blocker with advanced element hiding. Forged from uBlock Origin.",
     "description": "this will be in the Chrome web store: must be 132 characters or less"
   },
   "dashboardName": {
-    "message": "uBlock₀ — Dashboard",
-    "description": "English: uBlock₀ — Dashboard"
+    "message": "uBlockForge -- Dashboard",
+    "description": "English: uBlockForge -- Dashboard"
   },
   "dashboardUnsavedWarning": {
     "message": "Warning: you have unsaved changes!",

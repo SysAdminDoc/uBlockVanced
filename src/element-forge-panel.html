@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Element Forge</title>
+<style>
+:root {
+    --bg-base: #1e1e2e;
+    --bg-surface: #181825;
+    --bg-mantle: #11111b;
+    --bg-crust: #0b0b14;
+    --bg-overlay: #313244;
+    --bg-hover: #45475a;
+    --text-main: #cdd6f4;
+    --text-sub: #a6adc8;
+    --text-dim: #6c7086;
+    --accent-blue: #89b4fa;
+    --accent-green: #a6e3a1;
+    --accent-red: #f38ba8;
+    --accent-peach: #fab387;
+    --accent-mauve: #cba6f7;
+    --accent-teal: #94e2d5;
+    --accent-yellow: #f9e2af;
+    --accent-lavender: #b4befe;
+    --border: #45475a;
+    --border-active: #89b4fa;
+    --radius: 8px;
+    --radius-sm: 4px;
+    --font: 'Segoe UI', Inter, system-ui, sans-serif;
+    --mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    --transition: 150ms ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-base);
+    color: var(--text-main);
+    font-family: var(--font);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-y: auto;
+    min-height: 100vh;
+}
+
+.panel-header {
+    background: var(--bg-mantle);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.panel-header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent-lavender);
+    letter-spacing: 0.3px;
+}
+
+.panel-header .version {
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--bg-overlay);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.status-indicator {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: background var(--transition);
+}
+
+.status-dot.active { background: var(--accent-green); }
+.status-dot.error { background: var(--accent-red); }
+
+.panel-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.section-header {
+    background: var(--bg-mantle);
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-body {
+    padding: 14px;
+}
+
+/* Inspect Controls */
+.inspect-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    background: var(--bg-overlay);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 8px 14px;
+    transition: all var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-active);
+}
+
+.btn.primary {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: var(--bg-base);
+    font-weight: 600;
+}
+
+.btn.primary:hover {
+    filter: brightness(1.1);
+}
+
+.btn.success {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    color: var(--bg-base);
+    font-weight: 600;
+}
+
+.btn.danger {
+    background: transparent;
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
+.btn.danger:hover {
+    background: var(--accent-red);
+    color: var(--bg-base);
+}
+
+/* Element Info */
+.element-info {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 6px 12px;
+    font-size: 12px;
+}
+
+.element-info .label {
+    color: var(--text-dim);
+    font-weight: 600;
+    text-align: right;
+}
+
+.element-info .value {
+    color: var(--text-main);
+    font-family: var(--mono);
+    font-size: 11px;
+    word-break: break-all;
+}
+
+.element-info .value.tag { color: var(--accent-peach); }
+.element-info .value.id { color: var(--accent-mauve); }
+.element-info .value.classes { color: var(--accent-green); }
+
+/* Selector List */
+.selector-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.selector-item {
+    background: var(--bg-mantle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.selector-item:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-overlay);
+}
+
+.selector-item.selected {
+    border-color: var(--accent-green);
+    background: rgba(166, 227, 161, 0.08);
+}
+
+.selector-item .selector-type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    min-width: 60px;
+    text-align: center;
+}
+
+.selector-type.stable { background: var(--accent-green); color: var(--bg-base); }
+.selector-type.robust { background: var(--accent-blue); color: var(--bg-base); }
+.selector-type.deep { background: var(--accent-mauve); color: var(--bg-base); }
+.selector-type.pierce { background: var(--accent-peach); color: var(--bg-base); }
+.selector-type.attrs { background: var(--accent-teal); color: var(--bg-base); }
+.selector-type.nth { background: var(--accent-yellow); color: var(--bg-base); }
+
+.selector-item .selector-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-main);
+    word-break: break-all;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.selector-item .match-count {
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    background: var(--bg-base);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Filter Output */
+.filter-output {
+    position: relative;
+}
+
+.filter-output textarea {
+    width: 100%;
+    min-height: 60px;
+    background: var(--bg-mantle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--accent-green);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 10px 12px;
+    resize: vertical;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.filter-output textarea:focus {
+    border-color: var(--border-active);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* Shadow DOM indicator */
+.shadow-badge {
+    font-size: 10px;
+    background: var(--accent-mauve);
+    color: var(--bg-base);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+/* Highlight preview */
+.preview-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.preview-toggle input[type="checkbox"] {
+    accent-color: var(--accent-blue);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dim);
+}
+
+.empty-state .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.empty-state .hint {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+/* Log area */
+#log {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-sub);
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 8px;
+    background: var(--bg-crust);
+    border-radius: var(--radius-sm);
+}
+
+#log .log-entry {
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(69,71,90,0.3);
+}
+
+#log .log-entry.error { color: var(--accent-red); }
+#log .log-entry.success { color: var(--accent-green); }
+#log .log-entry.info { color: var(--accent-blue); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-mantle); }
+::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="panel-header">
+    <h1>Element Forge</h1>
+    <span class="version">v0.1.0</span>
+    <div class="status-indicator">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Ready</span>
+    </div>
+</div>
+
+<div class="panel-body">
+    <!-- Inspect Controls -->
+    <div class="section">
+        <div class="section-header">
+            <span>Element Inspector</span>
+        </div>
+        <div class="section-body">
+            <div class="inspect-controls">
+                <button class="btn primary" id="btnInspectSelected">Inspect Selected Element</button>
+                <button class="btn" id="btnInspectPoint">Pick from Page</button>
+                <button class="btn" id="btnScanShadow">Scan Shadow DOM</button>
+                <button class="btn" id="btnScanIframes">Scan iframes</button>
+            </div>
+            <div style="margin-top: 10px;">
+                <div class="preview-toggle">
+                    <input type="checkbox" id="chkLivePreview" checked>
+                    <label for="chkLivePreview">Live highlight on hover</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Element Details -->
+    <div class="section" id="elementSection" style="display:none;">
+        <div class="section-header">
+            <span>Element Details</span>
+            <span id="shadowBadge" class="shadow-badge" style="display:none;">SHADOW DOM</span>
+        </div>
+        <div class="section-body">
+            <div class="element-info" id="elementInfo">
+                <span class="label">Tag</span><span class="value tag" id="elTag">--</span>
+                <span class="label">ID</span><span class="value id" id="elId">--</span>
+                <span class="label">Classes</span><span class="value classes" id="elClasses">--</span>
+                <span class="label">Attributes</span><span class="value" id="elAttrs">--</span>
+                <span class="label">Dimensions</span><span class="value" id="elDims">--</span>
+                <span class="label">Visibility</span><span class="value" id="elVisibility">--</span>
+                <span class="label">Position</span><span class="value" id="elPosition">--</span>
+                <span class="label">Computed</span><span class="value" id="elComputed">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generated Selectors -->
+    <div class="section" id="selectorSection" style="display:none;">
+        <div class="section-header">
+            <span>Generated Selectors</span>
+            <span id="selectorCount" style="font-size:11px; color:var(--text-dim);">0 selectors</span>
+        </div>
+        <div class="section-body">
+            <div class="selector-list" id="selectorList"></div>
+        </div>
+    </div>
+
+    <!-- Filter Output -->
+    <div class="section" id="filterSection" style="display:none;">
+        <div class="section-header">
+            <span>uBlock Cosmetic Filter</span>
+        </div>
+        <div class="section-body">
+            <div class="filter-output">
+                <textarea id="filterOutput" placeholder="Select a selector above to generate a filter..." spellcheck="false"></textarea>
+            </div>
+            <div class="filter-actions">
+                <button class="btn success" id="btnApplyFilter">Apply Filter</button>
+                <button class="btn" id="btnCopyFilter">Copy to Clipboard</button>
+                <button class="btn" id="btnTestFilter">Test (Preview)</button>
+                <button class="btn danger" id="btnRemoveFilter">Remove Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state">
+        <div class="icon">&#9881;</div>
+        <p>Select an element in the Elements panel, then click <strong>Inspect Selected Element</strong>.</p>
+        <p class="hint">Element Forge generates robust CSS selectors for elements that uBlock's standard picker cannot reach -- shadow DOM, obfuscated classes, YouTube live chat banners, and other stubborn elements.</p>
+    </div>
+
+    <!-- Log -->
+    <div class="section">
+        <div class="section-header"><span>Log</span></div>
+        <div class="section-body">
+            <div id="log"></div>
+        </div>
+    </div>
+</div>
+
+<script src="js/element-forge-panel.js"></script>
+</body>
+</html>

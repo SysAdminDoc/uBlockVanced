@@ -180,10 +180,10 @@
 }
 @media (prefers-color-scheme: dark) {
     :root {
-        --surface-0-rgb: 0 0 0;
-        --surface-1: rgb(var(--gray-10));
-        --surface-2: rgb(var(--gray-20));
-        --surface-3: rgb(var(--gray-30));
+        --surface-0-rgb: 30 30 46; /* Catppuccin Base */
+        --surface-1: rgb(24 24 37); /* Catppuccin Mantle */
+        --surface-2: rgb(49 50 68); /* Catppuccin Surface0 */
+        --surface-3: rgb(69 71 90); /* Catppuccin Surface1 */
     }
 }
 
@@ -195,10 +195,10 @@
 }
 
 :root.dark {
-    --surface-0-rgb: 0 0 0;
-    --surface-1: rgb(var(--gray-10));
-    --surface-2: rgb(var(--gray-20));
-    --surface-3: rgb(var(--gray-30));
+    --surface-0-rgb: 30 30 46; /* Catppuccin Base */
+    --surface-1: rgb(24 24 37); /* Catppuccin Mantle */
+    --surface-2: rgb(49 50 68); /* Catppuccin Surface0 */
+    --surface-3: rgb(69 71 90); /* Catppuccin Surface1 */
 }
 
 /*
@@ -305,80 +305,104 @@
     --logger-scriptlet-surface: rgb(var(--yellow-30) / 50%);
 }
 
+/*
+ * uBlockForge: Catppuccin Mocha dark theme
+ * Based on https://github.com/catppuccin/catppuccin
+ *
+ * Catppuccin Mocha palette:
+ *   Base:     #1e1e2e  (30 30 46)
+ *   Mantle:   #181825  (24 24 37)
+ *   Crust:    #11111b  (17 17 27)
+ *   Surface0: #313244  (49 50 68)
+ *   Surface1: #45475a  (69 71 90)
+ *   Surface2: #585b70  (88 91 112)
+ *   Overlay0: #6c7086  (108 112 134)
+ *   Text:     #cdd6f4  (205 214 244)
+ *   Subtext1: #bac2de  (186 194 222)
+ *   Subtext0: #a6adc8  (166 173 200)
+ *   Blue:     #89b4fa  (137 180 250)
+ *   Lavender: #b4befe  (180 190 254)
+ *   Green:    #a6e3a1  (166 227 161)
+ *   Red:      #f38ba8  (243 139 168)
+ *   Peach:    #fab387  (250 179 135)
+ *   Mauve:    #cba6f7  (203 166 247)
+ *   Teal:     #94e2d5  (148 226 213)
+ *   Yellow:   #f9e2af  (249 226 175)
+ */
 /* https://material.io/design/color/dark-theme.html */
 :root.dark {
-    --elevation-down-surface: black;
+    --elevation-down-surface: #11111b;
     --elevation-down1-opacity: 16%;
     --elevation-down2-opacity: 32%;
-    --elevation-up-surface: white;
-    --elevation-up1-opacity: 12%;
-    --elevation-up2-opacity: 24%;
+    --elevation-up-surface: #cdd6f4;
+    --elevation-up1-opacity: 10%;
+    --elevation-up2-opacity: 20%;
 
-    --ink-rgb: var(--gray-95);
-    --ink-0: white;
-    --ink-100: black;
+    --ink-rgb: 205 214 244; /* Catppuccin Text */
+    --ink-0: #cdd6f4;
+    --ink-100: #11111b;
 
-    --border-1: rgb(var(--gray-35));
-    --border-2: rgb(var(--gray-40));
-    --border-3: rgb(var(--gray-45));
-    --border-4: rgb(var(--gray-50));
+    --border-1: rgb(49 50 68); /* Surface0 */
+    --border-2: rgb(69 71 90); /* Surface1 */
+    --border-3: rgb(88 91 112); /* Surface2 */
+    --border-4: rgb(108 112 134); /* Overlay0 */
 
-    --accent-surface-1: rgb(var(--primary-70));
+    --accent-surface-1: rgb(137 180 250); /* Blue */
 
-    --link-ink: rgb(var(--primary-70));
-    --link-hover-ink: rgb(var(--primary-80));
+    --link-ink: rgb(137 180 250); /* Blue */
+    --link-hover-ink: rgb(180 190 254); /* Lavender */
 
     /* buttons */
-    --button-surface-rgb: var(--gray-30);
+    --button-surface-rgb: 49 50 68; /* Surface0 */
 
-    --dashboard-tab-active-ink-rgb: var(--primary-70);
-    --dashboard-tab-focus-surface-rgb: var(--primary-20);
-    --dashboard-highlight-surface-rgb: var(--primary-20);
+    --dashboard-tab-active-ink-rgb: 137 180 250; /* Blue */
+    --dashboard-tab-focus-surface-rgb: 30 30 46; /* Base */
+    --dashboard-highlight-surface-rgb: 49 50 68; /* Surface0 */
 
     /* popup panel */
-    --popup-cell-cname-ink: #93a6ff; /* h260 S:100 Luv:70 */;
-    --popup-cell-label-mixed-surface: hsla(45, 100%, 38%, 1); /* TODO: fix */
-    --popup-icon-x-ink: rgb(var(--red-50));
-    --popup-power-ink-rgb: var(--primary-60);
+    --popup-cell-cname-ink: #89b4fa; /* Blue */
+    --popup-cell-label-mixed-surface: #f9e2af; /* Yellow */
+    --popup-icon-x-ink: rgb(243 139 168); /* Red */
+    --popup-power-ink-rgb: 137 180 250; /* Blue */
 
     /* cloud widget */
-    --cloud-total-used-surface: rgb(var(--violet-20) / 25%);
-    --cloud-used-surface: rgb(var(--violet-20));
+    --cloud-total-used-surface: rgb(203 166 247 / 25%); /* Mauve */
+    --cloud-used-surface: rgb(203 166 247); /* Mauve */
 
     /* misc */
-    --error-surface: #ff5354; /* h:12 S:100 Luv:60 */
+    --error-surface: #f38ba8; /* Red */
 
     /* codemirror */
-    --cm-active-line: rgb(var(--gray-20));
-    --cm-merge-copy-ink: rgb(var(--blue-30));
-    --cm-foldmarker-ink: rgb(var(--blue-20));
-    --cm-matchingbracket: rgb(var(--green-30) / 50%);
-    --cm-negative: #ff8982; /* h:15 S:100 Luv:70 */
-    --cm-positive: #00c634; /* h:130 S:100 Luv:70 */
-    --cm-selection-surface: rgb(var(--gray-40));
-    --cm-selection-focused-surface: rgb(var(--primary-40));
-    --cm-searching-ink: black;
-    --cm-searching-surface: #fee300cc /* h75 S:100 Luv:90 a:80% */;
+    --cm-active-line: rgb(49 50 68); /* Surface0 */
+    --cm-merge-copy-ink: rgb(137 180 250); /* Blue */
+    --cm-foldmarker-ink: rgb(148 226 213); /* Teal */
+    --cm-matchingbracket: rgb(166 227 161 / 40%); /* Green */
+    --cm-negative: #f38ba8; /* Red */
+    --cm-positive: #a6e3a1; /* Green */
+    --cm-selection-surface: rgb(69 71 90); /* Surface1 */
+    --cm-selection-focused-surface: rgb(137 180 250 / 30%); /* Blue */
+    --cm-searching-ink: #11111b;
+    --cm-searching-surface: rgb(249 226 175 / 80%); /* Yellow */
 
     /* syntax highlight: static filtering */
     --sf-comment-ink: var(--ink-3);
-    --sf-def-ink: #a2a2ff; /* h:266 S:100 Luv:70 */
-    --sf-error-ink: #ff8981; /* h15 S:100 Luv:70 */
-    --sf-error-surface: #ff898166; /* h15 S:100 Luv:70 @ 40% */
-    --sf-keyword-ink: #d78dff; /* h:290 S:100 Luv:70 */
-    --sf-tag-ink: #00c559 /* h:135 S:100 Luv:70 */;
-    --sf-value-ink: #ff8d48 /* h:30 S:100 Luv:70 */;
+    --sf-def-ink: #b4befe; /* Lavender */
+    --sf-error-ink: #f38ba8; /* Red */
+    --sf-error-surface: rgba(243, 139, 168, 0.25); /* Red */
+    --sf-keyword-ink: #cba6f7; /* Mauve */
+    --sf-tag-ink: #a6e3a1; /* Green */
+    --sf-value-ink: #fab387; /* Peach */
     --sf-variable-ink: var(--ink-1);
-    --sf-warning-ink: #e49d00; /* h:50 S:100 Luv:70 */
-    --sf-warning-surface: #e49d0066; /* h:50 S:100 Luv:50 @ 40% */
+    --sf-warning-ink: #f9e2af; /* Yellow */
+    --sf-warning-surface: rgba(249, 226, 175, 0.25); /* Yellow */
 
     /* syntax highlight: dynamic filtering */
     --df-noop-ink: var(--ink-3);
 
     /* logger */
-    --logger-modified-surface: #663efd60;
-    --logger-redirected-surface: rgb(var(--yellow-5) / 40%);
-    --logger-scriptlet-surface: rgb(var(--yellow-30) / 40%);
+    --logger-modified-surface: rgba(203, 166, 247, 0.35); /* Mauve */
+    --logger-redirected-surface: rgba(249, 226, 175, 0.3); /* Yellow */
+    --logger-scriptlet-surface: rgba(249, 226, 175, 0.3); /* Yellow */
 }
 
 :root.dark {
@@ -483,12 +507,12 @@
 }
 
 :root.dark:not(.colorBlind) {
-    --popup-cell-allow-own-surface-rgb:   0 153   0; /* h:127.7 S:100 Luv:55 */
-    --popup-cell-allow-surface-rgb:      73 117  73; /* h:127.7 S:50  Luv:45 */
-    --popup-cell-block-own-surface-rgb: 255  40  40; /* h:12.2  S:100 Luv:55 */
-    --popup-cell-block-surface-rgb:     175  74  74; /* h:12.2  S:50  Luv:45 */
-    --popup-cell-noop-own-surface-rgb:  132 132 132; /* h:0     S:0   Luv:55 */
-    --popup-cell-noop-surface-rgb:       94  94  94; /* h:0     S:0   Luv:40 */
+    --popup-cell-allow-own-surface-rgb: 166 227 161; /* Catppuccin Green */
+    --popup-cell-allow-surface-rgb:      64 100  62; /* Green dimmed */
+    --popup-cell-block-own-surface-rgb: 243 139 168; /* Catppuccin Red */
+    --popup-cell-block-surface-rgb:     120  60  75; /* Red dimmed */
+    --popup-cell-noop-own-surface-rgb:  108 112 134; /* Catppuccin Overlay0 */
+    --popup-cell-noop-surface-rgb:       69  71  90; /* Catppuccin Surface1 */
 }
 
 /*

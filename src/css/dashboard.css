@@ -118,3 +118,19 @@ body.noDashboard #dashboard-nav {
 :root.mobile #dashboard-nav .logo {
     display: none;
     }
+
+/* uBlockForge: Catppuccin dashboard polish */
+:root.dark #dashboard-nav {
+    background: linear-gradient(180deg, rgb(24 24 37) 0%, rgb(30 30 46) 100%);
+    border-bottom-color: rgb(49 50 68);
+    }
+:root.dark .tabButton.selected {
+    border-bottom-color: rgb(137 180 250);
+    }
+:root.dark .tabButton:not(.selected):hover {
+    background-color: rgb(49 50 68 / 60%);
+    }
+:root.dark ::-webkit-scrollbar { width: 6px; }
+:root.dark ::-webkit-scrollbar-track { background: rgb(24 24 37); }
+:root.dark ::-webkit-scrollbar-thumb { background: rgb(69 71 90); border-radius: 3px; }
+:root.dark ::-webkit-scrollbar-thumb:hover { background: rgb(108 112 134); }
