@@ -20,15 +20,16 @@
 */
 
 function getActualTheme(nominalTheme) {
-    let theme = nominalTheme || 'light';
+    // uBlockForge: dark theme is always the default
+    let theme = nominalTheme || 'dark';
     if ( nominalTheme === 'auto' ) {
         if ( typeof self.matchMedia === 'function' ) {
-            const mql = self.matchMedia('(prefers-color-scheme: dark)');
+            const mql = self.matchMedia('(prefers-color-scheme: light)');
             theme = mql instanceof Object && mql.matches === true
-                ? 'dark'
-                : 'light';
+                ? 'light'
+                : 'dark';
         } else {
-            theme = 'light';
+            theme = 'dark';
         }
     }
     return theme;
