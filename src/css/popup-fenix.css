@@ -777,3 +777,40 @@ body:not([data-more*="e"]) [data-more="e"] {
     background-color: var(--surface-2);
     /* background-color: var(--popup-toolbar-surface-hover); */
     }
+
+/* uBlockForge: premium polish */
+:root.dark #sticky {
+    background: linear-gradient(180deg, rgb(24 24 37 / 95%) 0%, rgb(30 30 46 / 90%) 100%);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    }
+:root.dark #hostname {
+    background: linear-gradient(135deg, rgb(137 180 250 / 12%) 0%, rgb(203 166 247 / 8%) 100%);
+    border-radius: 6px;
+    margin: 0 4px;
+    }
+:root.dark .toolRibbon {
+    background: linear-gradient(135deg, rgb(49 50 68 / 60%) 0%, rgb(69 71 90 / 40%) 100%);
+    }
+:root.dark .toolRibbon .tool:hover {
+    background-color: rgb(137 180 250 / 15%);
+    border-radius: 4px;
+    }
+:root.dark #switch {
+    transition: fill 200ms ease, stroke 200ms ease;
+    }
+:root.dark body:not(.off) #switch {
+    filter: drop-shadow(0 0 8px rgb(137 180 250 / 30%));
+    }
+:root.dark .rulesetTools [id]:hover {
+    background-color: rgb(137 180 250 / 15%);
+    }
+:root.dark #moreOrLess > span {
+    transition: background-color 150ms ease;
+    }
+
+/* Scrollbar styling for dark mode */
+:root.dark ::-webkit-scrollbar { width: 6px; }
+:root.dark ::-webkit-scrollbar-track { background: rgb(24 24 37); }
+:root.dark ::-webkit-scrollbar-thumb { background: rgb(69 71 90); border-radius: 3px; }
+:root.dark ::-webkit-scrollbar-thumb:hover { background: rgb(108 112 134); }
