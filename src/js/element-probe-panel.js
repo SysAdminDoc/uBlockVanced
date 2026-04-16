@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlockVanced - Element Probe Panel v0.2.4
+    uBlockVanced - Element Probe Panel v0.2.5
 
     Deep element inspection panel for Chrome DevTools.
     Generates robust CSS selectors AND procedural cosmetic filters for elements
@@ -25,9 +25,18 @@
 (function() {
 
 const $ = id => document.getElementById(id);
+
+// Set to true once the panel window unloads so async callbacks (devtools eval,
+// storage, sendMessage) skip UI updates instead of touching a detached DOM.
+let panelClosed = false;
+window.addEventListener('pagehide', () => { panelClosed = true; }, { once: true });
+window.addEventListener('unload', () => { panelClosed = true; }, { once: true });
+
 const MAX_LOG_ENTRIES = 120;
 const log = (msg, type = '') => {
+    if (panelClosed) { return; }
     const el = $('log');
+    if (!el) { return; }
     const entry = document.createElement('div');
     entry.className = 'log-entry' + (type ? ' ' + type : '');
     entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
@@ -55,10 +64,14 @@ const MAX_HISTORY = 50;
 /******************************************************************************/
 
 const setStatus = (text, state = '') => {
-    $('statusText').textContent = text;
+    if (panelClosed) { return; }
+    const statusText = $('statusText');
+    if (statusText) { statusText.textContent = text; }
     const dot = $('statusDot');
-    dot.className = 'status-dot';
-    if (state) dot.classList.add(state);
+    if (dot) {
+        dot.className = 'status-dot';
+        if (state) { dot.classList.add(state); }
+    }
     const indicator = document.querySelector('.status-indicator');
     if (indicator) {
         indicator.dataset.state = state || 'idle';
@@ -288,18 +301,31 @@ async function saveHistory() {
 }
 
 function addToHistory(filter, selector, hostname) {
-    const entry = {
-        filter,
-        selector,
-        hostname,
-        timestamp: Date.now(),
-        active: true
-    };
-    // Deduplicate
-    filterHistory = filterHistory.filter(h => h.filter !== filter);
-    filterHistory.unshift(entry);
+    // Find an existing entry with the same filter text. If one exists, keep
+    // its spot and just update metadata/status — this avoids the previous
+    // pattern of deleting the old entry + prepending a new one (which, if
+    // the persist failed mid-way, would silently drop the old record).
+    const existingIdx = filterHistory.findIndex(h => h.filter === filter);
+    const now = Date.now();
+    if (existingIdx !== -1) {
+        const existing = filterHistory[existingIdx];
+        existing.selector = selector;
+        existing.hostname = hostname;
+        existing.timestamp = now;
+        existing.active = true;
+        filterHistory.splice(existingIdx, 1);
+        filterHistory.unshift(existing);
+    } else {
+        filterHistory.unshift({
+            filter,
+            selector,
+            hostname,
+            timestamp: now,
+            active: true,
+        });
+    }
     if (filterHistory.length > MAX_HISTORY) {
-        filterHistory = filterHistory.slice(0, MAX_HISTORY);
+        filterHistory.length = MAX_HISTORY;
     }
     saveHistory();
     renderHistory();
@@ -368,50 +394,62 @@ function renderHistory() {
     updateWorkflowSummary();
 }
 
+function unhideOnPage(selector) {
+    // Strip the inline `display: none !important` we set when applying the
+    // filter. This is best-effort — page may have navigated or the element
+    // may no longer match — so swallow errors and return a count.
+    const code = `
+        (function() {
+            try {
+                var sel = ${JSON.stringify(selector)};
+                var els = document.querySelectorAll(sel);
+                for (var i = 0; i < els.length; i++) {
+                    els[i].style.removeProperty('display');
+                }
+                return els.length;
+            } catch(e) { return -1; }
+        })()`;
+    return evalInPage(code).catch(() => -1);
+}
+
+function sendMessageAsync(msg) {
+    // Promise wrapper around chrome.runtime.sendMessage. Resolves with
+    // { ok: bool, response, error } instead of rejecting so callers don't
+    // need try/catch around the call-and-wait.
+    return new Promise(resolve => {
+        try {
+            chrome.runtime.sendMessage(msg, response => {
+                const err = chrome.runtime.lastError;
+                if (err) { resolve({ ok: false, error: err.message || String(err) }); }
+                else { resolve({ ok: true, response }); }
+            });
+        } catch (e) {
+            resolve({ ok: false, error: e && e.message || String(e) });
+        }
+    });
+}
+
 async function undoFilter(idx) {
     const entry = filterHistory[idx];
-    if (!entry) return;
+    if (!entry) { return; }
 
-    // Remove the filter from uBlock's user filters
-    try {
-        chrome.runtime.sendMessage({
-            what: 'removeUserFilter',
-            filters: entry.filter,
-        }, () => {
-            if (chrome.runtime.lastError) {
-                // Fallback: un-hide elements on the page directly
-                evalInPage(`
-                    (function() {
-                        try {
-                            var sel = ${JSON.stringify(entry.selector)};
-                            var els = document.querySelectorAll(sel);
-                            for (var i = 0; i < els.length; i++) {
-                                els[i].style.removeProperty('display');
-                            }
-                            return els.length;
-                        } catch(e) { return -1; }
-                    })()
-                `).then(count => {
-                    log('Un-hid ' + count + ' element(s) on page (filter not removed from list -- remove manually)', 'info');
-                });
-            } else {
-                log('Filter removed from user filter list: ' + entry.filter, 'success');
-            }
-        });
-    } catch(e) {
-        // Direct page un-hide
-        await evalInPage(`
-            (function() {
-                try {
-                    var sel = ${JSON.stringify(entry.selector)};
-                    var els = document.querySelectorAll(sel);
-                    for (var i = 0; i < els.length; i++) {
-                        els[i].style.removeProperty('display');
-                    }
-                } catch(e) {}
-            })()
-        `);
-        log('Un-hid elements on page. Remove filter manually: ' + entry.filter, 'info');
+    const result = await sendMessageAsync({
+        what: 'removeUserFilter',
+        filters: entry.filter,
+        docURL: currentPageUrl || undefined,
+    });
+    if (panelClosed) { return; }
+
+    if (result.ok) {
+        log('Filter removed from user filter list: ' + entry.filter, 'success');
+    } else {
+        // Fallback: un-hide elements in the page directly so the user at
+        // least sees the element return. Remind them the list still holds
+        // the filter.
+        const count = await unhideOnPage(entry.selector);
+        if (panelClosed) { return; }
+        const countStr = (count === -1) ? '0' : String(count);
+        log('Un-hid ' + countStr + ' element(s) on page (filter not removed from list — remove manually)', 'info');
     }
 
     entry.active = false;
@@ -421,18 +459,22 @@ async function undoFilter(idx) {
 
 async function reapplyFilter(idx) {
     const entry = filterHistory[idx];
-    if (!entry) return;
+    if (!entry) { return; }
 
     try {
         const count = await evalInPage(HIDE_ELEMENT_SCRIPT(entry.selector));
+        if (panelClosed) { return; }
         if (count > 0) {
             log('Re-applied: hid ' + count + ' element(s)', 'success');
         }
-        persistFilter(entry.filter);
+        // Wait for the persist round-trip so the history state matches
+        // what was actually written to the user filter list.
+        await persistFilter(entry.filter);
     } catch(e) {
         log('Re-apply failed: ' + e, 'error');
     }
 
+    if (panelClosed) { return; }
     entry.active = true;
     saveHistory();
     renderHistory();
@@ -443,16 +485,25 @@ async function reapplyFilter(idx) {
 /******************************************************************************/
 
 function persistFilter(filter) {
-    chrome.runtime.sendMessage({
-        what: 'createUserFilter',
-        autoComment: true,
-        filters: filter,
-        docURL: currentPageUrl || undefined,
-    }, (response) => {
-        if (chrome.runtime.lastError) {
-            log('Could not persist to filter list (copy and add manually)', 'info');
-        } else {
-            log('Filter persisted to user filter list', 'success');
+    return new Promise(resolve => {
+        try {
+            chrome.runtime.sendMessage({
+                what: 'createUserFilter',
+                autoComment: true,
+                filters: filter,
+                docURL: currentPageUrl || undefined,
+            }, () => {
+                if (panelClosed) { resolve(false); return; }
+                if (chrome.runtime.lastError) {
+                    log('Could not persist to filter list (copy and add manually)', 'info');
+                    resolve(false);
+                } else {
+                    log('Filter persisted to user filter list', 'success');
+                    resolve(true);
+                }
+            });
+        } catch (_) {
+            resolve(false);
         }
     });
 }
@@ -1119,7 +1170,21 @@ async function inspectSelected() {
 
     try {
         const raw = await evalInPage(INSPECT_SCRIPT);
-        const data = JSON.parse(raw);
+        if (panelClosed) { return; }
+        let data;
+        try {
+            data = JSON.parse(raw);
+        } catch (_) {
+            log('Inspector payload was not valid JSON (page may have navigated mid-scan)', 'error');
+            setStatus('Error', 'error');
+            return;
+        }
+
+        if (!data || typeof data !== 'object') {
+            log('Inspector returned no data', 'error');
+            setStatus('Error', 'error');
+            return;
+        }
 
         if (data.error) {
             log(data.error, 'error');
@@ -1127,25 +1192,35 @@ async function inspectSelected() {
             return;
         }
 
+        // Normalize potentially-missing fields so the rest of the UI never
+        // crashes on older/partial payloads.
+        const selectors = Array.isArray(data.selectors) ? data.selectors : [];
+        const proceduralFilters = Array.isArray(data.proceduralFilters) ? data.proceduralFilters : [];
+        if (!Array.isArray(data.classes)) { data.classes = []; }
+        if (!data.attrs || typeof data.attrs !== 'object') { data.attrs = {}; }
+        data.selectors = selectors;
+        data.proceduralFilters = proceduralFilters;
+
         lastInspectedData = data;
         currentHostname = data.hostname || '';
         currentPageUrl = data.pageUrl || '';
 
         displayElementInfo(data);
-        displaySelectors(data.selectors);
-        displayProceduralFilters(data.proceduralFilters);
+        displaySelectors(selectors);
+        displayProceduralFilters(proceduralFilters);
 
-        $('emptyState').style.display = 'none';
-        $('elementSection').style.display = '';
-        $('selectorSection').style.display = '';
-        if (data.proceduralFilters.length > 0) {
-            $('proceduralSection').style.display = '';
-        }
-        $('filterSection').style.display = '';
+        const hide = id => { const el = $(id); if (el) { el.style.display = 'none'; } };
+        const show = id => { const el = $(id); if (el) { el.style.display = ''; } };
+        hide('emptyState');
+        show('elementSection');
+        show('selectorSection');
+        if (proceduralFilters.length > 0) { show('proceduralSection'); }
+        show('filterSection');
 
         setStatus('Element inspected', 'active');
-        log(`Inspected <${data.tag}> - ${data.selectors.length} selectors, ${data.proceduralFilters.length} procedural filters`, 'success');
+        log(`Inspected <${data.tag}> - ${selectors.length} selectors, ${proceduralFilters.length} procedural filters`, 'success');
     } catch (err) {
+        if (panelClosed) { return; }
         log('Inspection failed: ' + (err.message || String(err)), 'error');
         setStatus('Error', 'error');
     } finally {
@@ -1154,36 +1229,37 @@ async function inspectSelected() {
 }
 
 function displayElementInfo(data) {
-    $('elTag').textContent = '<' + data.tag + '>';
-    $('elId').textContent = data.id || '(none)';
-    $('elClasses').textContent = data.classes.length > 0 ? data.classes.join(' ') : '(none)';
+    setText('elTag', '<' + (data.tag || '?') + '>');
+    setText('elId', data.id || '(none)');
+    setText('elClasses', data.classes.length > 0 ? data.classes.join(' ') : '(none)');
 
     const attrKeys = Object.keys(data.attrs);
-    $('elAttrs').textContent = attrKeys.length > 0
+    setText('elAttrs', attrKeys.length > 0
         ? attrKeys.map(k => k + '="' + data.attrs[k] + '"').join(', ')
-        : '(none)';
+        : '(none)');
 
-    $('elDims').textContent = data.rect ? data.rect.w + ' x ' + data.rect.h + ' px' : '--';
-    $('elVisibility').textContent = data.visibility || '--';
-    $('elPosition').textContent = data.position || '--';
-    $('elComputed').textContent = data.computed || '--';
+    setText('elDims', data.rect ? data.rect.w + ' x ' + data.rect.h + ' px' : '--');
+    setText('elVisibility', data.visibility || '--');
+    setText('elPosition', data.position || '--');
+    setText('elComputed', data.computed || '--');
 
-    // Text content display
-    const textEl = $('elText');
-    if (textEl) {
-        textEl.textContent = data.textContent ? data.textContent.substring(0, 100) + (data.textContent.length > 100 ? '...' : '') : '(none)';
-    }
+    setText('elText', data.textContent
+        ? data.textContent.substring(0, 100) + (data.textContent.length > 100 ? '...' : '')
+        : '(none)');
 
-    const selectorSummary = [data.tag];
-    if (data.id) selectorSummary.push('#' + data.id);
-    if (data.classes && data.classes.length > 0) selectorSummary.push('.' + data.classes[0]);
+    const selectorSummary = [data.tag || '?'];
+    if (data.id) { selectorSummary.push('#' + data.id); }
+    if (data.classes.length > 0) { selectorSummary.push('.' + data.classes[0]); }
     setSelectionSummary(`${selectorSummary.join('')} on ${data.hostname || 'the current page'}`);
 
-    if (data.inShadowDOM) {
-        $('shadowBadge').style.display = '';
-        $('shadowBadge').title = 'Host: ' + data.shadowHost;
-    } else {
-        $('shadowBadge').style.display = 'none';
+    const shadowBadge = $('shadowBadge');
+    if (shadowBadge) {
+        if (data.inShadowDOM) {
+            shadowBadge.style.display = '';
+            shadowBadge.title = 'Host: ' + (data.shadowHost || 'unknown');
+        } else {
+            shadowBadge.style.display = 'none';
+        }
     }
 }
 
@@ -1443,24 +1519,29 @@ $('btnApplyFilter').addEventListener('click', async () => {
     const isProcedural = /:has-text|:upward|:matches-path|:not\(:has-text\(/.test(rawSelector);
 
     // For procedural filters, we can't use querySelectorAll to preview,
-    // but uBlock will handle them natively when persisted
+    // but uBlock will handle them natively when persisted.
     if (isProcedural) {
         log('Procedural filter detected. Persisting to uBlock...', 'info');
-        persistFilter(filter);
-        addToHistory(filter, rawSelector, currentHostname);
-        log('Procedural filter saved. Reload the page for it to take effect.', 'success');
+        const ok = await persistFilter(filter);
+        if (ok) {
+            addToHistory(filter, rawSelector, currentHostname);
+            log('Procedural filter saved. Reload the page for it to take effect.', 'success');
+        }
         setBusy('btnApplyFilter', false);
         return;
     }
 
-    // Standard CSS filter - apply immediately + persist
+    // Standard CSS filter - apply immediately + persist.
     try {
         const count = await evalInPage(HIDE_ELEMENT_SCRIPT(rawSelector));
+        if (panelClosed) { return; }
 
         if (count > 0) {
             log(`Applied filter: hid ${count} element(s)`, 'success');
-            persistFilter(filter);
-            addToHistory(filter, rawSelector, currentHostname);
+            const ok = await persistFilter(filter);
+            if (ok) {
+                addToHistory(filter, rawSelector, currentHostname);
+            }
         } else if (count === 0) {
             log('No elements matched the selector', 'error');
         } else {
@@ -1544,16 +1625,29 @@ if (btnClearHistory) {
 const btnClearLog = $('btnClearLog');
 if (btnClearLog) {
     btnClearLog.addEventListener('click', () => {
-        $('log').textContent = '';
+        const el = $('log');
+        if (el) {
+            while (el.firstChild) { el.firstChild.remove(); }
+        }
         log('Activity log cleared', 'info');
     });
 }
 
-// Listen for element selection changes in the Elements panel
+// Listen for element selection changes in the Elements panel. DevTools can
+// fire this rapidly (e.g. holding arrow keys in the Elements tree); debounce
+// so we don't stack up in-flight `evalInPage` calls that resolve against
+// stale state.
 if (chrome.devtools && chrome.devtools.panels && chrome.devtools.panels.elements) {
+    let selectionChangeTimer = null;
     chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
-        log('Element selection changed', 'info');
-        inspectSelected();
+        if (panelClosed) { return; }
+        if (selectionChangeTimer !== null) { clearTimeout(selectionChangeTimer); }
+        selectionChangeTimer = setTimeout(() => {
+            selectionChangeTimer = null;
+            if (panelClosed) { return; }
+            log('Element selection changed', 'info');
+            inspectSelected();
+        }, 120);
     });
 }
 
@@ -1648,23 +1742,37 @@ $('btnRefreshFrames').addEventListener('click', async () => {
     log('Found ' + frames.length + ' iframe(s)', frames.length > 0 ? 'success' : 'info');
 });
 
-// Handle page navigation — reset panel state
-if ( chrome.devtools.inspectedWindow.onNavigated ) {
-    chrome.devtools.inspectedWindow.onNavigated.addListener(() => {
+// Handle page navigation — reset panel state. Guarded against double-install
+// so reopening/reloading the panel doesn't stack listeners that fire against
+// detached DOM. (The panel script is already an IIFE, but DevTools can
+// recreate the panel document without reloading the background, leaving a
+// prior listener alive.)
+if (
+    chrome.devtools &&
+    chrome.devtools.inspectedWindow &&
+    chrome.devtools.inspectedWindow.onNavigated &&
+    !window.__elementProbe_navListenerInstalled__
+) {
+    window.__elementProbe_navListenerInstalled__ = true;
+    const onNav = () => {
+        if (panelClosed) { return; }
         lastInspectedData = null;
         currentSelectors = [];
         selectedSelectorIndex = -1;
         currentFrameUrl = '';
         isHighlighting = false;
-        $('emptyState').style.display = '';
-        $('elementSection').style.display = 'none';
-        $('selectorSection').style.display = 'none';
-        $('proceduralSection').style.display = 'none';
-        $('filterSection').style.display = 'none';
-        $('filterOutput').value = '';
+        const hide = id => { const el = $(id); if (el) { el.style.display = 'none'; } };
+        const show = id => { const el = $(id); if (el) { el.style.display = ''; } };
+        show('emptyState');
+        hide('elementSection');
+        hide('selectorSection');
+        hide('proceduralSection');
+        hide('filterSection');
+        const fo = $('filterOutput');
+        if (fo) { fo.value = ''; }
         const select = $('frameTarget');
         if (select) {
-            while (select.options.length > 1) select.remove(1);
+            while (select.options.length > 1) { select.remove(1); }
             select.value = '';
         }
         setStatus('Page navigated', 'idle');
@@ -1672,14 +1780,15 @@ if ( chrome.devtools.inspectedWindow.onNavigated ) {
         syncFilterActions();
         log('Page navigated — state reset', 'info');
         scanFrames();
-    });
+    };
+    chrome.devtools.inspectedWindow.onNavigated.addListener(onNav);
 }
 
 // Initialize
 loadHistory();
 scanFrames(); // auto-detect iframes on panel open
 syncLogState();
-log('Element Probe v0.2.4 initialized', 'info');
+log('Element Probe v0.2.5 initialized', 'info');
 setStatus('Ready');
 setSelectionSummary('No element selected yet.');
 syncFilterActions();

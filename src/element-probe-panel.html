@@ -17,7 +17,7 @@
             <p class="panel-eyebrow">uBlockVanced DevTools</p>
             <div class="heading-row">
                 <h1>Element Probe</h1>
-                <span class="version">v0.2.4</span>
+                <span class="version">v0.2.5</span>
             </div>
             <p class="panel-subtitle">Generate resilient selectors and cosmetic filters for shadow DOM, dynamic class names, live chat overlays, and other stubborn page elements.</p>
         </div>
@@ -60,10 +60,10 @@
         </div>
         <div class="section-body">
             <div class="inspect-controls">
-                <button class="btn primary" id="btnInspectSelected">Inspect selection</button>
-                <button class="btn" id="btnInspectPoint">Pick on page</button>
-                <button class="btn" id="btnScanShadow">Scan shadow DOM</button>
-                <button class="btn" id="btnScanIframes">Scan iframes</button>
+                <button type="button" class="btn primary" id="btnInspectSelected">Inspect selection</button>
+                <button type="button" class="btn" id="btnInspectPoint">Pick on page</button>
+                <button type="button" class="btn" id="btnScanShadow">Scan shadow DOM</button>
+                <button type="button" class="btn" id="btnScanIframes">Scan iframes</button>
             </div>
             <div class="control-row">
                 <div class="frame-field">
@@ -71,7 +71,7 @@
                     <select id="frameTarget" class="control-select">
                         <option value="">Top document</option>
                     </select>
-                    <button class="btn-mini" id="btnRefreshFrames" title="Refresh iframe list">Refresh</button>
+                    <button type="button" class="btn-mini" id="btnRefreshFrames" title="Refresh iframe list">Refresh</button>
                 </div>
                 <label class="preview-toggle" for="chkLivePreview">
                     <input type="checkbox" id="chkLivePreview" checked>
@@ -150,10 +150,10 @@
                 <span class="filter-hint-text" id="filterHintText">Choose a selector or procedural filter to build a rule.</span>
             </div>
             <div class="filter-actions">
-                <button class="btn success" id="btnApplyFilter">Save filter</button>
-                <button class="btn" id="btnCopyFilter">Copy</button>
-                <button class="btn" id="btnTestFilter">Preview</button>
-                <button class="btn danger" id="btnRemoveFilter">Clear preview</button>
+                <button type="button" class="btn success" id="btnApplyFilter">Save filter</button>
+                <button type="button" class="btn" id="btnCopyFilter">Copy</button>
+                <button type="button" class="btn" id="btnTestFilter">Preview</button>
+                <button type="button" class="btn danger" id="btnRemoveFilter">Clear preview</button>
             </div>
         </div>
     </div>
@@ -167,7 +167,7 @@
             </div>
             <span style="display:flex;align-items:center;gap:8px;">
                 <span id="historyCount" class="section-meta">0 filters</span>
-                <button class="btn-mini danger" id="btnClearHistory">Clear</button>
+                <button type="button" class="btn-mini danger" id="btnClearHistory">Clear</button>
             </span>
         </div>
         <div class="section-body" style="padding:0;">
@@ -190,7 +190,7 @@
                 <span class="section-title">Activity log</span>
                 <span class="section-subtitle">Recent actions and results from this panel.</span>
             </div>
-            <button class="btn-mini" id="btnClearLog">Clear</button>
+            <button type="button" class="btn-mini" id="btnClearLog">Clear</button>
         </div>
         <div class="section-body">
             <div id="log"></div>

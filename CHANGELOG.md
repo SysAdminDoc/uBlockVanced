@@ -1,3 +1,21 @@
+# uBlockVanced 0.2.5
+
+Correctness and reliability pass focused on the fork-specific custom code paths (Element Probe, context menu integration, user-filter messaging).
+
+- **Race fix — createUserFilter**: `messaging.js` `createUserFilter` now awaits `µb.createUserFilters` before invoking the response callback; `µb.createUserFilters` is now `async` and awaits `appendUserFilters`. Previously the callback fired *before* the filter was written, so a client that immediately reloaded the page (as the Element Probe flow does implicitly) could hit a race where the page loaded without the new rule.
+- **Race fix — context menu iframe targeting**: `ensureProbeListener` now injects into every frame (`allFrames: true`) with a top-frame fallback. Previously the listener was installed only in the top frame, so a right-click inside an iframe never marked `[data-ubp-ctx-target]`; the DevTools handler then fell back to the top-frame `<body>`, inspecting the wrong element.
+- **Panel-closed safety**: Element Probe panel sets a `panelClosed` flag on `pagehide`/`unload`. Every async callback (devtools `eval`, `sendMessage`, `storage.local`, clipboard, setTimeout) checks the flag before touching DOM, so late-resolving work no longer crashes against a detached document.
+- **Null safety in setStatus / setText / display helpers**: every `document.getElementById(...)` result is null-guarded. Prevents hard crash if the DevTools host delays panel DOM construction.
+- **Robust payload parsing**: `inspectSelected` wraps `JSON.parse` in its own try/catch and normalises missing `selectors`, `proceduralFilters`, `classes`, `attrs` — partial/older payloads render as best-effort instead of throwing.
+- **Idempotent navigation listener**: `chrome.devtools.inspectedWindow.onNavigated` is guarded by `window.__elementProbe_navListenerInstalled__`; panel recreation no longer stacks duplicate handlers.
+- **Debounced selection inspector**: `onSelectionChanged` debounced at 120 ms. Arrow-key scrolling through the Elements tree no longer piles up in-flight `evalInPage` calls that resolve against stale state.
+- **History deduplication no longer loses entries on failed save**: `addToHistory` updates the existing entry in place (selector / timestamp / active) before re-unshifting it; old code did `filter(…) + unshift(…)` which could drop the old record if the follow-up `saveHistory` or `persistFilter` failed mid-stream. `length = MAX_HISTORY` truncation avoids a fresh array allocation.
+- **persistFilter now awaitable**: returns a `Promise<boolean>`; both the Save button flow and `reapplyFilter` await the round-trip, so the `active` flag in history only flips true after the storage write actually completed.
+- **undoFilter rewrite**: new `sendMessageAsync` / `unhideOnPage` helpers replace the nested-promise-inside-callback pattern. `removeUserFilter` errors now surface cleanly, the page fallback runs deterministically, and `chrome.runtime.lastError` is consumed before logging.
+- **Explicit `type="button"` on all `<button>`s in `element-probe-panel.html`** — prevents accidental form submission behaviour and clarifies intent.
+
+----------
+
 # uBlockVanced 0.2.4
 
 - Accessibility: added `lang="en"` to every HTML document across `src/` (including web_accessible_resources: epicker-ui, click2load, dom-inspector, noop). Screen readers previously announced pages with no language declaration.
