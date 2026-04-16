@@ -1852,6 +1852,34 @@
     "message": "Could not filter properly at browser launch. Reload the page to ensure proper filtering.",
     "description": "A warning which will appear in the popup panel if needed"
   },
+  "noDashboardNotice": {
+    "message": "Your administrator removed the ability to access the dashboard.",
+    "description": "Shown when the dashboard is restricted by policy"
+  },
+  "supportPageLead": {
+    "message": "Documentation, issue reporting, and diagnostics in one place.",
+    "description": "Lead text shown below the Support page heading"
+  },
+  "cloudSyncSettings": {
+    "message": "Cloud sync settings",
+    "description": "Aria label for the cloud settings cog button"
+  },
+  "codeViewerReload": {
+    "message": "Reload current resource",
+    "description": "Aria label for the reload button in code viewer"
+  },
+  "codeViewerRemove": {
+    "message": "Remove current resource from history",
+    "description": "Aria label for the remove button in code viewer"
+  },
+  "docblockedToggleDetails": {
+    "message": "Show or hide URL details",
+    "description": "Aria label for the URL detail toggle on the blocked page"
+  },
+  "epickerMinimize": {
+    "message": "Minimize picker",
+    "description": "Aria label and title for the minimize button in the element picker"
+  },
   "dummy": {
     "message": "This entry must be the last one",
     "description": "so we dont need to deal with comma for last entry"

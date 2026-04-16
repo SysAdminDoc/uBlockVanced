@@ -1,185 +1,103 @@
-[![Badge Commits]][Commit Rate]
-[![Badge Issues]][Issues]
-[![Badge Localization]][Crowdin]
-[![Badge License]][License]
-[![Badge NPM]][NPM]
-[![Badge Mozilla]][Mozilla]
-[![Badge Chrome]][Chrome]
-[![Badge Edge]][Edge]
+<!-- codex-branding:start -->
+<p align="center"><img src="icon.png" width="128" alt="u Block Vanced"></p>
 
-***
+<p align="center">
+  <img alt="Version" src="https://img.shields.io/badge/version-preview-58A6FF?style=for-the-badge">
+  <img alt="License" src="https://img.shields.io/badge/license-GPL--3.0-4ade80?style=for-the-badge">
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Chrome%20Extension-58A6FF?style=for-the-badge">
+</p>
+<!-- codex-branding:end -->
 
-<h1 align="center">
-<sub>
-<img src="https://github.com/gorhill/uBlock/blob/master/src/img/ublock.svg" height="38" width="38">
-</sub>
-uBlock Origin (uBO)
-</h1>
+<p align="center">
+  <img src="src/img/icon_128.png" alt="uBlockVanced" width="80">
+</p>
 
-| Browser   | Install from ... | Status |
-| :-------: | ---------------- | ------ |
-| <img src="https://github.com/user-attachments/assets/b0136512-56a5-4856-8c50-4971c957a24f" alt="Get uBlock Origin for Firefox"> | <a href="https://addons.mozilla.org/addon/ublock-origin/">Firefox Add-ons</a> | [uBO works best on Firefox](https://github.com/gorhill/uBlock/wiki/uBlock-Origin-works-best-on-Firefox) |
-| <img src="https://github.com/user-attachments/assets/3a7569f8-688b-4eb1-a643-8d0fe173aefe" alt="Get uBlock Origin for Microsoft Edge"> | <a href="https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak">Edge Add-ons</a> |
-| <img src="https://github.com/user-attachments/assets/938f080c-fe64-4e48-8b89-4bfceabb56e6" alt="Get uBlock Origin for Opera"> | <a href="https://addons.opera.com/extensions/details/ublock/">Opera Add-ons</a> |
-| <img src="https://github.com/user-attachments/assets/5463ef88-873b-4516-8514-5277664cfde7" alt="Get uBlock Origin for Chromium"> | <a href="https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm">Chrome Web Store</a> | <a href="https://github.com/uBlockOrigin/uBlock-issues/wiki/About-Google-Chrome's-%22This-extension-may-soon-no-longer-be-supported%22">About Google Chrome's "This extension may soon no longer be supported"</a><br>End of support on Chrome 139 |
-| <img src="https://github.com/user-attachments/assets/2e9037c4-836d-44c1-a716-ba96e89daaff" alt="Get uBlock Origin for Thunderbird"> | <a href="https://addons.thunderbird.net/thunderbird/addon/ublock-origin/">Thunderbird Add-ons</a> | [No longer updated and stuck at 1.49.2.](https://github.com/uBlockOrigin/uBlock-issues/issues/2928) Later versions require "GitHub - Releases". |
-| <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Invertocat_Logo.svg" height="50" alt="Get uBlock Origin through GitHub"> | <a href="https://github.com/gorhill/uBlock/releases">GitHub - Releases</a> | Stable and development versions on Firefox, Chromium MV2, and Thunderbird. Must be placed manually into web browsers; the Chromium and Thunderbird versions usually won't auto-update.
+<h1 align="center">uBlockVanced v0.2.0</h1>
 
-***
+<p align="center">
+  Enhanced fork of <a href="https://github.com/gorhill/uBlock">uBlock Origin</a> (Manifest V2) with deep element inspection, procedural cosmetic filters, and Catppuccin Mocha dark theme.
+</p>
 
-uBlock Origin (uBO) is a CPU and memory-efficient [wide-spectrum content blocker][Blocking] for Chromium and Firefox. It blocks ads, trackers, coin miners, popups, annoying anti-blockers, malware sites, etc., by default using [EasyList][EasyList], [EasyPrivacy][EasyPrivacy], [Peter Lowe's Blocklist][Peter Lowe's Blocklist], [Online Malicious URL Blocklist][Malicious Blocklist], and uBO [filter lists][uBO Filters]. There are many other lists available to block even more. Hosts files are also supported. uBO uses the EasyList filter syntax and [extends][Extended Syntax] the syntax to work with custom rules and filters.
+<p align="center">
+  <img src="https://img.shields.io/badge/Manifest-V2-blue" alt="MV2">
+  <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7" alt="Catppuccin Mocha">
+  <img src="https://img.shields.io/badge/License-GPLv3-green" alt="GPLv3">
+</p>
 
-You may easily unselect any preselected filter lists if you think uBO blocks too much. For reference, Adblock Plus installs with only EasyList, ABP filters, and Acceptable Ads enabled by default.
+---
 
-It is important to note that using a blocker is **NOT** [theft]. Do not fall for this creepy idea. The _ultimate_ logical consequence of `blocking = theft` is the criminalization of the inalienable right to privacy.
+## What's Different
 
-Ads, "unintrusive" or not, are just the visible portion of the privacy-invading means entering your browser when you visit most sites. **uBO's primary goal is to help users neutralize these privacy-invading methods** in a way that welcomes those users who do not wish to use more technical means.
+uBlockVanced adds a **DevTools panel called Element Probe** that solves a specific problem: uBlock Origin's standard element picker can't select elements with obfuscated CSS classes, shadow DOM boundaries, or dynamic content like YouTube live chat banners.
 
-***
+### Element Probe Features
 
-* [Documentation](#documentation)
-* [Installation](#installation)
-  * [Firefox](#firefox)
-  * [Thunderbird](#thunderbird)
-  * [Chromium](#chromium)
-  * [All Programs](#all-programs)
-  * [Enterprise Deployment](#enterprise-deployment)
-* [Release History](#release-history)
-* [Translations](#translations)
-* [About](#about)
+- **Deep element inspection** via `chrome.devtools.inspectedWindow.eval()` -- bypasses content script limitations
+- **Procedural cosmetic filter generation**:
+  - `:has-text()` -- match elements by their text content (regex supported)
+  - `:upward(N)` / `:upward(selector)` -- target ancestor elements from a known child
+  - `:matches-path()` -- restrict filters to specific URL paths
+  - `:not(:has-text())` -- inverse text matching
+- **YouTube-specific selectors** for live chat banners, tickers, and custom elements with dynamic classes
+- **Shadow DOM scanning** and piercing selectors
+- **iframe detection** and analysis
+- **Smart class classification** -- distinguishes stable class names from obfuscated/dynamic ones (CSS-in-JS, styled-components, emotion, etc.)
+- **Filter history with undo** -- persisted in `chrome.storage.local`, revert applied filters
+- **Proper filter persistence** via uBlock's `createUserFilter` messaging channel
+- **Visual element picker** -- hover-to-highlight with `inspect()` integration to set `$0`
+- **Right-click context menu** -- "Inspect with Element Probe" on any page element
+- **Live preview** -- hover over generated selectors to highlight matching elements
 
-## Documentation
+### Theme
 
-<table>
-    <thead>
-        <tr>
-            <th>Basic Mode</th>
-            <th>Advanced Mode</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>The <a href="https://github.com/gorhill/uBlock/wiki/Quick-guide:-popup-user-interface">simple popup user interface</a> for an install-it-and-forget-it type of installation that is configured optimally by default.</td>
-            <td>The <a href="https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-quick-guide">advanced popup user interface</a> includes a point-and-click firewall that is configurable on a per-site basis.</td>
-        </tr>
-        <tr>
-            <td align="center" valign="top"><a href="https://github.com/gorhill/uBlock/wiki/Quick-guide:-popup-user-interface"><img src="https://user-images.githubusercontent.com/585534/232531044-c4ac4dd5-0b60-4c1e-aabb-914be04b846c.png"/></a></td>
-            <td align="center" valign="top"><a href="https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-quick-guide"><img src="https://user-images.githubusercontent.com/585534/232531439-a8f81cc3-6622-45c4-8b32-7348cecf6e98.png"/></a></td>
-        </tr>
-    </tbody>
-</table>
+Full **Catppuccin Mocha** dark theme applied across:
+- Element Probe DevTools panel
+- Element picker overlay (epicker)
+- Logger UI (all hardcoded colors replaced with theme-aware values)
+- DOM inspector
+- Filter list pages
+- Dynamic filtering dialog (allow/block/noop action colors)
 
-Visit the [Wiki][Wiki] for documentation.
+### Base
 
-For support, questions, or help, visit [/r/uBlockOrigin][Reddit].
+All standard uBlock Origin features remain intact -- ad blocking, filter lists, dynamic filtering, logger, cloud sync, etc.
 
 ## Installation
 
-[Required Permissions][Permissions]
+1. Clone: `git clone https://github.com/SysAdminDoc/uBlockVanced.git`
+2. Open `chrome://extensions/` in Chrome/Edge
+3. Enable **Developer mode**
+4. Click **Load unpacked** and select the `src/` directory
+5. Open DevTools (F12) on any page -- the **Element Probe** tab appears
 
-#### Firefox
+## Usage
 
-[Firefox Add-ons][Mozilla]
+### Element Probe (DevTools Panel)
 
-[Development Builds][Beta]
+1. Open DevTools (F12) on any page
+2. Navigate to the **Element Probe** tab
+3. Either:
+   - Select an element in the Elements panel, then click **Inspect Selected Element**
+   - Click **Pick from Page** to hover-and-click select directly
+4. Review generated **CSS Selectors** (standard) and **Procedural Filters** (`:has-text`, `:upward`, etc.)
+5. Click a selector/filter to populate the filter output
+6. **Apply Filter** persists it to uBlock's user filter list
+7. Use **Filter History** to undo/redo applied filters
 
-uBO [works best][Works Best] on Firefox and is available for desktop and Android versions.
+### Context Menu
 
-#### Thunderbird
+Right-click any element and select **Inspect with Element Probe** to set it as the DevTools `$0` reference, then switch to the Element Probe panel.
 
-[Thunderbird Add-ons][Thunderbird]
+## Building
 
-In Thunderbird, uBlock Origin does not affect emails, just feeds.
+```bash
+make chromium   # Build for Chrome/Edge
+make firefox    # Build for Firefox
+make opera      # Build for Opera
+```
 
-#### Chromium
+## License
 
-[Chrome Web Store][Chrome]
+[GPLv3](LICENSE.txt)
 
-[Microsoft Edge Add-ons][Edge] (Published by [Nicole Rolls][Nicole Rolls] until version 1.62. Ownership transfer at version 1.64.)
-
-[Opera Add-ons][Opera]
-
-[Development Builds][Chrome Dev]
-
-uBO should be compatible with any Chromium-based browser.
-
-#### All Programs
-
-Do **NOT** use uBO with any other content blocker. uBO [performs][Performance] as well as or better than most popular blockers. Other blockers can prevent uBO's privacy or anti-blocker-defusing features from working correctly.
-
-[Manual Installation][Manual Installation]
-
-#### Enterprise Deployment
-
-[Deploying uBO][Deployment]
-
-## Release History
-
-[Releases Page][Releases]
-
-## Translations
-
-Help translate uBO via [Crowdin][Crowdin].
-
-## About
-
-[Manifesto][Manifesto]
-
-[Privacy Policy][Privacy Policy]
-
-[GPLv3 License][License]
-
-Free. Open-source. For users by users. No donations sought.
-
-If you ever want to contribute something, think about the people working hard to maintain the filter lists you are using, which are available to use by all for free.
-
-
-<!----------------------------------------------------------------------------->
-
-[Peter Lowe's Blocklist]: https://pgl.yoyo.org/adservers/
-[Malicious Blocklist]: https://gitlab.com/malware-filter/urlhaus-filter#malicious-url-blocklist
-[Performance]: https://www.debugbear.com/blog/chrome-extensions-website-performance#the-impact-of-ad-blocking-on-website-performance
-[EasyPrivacy]: https://easylist.to/#easyprivacy
-[Thunderbird]: https://addons.thunderbird.net/thunderbird/addon/ublock-origin/
-[Chrome Dev]: https://chromewebstore.google.com/detail/ublock-origin-development/cgbcahbpdhpcegmbfconppldiemgcoii
-[EasyList]: https://easylist.to/#easylist
-[Mozilla]: https://addons.mozilla.org/addon/ublock-origin/
-[Crowdin]: https://crowdin.com/project/ublock
-[Chrome]: https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm
-[Reddit]: https://www.reddit.com/r/uBlockOrigin/
-[Theft]: https://x.com/LeaVerou/status/518154828166725632
-[Opera]: https://addons.opera.com/extensions/details/ublock/
-[Edge]: https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak
-[NPM]: https://www.npmjs.com/package/@gorhill/ubo-core
-
-[Manifesto]: MANIFESTO.md
-[License]: LICENSE.txt
-
-[Nicole Rolls]: https://github.com/nicole-ashley
-
-<!---------------------------------[ Internal ]-------------------------------->
-
-[Manual Installation]: https://github.com/gorhill/uBlock/tree/master/dist#install
-[Extended Syntax]: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#extended-syntax
-[Privacy Policy]: https://github.com/gorhill/uBlock/wiki/Privacy-policy
-[uBO Filters]: https://github.com/uBlockOrigin/uAssets/tree/master/filters
-[Permissions]: https://github.com/gorhill/uBlock/wiki/Permissions
-[Commit Rate]: https://github.com/gorhill/uBlock/commits/master
-[Works Best]: https://github.com/gorhill/uBlock/wiki/uBlock-Origin-works-best-on-Firefox
-[Deployment]: https://github.com/gorhill/uBlock/wiki/Deploying-uBlock-Origin
-[Blocking]: https://github.com/gorhill/uBlock/wiki/Blocking-mode
-[Releases]: https://github.com/gorhill/uBlock/releases
-[Issues]: https://github.com/uBlockOrigin/uBlock-issues/issues
-[Beta]: https://github.com/gorhill/uBlock/blob/master/dist/README.md#for-beta-version
-[Wiki]: https://github.com/gorhill/uBlock/wiki
-
-<!----------------------------------[ Badges ]--------------------------------->
-
-[Badge Localization]: https://d322cqt584bo4o.cloudfront.net/ublock/localized.svg
-[Badge Commits]: https://img.shields.io/github/commit-activity/m/gorhill/ublock?label=Commits
-[Badge Mozilla]: https://img.shields.io/amo/rating/ublock-origin?label=Firefox
-[Badge License]: https://img.shields.io/badge/License-GPLv3-blue.svg
-[Badge Chrome]: https://img.shields.io/chrome-web-store/rating/cjpalhdlnbpafiamejdnhcphjbkeiagm?label=Chrome
-[Badge Edge]: https://img.shields.io/badge/dynamic/json?label=Edge&color=brightgreen&query=%24.averageRating&suffix=%2F%35&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fodfafepnkmbhccpbejgmiehpchacaeak
-[Badge Issues]: https://img.shields.io/github/issues/uBlockOrigin/uBlock-issues
-[Badge NPM]: https://img.shields.io/npm/v/@gorhill/ubo-core
+Based on [uBlock Origin](https://github.com/gorhill/uBlock) by Raymond Hill.

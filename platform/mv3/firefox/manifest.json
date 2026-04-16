@@ -2,54 +2,51 @@
   "action": {
     "default_area": "navbar",
     "default_icon": {
-      "16": "img/icon_16.png",
-      "32": "img/icon_32.png",
-      "64": "img/icon_64.png"
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
     },
     "default_popup": "popup.html"
   },
-  "author": "Raymond Hill",
+  "author": "SysAdminDoc (forked from Raymond Hill)",
   "background": {
-    "scripts": [ "/js/background.js" ],
+    "scripts": [
+      "/js/background.js"
+    ],
     "type": "module"
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "uBOLiteRedux@raymondhill.net",
+      "id": "uBlockVanced-lite@sysadmindoc.dev",
       "strict_min_version": "128.0",
       "data_collection_permissions": {
-        "required": [ "none" ]
+        "required": [
+          "none"
+        ]
       }
     },
     "gecko_android": {
       "strict_min_version": "128.0"
     }
   },
-  "commands": {
-    "enter-zapper-mode": {
-      "description": "__MSG_zapperTipEnter__"
-    },
-    "enter-picker-mode": {
-      "description": "__MSG_pickerTipEnter__"
-    }
-  },
+  "commands": {},
   "declarative_net_request": {
-    "rule_resources": [
-    ]
+    "rule_resources": []
   },
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
   "icons": {
-    "16": "img/icon_16.png",
-    "32": "img/icon_32.png",
-    "64": "img/icon_64.png",
-    "128": "img/icon_128.png"
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   },
   "manifest_version": 3,
-  "name": "uBO Lite",
+  "name": "uBlockVanced Lite",
   "options_ui": {
-      "open_in_tab": true,
-      "page": "dashboard.html"
+    "open_in_tab": true,
+    "page": "dashboard.html"
   },
   "host_permissions": [
     "<all_urls>"
@@ -60,8 +57,8 @@
     "scripting",
     "storage"
   ],
-  "short_name": "uBO Lite",
-  "version": "1.0",
+  "short_name": "uBlockVanced Lite",
+  "version": "0.2.0",
   "web_accessible_resources": [
     {
       "resources": [

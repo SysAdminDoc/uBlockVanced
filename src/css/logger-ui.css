@@ -1207,8 +1207,8 @@ body > .permatoolbar {
     box-shadow: var(--panel-shadow);
 }
 
-#modalOverlay .closeButton:hover {
-    background-color: rgb(var(--primary-70) / 0.14) !important;
+#modalOverlay > .closeButton:hover {
+    background-color: rgb(var(--primary-70) / 0.14);
 }
 
 #loggerExportDialog .options span[data-i18n],

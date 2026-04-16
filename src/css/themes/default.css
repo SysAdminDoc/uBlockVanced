@@ -430,7 +430,7 @@
     --focus-ring: 0 0 0 3px rgb(var(--primary-70) / 28%);
     --panel-shadow:
         0 1px 0 rgb(255 255 255 / 0.05),
-        0 18px 44px rgb(15 23 42 / 0.12);
+        0 18px 44px rgb(17 17 27 / 0.12);
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(var(--primary-70) / 0.14), transparent 34%),
         radial-gradient(circle at top right, rgb(var(--violet-40) / 0.12), transparent 28%);
@@ -446,7 +446,7 @@
     --field-border: rgb(var(--gray-80));
     --panel-shadow:
         0 1px 0 rgb(255 255 255 / 0.8),
-        0 18px 44px rgb(15 23 42 / 0.08);
+        0 18px 44px rgb(17 17 27 / 0.08);
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(var(--primary-80) / 0.26), transparent 34%),
         radial-gradient(circle at top right, rgb(var(--violet-20) / 0.22), transparent 30%);

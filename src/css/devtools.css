@@ -95,7 +95,7 @@ body {
     border-radius: 999px;
     color: var(--ink-1);
     display: inline-flex;
-    font-family: var(--monospace-font, Consolas, monospace);
+    font-family: Consolas, monospace;
     font-size: 0.9em;
     padding: 0.18rem 0.55rem;
 }

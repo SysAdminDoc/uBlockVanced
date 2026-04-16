@@ -154,7 +154,7 @@ function addToHistory(filter, selector, hostname) {
 function renderHistory() {
     const container = $('historyList');
     if (!container) return;
-    container.innerHTML = '';
+    while ( container.lastChild ) { container.lastChild.remove(); }
 
     const historySection = $('historySection');
     if (filterHistory.length === 0) {
@@ -1035,7 +1035,7 @@ function displaySelectors(selectors) {
     selectedSelectorIndex = -1;
 
     const container = $('selectorList');
-    container.innerHTML = '';
+    while ( container.lastChild ) { container.lastChild.remove(); }
 
     $('selectorCount').textContent = selectors.length + ' selector' + (selectors.length !== 1 ? 's' : '');
 
@@ -1083,7 +1083,7 @@ function displaySelectors(selectors) {
 function displayProceduralFilters(filters) {
     const container = $('proceduralList');
     if (!container) return;
-    container.innerHTML = '';
+    while ( container.lastChild ) { container.lastChild.remove(); }
 
     $('proceduralCount').textContent = filters.length + ' filter' + (filters.length !== 1 ? 's' : '');
 
@@ -1319,11 +1319,10 @@ $('btnCopyFilter').addEventListener('click', () => {
         log('Filter copied to clipboard', 'success');
         const btn = $('btnCopyFilter');
         btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 1500);
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
     }).catch(() => {
+        log('Could not copy -- select the filter text and copy manually', 'info');
         $('filterOutput').select();
-        document.execCommand('copy');
-        log('Filter copied to clipboard (fallback)', 'success');
     });
 });
 

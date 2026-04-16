@@ -1,40 +1,19 @@
 {
-  "author": "Raymond Hill & contributors",
+  "author": "SysAdminDoc (forked from Raymond Hill)",
   "background": {
     "page": "background.html"
   },
   "browser_action": {
     "default_icon": {
-      "16": "img/icon_16.png",
-      "32": "img/icon_32.png",
-      "64": "img/icon_64.png"
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
     },
     "default_popup": "popup-fenix.html",
-    "default_title": "uBlock Origin"
+    "default_title": "uBlockVanced"
   },
-  "commands": {
-    "launch-element-picker": {
-      "description": "__MSG_popupTipPicker__"
-    },
-    "launch-element-zapper": {
-      "description": "__MSG_popupTipZapper__"
-    },
-    "launch-logger": {
-      "description": "__MSG_popupTipLog__"
-    },
-    "open-dashboard": {
-      "description": "__MSG_popupTipDashboard__"
-    },
-    "relax-blocking-mode": {
-      "description": "__MSG_relaxBlockingMode__"
-    },
-    "toggle-cosmetic-filtering": {
-      "description": "__MSG_toggleCosmeticFiltering__"
-    },
-    "toggle-javascript": {
-      "description": "__MSG_toggleJavascript__"
-    }
-  },
+  "commands": {},
   "content_scripts": [
     {
       "matches": [
@@ -81,15 +60,15 @@
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
   "icons": {
-    "16": "img/icon_16.png",
-    "32": "img/icon_32.png",
-    "64": "img/icon_64.png",
-    "128": "img/icon_128.png"
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   },
   "incognito": "split",
   "manifest_version": 2,
   "minimum_opera_version": "79.0",
-  "name": "uBlock Origin",
+  "name": "uBlockVanced",
   "options_page": "dashboard.html",
   "permissions": [
     "alarms",
@@ -103,16 +82,16 @@
     "webRequestBlocking",
     "<all_urls>"
   ],
-  "short_name": "uBlock₀",
+  "short_name": "uBlockVanced",
   "sidebar_action": {
     "default_icon": {
-      "16": "img/icon_16.png",
-      "32": "img/icon_32.png"
+      "16": "icons/16.png",
+      "32": "icons/32.png"
     },
     "default_panel": "logger-ui.html",
     "default_title": "__MSG_statsPageName__"
   },
-  "version": "1.14.23.17",
+  "version": "0.2.0",
   "web_accessible_resources": [
     "/web_accessible_resources/*"
   ]

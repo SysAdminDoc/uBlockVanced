@@ -6,3 +6,15 @@ node_modules/
 /tmp/
 .DS_Store
 CLAUDE.md
+
+# Build artifacts copied into src/ by tools/copy-common-files.sh
+/src/js/vapi.js
+/src/js/vapi-background.js
+/src/js/vapi-background-ext.js
+/src/js/vapi-client.js
+/src/js/vapi-common.js
+/src/js/webext.js
+/src/js/is-webrtc-supported.js
+/src/is-webrtc-supported.html
+/src/managed_storage.json
+/src/manifest.json

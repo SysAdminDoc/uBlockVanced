@@ -676,6 +676,24 @@ onBroadcast(msg => {
     staticFilteringReverseLookup.resetLists();
 };
 
+µb.removeUserFilter = async function(details) {
+    const filters = details.filters;
+    if ( typeof filters !== 'string' || filters.trim() === '' ) { return; }
+    const content = await this.loadUserFilters();
+    const lines = content.filters.split('\n');
+    const filterLines = filters.split('\n').map(f => f.trim());
+    const remaining = lines.filter(line => !filterLines.includes(line.trim()));
+    const newContent = remaining.join('\n');
+    await this.saveUserFilters(newContent);
+    await this.loadFilterLists();
+    if ( details.docURL !== undefined ) {
+        cosmeticFilteringEngine.removeFromSelectorCache(
+            hostnameFromURI(details.docURL)
+        );
+    }
+    staticFilteringReverseLookup.resetLists();
+};
+
 µb.userFiltersAreEnabled = function() {
     return this.selectedFilterLists.includes(this.userFiltersPath);
 };
