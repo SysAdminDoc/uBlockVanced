@@ -27,7 +27,13 @@ match = re.search(r'^\d+\.\d+\.\d+\.\d+$', version)
 if match:
     manifest_out['name'] += ' development build'
     manifest_out['short_name'] += ' dev build'
-    manifest_out['browser_action']['default_title'] += ' dev build'
+    # MV3 manifests use `action` instead of `browser_action`, and some
+    # platform variants may omit either. Update whichever is present
+    # without blowing up on missing keys.
+    for key in ('browser_action', 'action'):
+        entry = manifest_out.get(key)
+        if isinstance(entry, dict) and 'default_title' in entry:
+            entry['default_title'] += ' dev build'
 
 with open(manifest_out_file, 'w') as f:
     json.dump(manifest_out, f, indent=2, separators=(',', ': '), sort_keys=True)

@@ -1663,6 +1663,11 @@ const getPopupData = async function(tabId, first = false) {
         } else {
             checkViewport();
         }
+    }).catch(( ) => {
+        // Background may be starting up or the tab may have closed mid-open.
+        // Take the popup out of the "loading" state so the user isn't left
+        // staring at a blank window; a follow-up click will retry cleanly.
+        dom.cl.remove(dom.body, 'loading');
     });
 }
 

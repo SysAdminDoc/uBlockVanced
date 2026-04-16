@@ -316,12 +316,12 @@ self.hasUnsavedData = function() {
 /******************************************************************************/
 
 vAPI.messaging.send('dashboard', { what: 'userSettings' }).then(result => {
-    onUserSettingsReceived(result);
-});
+    if ( result instanceof Object ) { onUserSettingsReceived(result); }
+}, ( ) => { /* background unavailable; leave defaults in place */ });
 
 vAPI.messaging.send('dashboard', { what: 'getLocalData' }).then(result => {
-    onLocalDataReceived(result);
-});
+    if ( result instanceof Object ) { onLocalDataReceived(result); }
+}, ( ) => { /* background unavailable; leave defaults in place */ });
 
 // https://github.com/uBlockOrigin/uBlock-issues/issues/591
 dom.on(

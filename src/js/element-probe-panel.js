@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlockVanced - Element Probe Panel v0.2.5
+    uBlockVanced - Element Probe Panel v0.2.6
 
     Deep element inspection panel for Chrome DevTools.
     Generates robust CSS selectors AND procedural cosmetic filters for elements
@@ -1501,6 +1501,21 @@ $('btnScanIframes').addEventListener('click', async () => {
     }
 });
 
+// Quick preflight: does this look like a valid CSS selector? We ask the
+// browser by trying it against a detached document fragment so we don't
+// pollute the inspected page. Procedural filters use uBlock-specific
+// pseudo-classes (e.g. :has-text) that are *not* valid CSS and must skip
+// this check — they are validated by uBlock's static filtering engine
+// when the filter is parsed.
+const isValidCssSelector = selector => {
+    try {
+        document.createDocumentFragment().querySelector(selector);
+        return true;
+    } catch (_) {
+        return false;
+    }
+};
+
 $('btnApplyFilter').addEventListener('click', async () => {
     const filter = $('filterOutput').value.trim();
     if (!filter) return;
@@ -1508,7 +1523,7 @@ $('btnApplyFilter').addEventListener('click', async () => {
 
     const match = filter.match(/##(.+)$/);
     if (!match) {
-        log('Invalid filter format', 'error');
+        log('Invalid filter format — expected "domain##selector"', 'error');
         setBusy('btnApplyFilter', false);
         return;
     }
@@ -1517,6 +1532,15 @@ $('btnApplyFilter').addEventListener('click', async () => {
 
     // Check if this is a procedural filter (contains :has-text, :upward, :matches-path, etc.)
     const isProcedural = /:has-text|:upward|:matches-path|:not\(:has-text\(/.test(rawSelector);
+
+    // Pre-flight validation for standard CSS filters only. Catches typos
+    // (unbalanced brackets, stray punctuation, unknown pseudo-classes)
+    // before we persist an unusable rule to the user filter list.
+    if (!isProcedural && !isValidCssSelector(rawSelector)) {
+        log('Invalid CSS selector — not saved. Fix the syntax and try again.', 'error');
+        setBusy('btnApplyFilter', false);
+        return;
+    }
 
     // For procedural filters, we can't use querySelectorAll to preview,
     // but uBlock will handle them natively when persisted.
@@ -1788,7 +1812,7 @@ if (
 loadHistory();
 scanFrames(); // auto-detect iframes on panel open
 syncLogState();
-log('Element Probe v0.2.5 initialized', 'info');
+log('Element Probe v0.2.6 initialized', 'info');
 setStatus('Ready');
 setSelectionSummary('No element selected yet.');
 syncFilterActions();

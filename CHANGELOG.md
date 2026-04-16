@@ -1,3 +1,18 @@
+# uBlockVanced 0.2.6
+
+Reliability hardening across dashboards, build tooling, and the Element Probe save path.
+
+- **document-blocked**: `JSON.parse(decodeURIComponent(details=…))` now wrapped in try/catch. A malformed or truncated query string no longer prevents the blocked-document UI from rendering.
+- **Startup race protection**: `popup-fenix.js`, `theme.js`, `settings.js`, `cloud-ui.js` all add a rejection handler on their initial `.then(...)` startup messages. A slow-to-wake background worker no longer leaves the popup / dashboard / cloud widget stuck in "loading".
+- **cloud-ui**: XHR that fetches the cloud widget template now has `onerror` / `ontimeout` handlers and checks HTTP status before parsing — an interrupted update or corrupted install won't crash the hosting dashboard page.
+- **settings**: `onUserSettingsReceived` / `onLocalDataReceived` guard `result instanceof Object` before iterating; a null result no longer throws on the first setting it touches.
+- **Element Probe selector preflight**: new `isValidCssSelector` check (via `document.createDocumentFragment().querySelector`) rejects invalid standard CSS before it reaches the user filter list. Users see an actionable error instead of a silently-ignored rule. Procedural filters (`:has-text`, `:upward`, `:matches-path`) skip the preflight by design.
+- **Build scripts**: `tools/make-chromium.sh` and `tools/make-firefox.sh` rewritten with `set -euo pipefail`, fully-quoted variables, and safer `${1:-}` expansion. Prevents silent failures when the build runs in a path with spaces, and ensures any single command failure aborts the build instead of cascading into a corrupt package.
+- **Meta generator**: `tools/make-chromium-meta.py` dev-build name injection now tolerates variants that omit `browser_action` or `action` (MV3 vs MV2 drift). Previously threw `KeyError`.
+- **Release template**: `.github/workflows/RELEASE.HEAD.md` rewritten for fork identity — links and install instructions now point to `SysAdminDoc/uBlockVanced` with clear notes about unsigned dev-build installation on Chromium and Firefox.
+
+----------
+
 # uBlockVanced 0.2.5
 
 Correctness and reliability pass focused on the fork-specific custom code paths (Element Probe, context menu integration, user-filter messaging).

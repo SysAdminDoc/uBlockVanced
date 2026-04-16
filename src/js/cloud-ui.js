@@ -217,8 +217,16 @@ const onInitialize = function(options) {
     xhr.open('GET', 'cloud-ui.html', true);
     xhr.overrideMimeType('text/html;charset=utf-8');
     xhr.responseType = 'text';
+    // Silently skip the cloud widget if its template cannot be fetched —
+    // an interrupted update or corrupted install shouldn't blow up the
+    // hosting dashboard page.
+    xhr.onerror = function() { this.onerror = null; };
+    xhr.ontimeout = function() { this.ontimeout = null; };
     xhr.onload = function() {
         this.onload = null;
+        if ( this.status !== 0 && (this.status < 200 || this.status >= 300) ) {
+            return;
+        }
         const parser = new DOMParser(),
             parsed = parser.parseFromString(this.responseText, 'text/html'),
             fromParent = parsed.body;
@@ -255,6 +263,10 @@ vAPI.messaging.send('cloudWidget', {
     what: 'cloudGetOptions',
 }).then(options => {
     onInitialize(options);
+}, ( ) => {
+    // Background hasn't finished initialising the cloud widget yet.
+    // Render the disabled default state instead of leaving the widget blank.
+    onInitialize(null);
 });
 
 /******************************************************************************/
