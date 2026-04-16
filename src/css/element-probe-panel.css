@@ -377,11 +377,35 @@ input:focus-visible {
     color: var(--accent-red);
 }
 
-.btn.is-busy,
 .btn:disabled {
+    cursor: not-allowed;
+    filter: saturate(0.5);
+    opacity: 0.46;
+    pointer-events: auto;
+    transform: none;
+}
+
+.btn.is-busy {
     cursor: progress;
     opacity: 0.68;
+    pointer-events: none;
+    position: relative;
     transform: none;
+}
+
+.btn.is-busy::after {
+    animation: ep-spin 0.7s linear infinite;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    border-top-color: currentColor;
+    content: '';
+    height: 0.85em;
+    margin-left: 0.45em;
+    width: 0.85em;
+}
+
+@keyframes ep-spin {
+    to { transform: rotate(360deg); }
 }
 
 .control-row {
