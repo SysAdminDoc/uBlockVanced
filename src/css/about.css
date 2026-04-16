@@ -94,7 +94,7 @@ body {
 }
 
 .about-badge {
-    background: rgb(255 255 255 / 0.05);
+    background: var(--field-surface);
     border: 1px solid var(--border-1);
     border-radius: 999px;
     color: var(--ink-2);
@@ -136,9 +136,9 @@ body {
     min-height: 7.5rem;
     padding: 1rem;
     transition:
-        background-color 150ms ease,
-        border-color 150ms ease,
-        transform 150ms ease;
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .about-link-card:hover,
@@ -153,7 +153,7 @@ body {
 .about-credit-list a:focus-visible,
 .about-note a:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgb(var(--primary-70) / 0.24);
+    box-shadow: var(--focus-ring);
 }
 
 .about-link-title {
@@ -189,6 +189,10 @@ body {
     font-weight: 600;
     line-height: 1.2;
     padding: 0.65rem 0.9rem;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .about-credit-list {
@@ -207,6 +211,14 @@ body {
     color: var(--ink-2);
     line-height: 1.55;
     padding: 0.8rem 0.95rem;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.about-credit-list li:hover {
+    background: var(--field-surface-hover);
+    border-color: var(--border-2);
 }
 
 .about-credit-list a,

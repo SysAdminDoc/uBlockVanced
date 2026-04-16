@@ -41,7 +41,7 @@
     vertical-align: middle;
     }
 #domInspector li > span {
-    color: var(--ink-3, #6c7086);
+    color: var(--ink-3);
     }
 #domInspector li > span:first-child {
     color: var(--ink-1);
