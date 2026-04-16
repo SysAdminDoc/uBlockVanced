@@ -122,6 +122,9 @@ async function exportToFile() {
 /******************************************************************************/
 
 function onLocalDataReceived(details) {
+    const locale = Array.isArray(navigator.languages) && navigator.languages.length !== 0
+        ? navigator.languages
+        : undefined;
     let v, unit;
     if ( typeof details.storageUsed === 'number' ) {
         v = details.storageUsed;
@@ -163,8 +166,10 @@ function onLocalDataReceived(details) {
         const dt = new Date(details.lastBackupTime);
         const text = i18n$('settingsLastBackupPrompt');
         const node = qs$('#settingsLastBackupPrompt');
-        node.textContent = text + '\xA0' + dt.toLocaleString('fullwide', timeOptions);
+        node.textContent = text + '\xA0' + dt.toLocaleString(locale, timeOptions);
         node.style.display = '';
+    } else {
+        qs$('#settingsLastBackupPrompt').style.display = 'none';
     }
 
     const lastRestoreFile = details.lastRestoreFile || '';
@@ -172,8 +177,10 @@ function onLocalDataReceived(details) {
         const dt = new Date(details.lastRestoreTime);
         const text = i18n$('settingsLastRestorePrompt');
         const node = qs$('#settingsLastRestorePrompt');
-        node.textContent = text + '\xA0' + dt.toLocaleString('fullwide', timeOptions);
+        node.textContent = text + '\xA0' + dt.toLocaleString(locale, timeOptions);
         node.style.display = '';
+    } else {
+        qs$('#settingsLastRestorePrompt').style.display = 'none';
     }
 
     if ( details.cloudStorageSupported === false ) {

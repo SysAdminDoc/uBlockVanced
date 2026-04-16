@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock Origin — Support</title>
+<title>uBlockVanced — Support</title>
 
 <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
 
@@ -19,57 +19,68 @@
 
 <body>
 
-<div class="body">
-    <div class="a">
-        <h3 data-i18n="supportS1H"></h3>
+<main class="body supportPage">
+    <header class="supportHero">
+        <div class="supportHeroMark" aria-hidden="true">
+            <img src="img/ublock.svg" alt="">
+        </div>
+        <div class="supportHeroCopy">
+            <p class="supportEyebrow" data-i18n="extName"></p>
+            <h1 data-i18n="supportPageName"></h1>
+            <p class="supportLead">Documentation, issue reporting, and diagnostics in one place.</p>
+        </div>
+    </header>
+
+    <section class="supportSection a">
+        <h2 data-i18n="supportS1H"></h2>
         <div class="supportEntry">
             <div>
-                <p data-i18n="supportS1P1">
+                <p data-i18n="supportS1P1"></p>
             </div>
             <button type="button" data-url="https://github.com/gorhill/uBlock/wiki" data-i18n="supportOpenButton">_<span class="hover"></span></button>
         </div>
         <hr>
-    </div>
-    <div class="b">
-        <h3 data-i18n="supportS2H"></h3>
+    </section>
+    <section class="supportSection b">
+        <h2 data-i18n="supportS2H"></h2>
         <div class="supportEntry">
             <div>
-                <p data-i18n="supportS2P1">
+                <p data-i18n="supportS2P1"></p>
             </div>
             <button type="button" data-url="https://www.reddit.com/r/uBlockOrigin/" data-i18n="supportOpenButton">_<span class="hover"></span></button>
         </div>
         <hr>
-    </div>
-    <div class="c">
-        <h3 data-i18n="supportS3H"></h3>
+    </section>
+    <section class="supportSection c">
+        <h2 data-i18n="supportS3H"></h2>
         <div class="supportEntry">
             <div>
-                <p data-i18n="supportS3P1">
-                <p data-i18n="supportS3P2">
-                <p data-i18n="supportS3P3">
+                <p data-i18n="supportS3P1"></p>
+                <p data-i18n="supportS3P2"></p>
+                <p data-i18n="supportS3P3"></p>
             </div>
             <button id="filterReport" type="button" data-url="https://github.com/uBlockOrigin/uAssets/issues/new?template=report_from_ubo.yml" data-i18n="supportOpenButton">_<span class="hover"></span></button>
         </div>
         <hr>
-    </div>
-    <div class="d">
-        <h3 data-i18n="supportS4H"></h3>
+    </section>
+    <section class="supportSection d">
+        <h2 data-i18n="supportS4H"></h2>
         <div class="supportEntry">
             <div>
-                <p data-i18n="supportS4P1">
+                <p data-i18n="supportS4P1"></p>
             </div>
             <button id="bugReport" type="button" data-url="https://github.com/uBlockOrigin/uBlock-issues/issues/new?template=bug_report_from_ubo.yml" data-i18n="supportOpenButton">_<span class="hover"></span></button>
         </div>
         <hr>
-    </div>
-    <div class="e">
-        <h3 data-i18n="supportS6H"></h3>
+    </section>
+    <section class="supportSection e">
+        <h2 data-i18n="supportS6H"></h2>
         <p data-i18n="supportS3P1"></p>
         <div class="supportEntry shouldUpdate">
             <hr>
             <p data-i18n="supportS6P2S1">_</p>
             <button type="button" class="iconified"><span class="fa-icon">refresh</span><span data-i18n="3pUpdateNow">_</span><span class="hover"></span></button>
-            <u class="updated" data-i18n="supportS6P2S2">_</u>
+            <u class="updated" role="status" aria-live="polite" data-i18n="supportS6P2S2">_</u>
         </div>
         <div class="supportEntry">
             <hr>
@@ -78,15 +89,15 @@
         </div>
         <div class="supportEntry createEntry">
             <hr>
-            <p>
-                <label data-i18n="supportS6URL"></label><br>
-                <select name="url">
+            <div class="reportField">
+                <label for="supportUrl" data-i18n="supportS6URL"></label>
+                <select id="supportUrl" name="url">
                     <option></option>
                 </select>
-            </p>
-            <p>
-                <label data-i18n="supportS6Select1"></label><br>
-                <select name="type">
+            </div>
+            <div class="reportField">
+                <label for="supportType" data-i18n="supportS6Select1"></label>
+                <select id="supportType" name="type">
                     <option value="[unknown]" data-i18n="supportS6Select1Option0" selected disabled></option>
                     <option value="ads" data-i18n="supportS6Select1Option1"></option>
                     <option value="detection" data-i18n="supportS6Select1Option3"></option>
@@ -96,24 +107,25 @@
                     <option value="privacy" data-i18n="supportS6Select1Option4"></option>
                     <option value="badware" data-i18n="supportS6Select1Option7"></option>
                 </select>
-            </p>
-            <p>
+            </div>
+            <div class="reportField">
                 <label><span class="input checkbox"><input id="isNSFW" type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="supportS6Checkbox1"></span></label>
-            </p>
+            </div>
             <button type="button" data-i18n="supportReportSpecificButton" class="preferred">_<span class="hover"></span></button>
         </div>
         <hr>
-        <h3 id="showSupportInfo" class="subtil" data-i18n="supportS5H">_<span>&nbsp;&#x25b8;</span></h3>
-    </div>
-    <div class="a b c d">
-        <h3 data-i18n="supportS5H"></h3>
-        <p data-i18n="supportS5P1">
-        <p>
+        <button id="showSupportInfo" class="subtil supportReveal" type="button" aria-expanded="false" aria-controls="supportDiagnostics" data-i18n="supportS5H">_<span>&nbsp;&#x25b8;</span></button>
+    </section>
+    <section id="supportDiagnostics" class="supportSection a b c d">
+        <h2 data-i18n="supportS5H"></h2>
+        <p data-i18n="supportS5P1"></p>
+        <div class="supportActions">
             <button id="selectAllButton" type="button" data-i18n="genericSelectAll">_<span class="hover"></span></button>
             <button id="moreButton" type="button" data-i18n="popupMoreButton_v2" data-url="/devtools.html">_<span class="hover"></span></button>
+        </div>
         <div id="supportData" class="codeMirrorContainer"></div>
-    </div>
-</div>
+    </section>
+</main>
 
 <script src="lib/codemirror/lib/codemirror.js"></script>
 <script src="lib/codemirror/addon/selection/active-line.js"></script>

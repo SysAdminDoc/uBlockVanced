@@ -52,10 +52,10 @@ textarea {
     width: 1em;
     }
 #info {
-    fill: #ccc;
+    fill: var(--ink-3, #6c7086);
     }
 #info:hover {
-    fill: #000;
+    fill: var(--ink-1, #cdd6f4);
     }
 
 /*
@@ -111,7 +111,7 @@ textarea {
 }
 #netInspector.paused #pause > .fa-icon[data-i18n-title="loggerUnpauseTip"] {
     display: inline-flex;
-    fill: #5F9EA0;
+    fill: #94e2d5;
 }
 #netInspector #filterExprGroup {
     display: flex;
@@ -124,7 +124,7 @@ textarea {
     opacity: 1;
     }
 #netInspector #filterInput {
-    border: 1px solid gray;
+    border: 1px solid var(--border-2, #45475a);
     display: inline-flex;
     }
 #netInspector #filterInput > input {
@@ -142,7 +142,7 @@ textarea {
     }
 #netInspector #filterExprPicker {
     background-color: var(--surface-0);
-    border: 1px solid gray;
+    border: 1px solid var(--border-2, #45475a);
     display: none;
     position: absolute;
     flex-direction: column;
@@ -160,8 +160,14 @@ body[dir="rtl"] #netInspector #filterExprPicker {
 #netInspector #filterExprGroup:hover #filterExprButton.expanded ~ #filterExprPicker {
     display: flex;
     }
+#netInspector #filterExprGroup:focus-within #filterExprButton.expanded ~ #filterExprPicker {
+    display: flex;
+    }
+#netInspector #filterExprGroup.expanded #filterExprPicker {
+    display: flex;
+    }
 #netInspector #filterExprPicker > div {
-    border: 1px dotted #ddd;
+    border: 1px dotted var(--border-1, #313244);
     border-left: 0;
     border-right: 0;
     display: flex;
@@ -179,6 +185,7 @@ body[dir="rtl"] #netInspector #filterExprPicker {
 #netInspector #filterExprPicker span[data-filtex] {
     align-items: center;
     border: 1px solid transparent;
+    border-radius: 10px;
     cursor: pointer;
     display: inline-flex;
     margin: 0 0.5em 0 0;
@@ -264,7 +271,7 @@ body[dir="rtl"] #netInspector #filterExprPicker {
     background-color: rgb(var(--popup-cell-allow-surface-rgb) / 50%);
     }
 #vwRenderer .logEntry > div[data-tabid="-1"] {
-    text-shadow: 0 0.2em 0.4em #aaa;
+    text-shadow: 0 0.2em 0.4em var(--ink-4, #585b70);
     }
 #vwRenderer .logEntry > div.extendedRealm,
 #vwRenderer .logEntry > div.redirect {
@@ -281,8 +288,8 @@ body[dir="rtl"] #netInspector #filterExprPicker {
     color: var(--popup-cell-cname-ink);
     }
 #vwRenderer .logEntry > div[data-type="tabLoad"] {
-    background-color: #666;
-    color: white;
+    background-color: var(--surface-3, #45475a);
+    color: var(--ink-1, #cdd6f4);
     }
 #vwRenderer .logEntry > div[data-type="error"] {
     color: var(--cm-negative);
@@ -309,7 +316,7 @@ body[dir="rtl"] #netInspector #filterExprPicker {
     word-break: break-all;
     }
 #vwRenderer .logEntry > div:hover > span {
-    background-color: rgba(0,0,0,0.04);
+    background-color: rgba(205,214,244,0.04);
     }
 body[dir="ltr"] #vwRenderer .logEntry > .fields > span:first-child {
     border-left: 0;
@@ -338,7 +345,7 @@ body[dir="rtl"] #vwRenderer .logEntry > .fields > span:first-child {
     display: none;
     }
 #vwRenderer .logEntry > .fields.extendedRealm.isException > span:nth-of-type(2) > span:last-of-type {
-    text-decoration: line-through rgba(0,0,255,0.7);
+    text-decoration: line-through rgba(137,180,250,0.7);
     }
 #vwRenderer .logEntry > .fields > span:nth-of-type(3) {
     font-family: monospace;
@@ -398,8 +405,8 @@ body[dir="rtl"] #vwRenderer .logEntry > .fields > span:first-child {
     }
 #vwRenderer .logEntry > .fields > span:nth-of-type(8) a {
     align-items: center;
-    background-color: dimgray;
-    color: white;
+    background-color: var(--surface-3, #45475a);
+    color: var(--ink-1, #cdd6f4);
     display: none;
     height: min(100%, 1.5em);
     justify-content: center;
@@ -429,7 +436,7 @@ body[dir="rtl"] #vwRenderer .logEntry > .fields > span:first-child {
 
 @keyframes unrollRow {
     to {
-        box-shadow: 0 2px 3px 0 #444;
+        box-shadow: 0 2px 3px 0 rgba(17,17,27,0.5);
         height: auto;
         max-height: 200px;
         z-index: 1;
@@ -456,7 +463,7 @@ body[dir="rtl"] #vwRenderer .logEntry > .fields > span:first-child {
     }
 
 #vwRenderer #vwBottom {
-    background-color: #00F;
+    background-color: transparent;
     height: 0;
     overflow: hidden;
     width: 100%;
@@ -479,6 +486,12 @@ body[dir="rtl"] #vwRenderer .logEntry > .fields > span:first-child {
     }
 
 .closeButton {
+    align-items: center;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    padding: 0;
     stroke: var(--ink-1);
     stroke-width: 3px;
     width: 1.6em;
@@ -509,7 +522,7 @@ body[dir="rtl"] .closeButton {
     font-size: small;
     }
 #inspectors #infoInspector .vscrollable > div {
-    border-bottom: 1px dotted gray;
+    border-bottom: 1px dotted var(--border-1, #313244);
     padding: 0.2em;
     white-space: pre-wrap;
     word-break: break-all;
@@ -522,7 +535,7 @@ body[dir="rtl"] .closeButton {
 
 #popupContainer {
     background-color: var(--surface-1);
-    border: 1px solid gray;
+    border: 1px solid var(--border-2, #45475a);
     bottom: 0;
     display: none;
     max-height: min(800px, calc(100vh - 2rem));
@@ -539,7 +552,7 @@ body[dir="rtl"] .closeButton {
 
 #modalOverlay {
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(17, 17, 27, 0.6);
     border: 0;
     bottom: 0;
     display: none;
@@ -586,23 +599,23 @@ body[dir="rtl"] .closeButton {
 .netFilteringDialog > .preview {
     align-items: center;
     /* http://lea.verou.me/css3patterns/ */
-    background-color: #aaa;
+    background-color: var(--surface-2, #313244);
     background-image:
         linear-gradient(
             45deg,
-            #666 25%,
+            var(--surface-3, #45475a) 25%,
             transparent 25%,
             transparent 75%,
-            #666 75%,
-            #666
+            var(--surface-3, #45475a) 75%,
+            var(--surface-3, #45475a)
         ),
         linear-gradient(
             45deg,
-            #666 25%,
+            var(--surface-3, #45475a) 25%,
             transparent 25%,
             transparent 75%,
-            #666 75%,
-            #666
+            var(--surface-3, #45475a) 75%,
+            var(--surface-3, #45475a)
         );
     background-position:0 0, 9px 9px;
     background-size: 18px 18px;
@@ -783,10 +796,10 @@ body[dir="rtl"] .netFilteringDialog > div.panes > .dynamic .row > span:nth-of-ty
     padding: 0 0.5em;
     }
 .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
-    background-color: #ffe;
-    border: 1px solid #ddc;
+    background-color: var(--surface-2, #313244);
+    border: 1px solid var(--border-2, #45475a);
     border-radius: 4px;
-    fill: #888;
+    fill: var(--ink-3, #6c7086);
     cursor: pointer;
     font-size: 2em;
     visibility: hidden;
@@ -796,7 +809,7 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     visibility: visible;
     }
 .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules:hover {
-    fill: black;
+    fill: var(--ink-1, #cdd6f4);
     }
 .netFilteringDialog > div.panes > .dynamic > .toolbar .entry {
     display: none;
@@ -824,7 +837,7 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     width: 33.33%;
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action.allow {
-    background-color: rgba(0, 160, 0, 0.3);
+    background-color: rgba(166, 227, 161, 0.3);
     }
 :root.colorBlind .netFilteringDialog > div.panes > .dynamic .entry > .action.allow {
     background-color: rgba(255, 194, 57, 0.4);
@@ -836,13 +849,13 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     background-color: rgba(96, 96, 96, 0.4);
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action.block {
-    background-color: rgba(192, 0, 0, 0.3);
+    background-color: rgba(243, 139, 168, 0.3);
     }
 :root.colorBlind .netFilteringDialog > div.panes > .dynamic .entry > .action.block {
     background-color: rgba(0, 19, 110, 0.4);
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action.own.allow {
-    background-color: rgba(0, 160, 0, 1);
+    background-color: rgba(166, 227, 161, 1);
     }
 :root.colorBlind .netFilteringDialog > div.panes > .dynamic .entry > .action.own.allow {
     background-color: rgba(255, 194, 57, 1);
@@ -852,7 +865,7 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     background-color: rgba(108, 108, 108, 1);
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action.own.block {
-    background-color: rgba(192, 0, 0, 1);
+    background-color: rgba(243, 139, 168, 1);
     }
 :root.colorBlind .netFilteringDialog > div.panes > .dynamic .entry > .action.own.block {
     background-color: rgba(0, 19, 110, 1);
@@ -865,7 +878,7 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     opacity: 0.75;
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action > .allow {
-    background-color: rgb(0, 160, 0);
+    background-color: rgb(166, 227, 161);
     }
 :root.colorBlind  .netFilteringDialog > div.panes > .dynamic .entry > .action > .allow {
     background-color: rgb(255, 194, 57);
@@ -874,7 +887,7 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     background-color: rgb(108, 108, 108);
     }
 .netFilteringDialog > div.panes > .dynamic .entry > .action > .block {
-    background-color: rgb(192, 0, 0);
+    background-color: rgb(243, 139, 168);
     }
 :root.colorBlind  .netFilteringDialog > div.panes > .dynamic .entry > .action > .block {
     background-color: rgb(0, 19, 110);
@@ -899,7 +912,7 @@ body.dirty .netFilteringDialog > div.panes > .dynamic > .toolbar #saveRules {
     word-break: break-all;
     }
 #filterFinderDialog code {
-    background: #eee;
+    background: var(--surface-2, #313244);
     font-size: 85%;
     padding: 3px;
     unicode-bidi: plaintext;
@@ -1013,6 +1026,223 @@ body[dir="rtl"] #loggerSettingsDialog ul {
 #loggerSettingsDialog input {
     max-width: 6em;
     }
+
+/*
+ * uBlockForge premium polish
+ */
+body {
+    background:
+        radial-gradient(circle at top left, rgb(var(--primary-70) / 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgb(var(--violet-30) / 0.12), transparent 24%),
+        var(--surface-0);
+}
+
+body > .permatoolbar {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: var(--surface-raised-strong);
+    border-bottom: 1px solid rgb(var(--primary-70) / 0.16);
+    box-shadow: var(--panel-shadow);
+    padding: 0.65rem 0.8rem;
+}
+
+.permatoolbar {
+    gap: var(--default-gap-small);
+}
+
+.permatoolbar > div {
+    align-items: center;
+    gap: var(--default-gap-xsmall);
+}
+
+.permatoolbar button.iconified {
+    border-radius: 12px;
+}
+
+.permatoolbar button.iconified,
+.permatoolbar a.wikilink,
+#netInspector #filterExprButton,
+#loggerExportDialog .options span[data-i18n],
+#loggerExportDialog .options span.pushbutton,
+.closeButton {
+    transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        color 150ms ease,
+        opacity 150ms ease,
+        transform 150ms ease;
+}
+
+.permatoolbar a.wikilink {
+    align-items: center;
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: 12px;
+    color: var(--ink-2);
+    display: inline-flex;
+    justify-content: center;
+    min-height: 2.25rem;
+    min-width: 2.25rem;
+    text-decoration: none;
+}
+
+.permatoolbar a.wikilink:hover {
+    background: rgb(var(--primary-70) / 0.14);
+    color: var(--ink-1);
+}
+
+.permatoolbar button.iconified:focus-visible,
+.permatoolbar a.wikilink:focus-visible,
+#netInspector #filterExprButton:focus-visible,
+#netInspector #filterExprPicker span[data-filtex]:focus-visible,
+#loggerExportDialog .options span[data-i18n]:focus-visible,
+#loggerExportDialog .options span.pushbutton:focus-visible,
+#pageSelector:focus-visible,
+#infoInspector .permatoolbar input[type="search"]:focus-visible,
+.closeButton:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(var(--primary-70) / 0.28);
+}
+
+#pageSelector {
+    background-color: var(--field-surface);
+    border-color: var(--border-1);
+    border-radius: 999px;
+    max-width: min(50vw, 28rem);
+    padding-inline: 0.9rem 2.2rem;
+}
+
+#inspectors {
+    gap: 12px;
+    padding: 12px;
+}
+
+.inspector {
+    background: var(--surface-raised-strong);
+    border: 1px solid var(--border-1);
+    border-radius: 22px;
+    box-shadow: var(--panel-shadow);
+    overflow: hidden;
+}
+
+.inspector .permatoolbar {
+    background: linear-gradient(180deg, rgb(17 17 27 / 0.68), transparent);
+    border-bottom: 1px solid var(--border-1);
+    padding: 0.6rem 0.75rem;
+}
+
+#netInspector #filterInput {
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#netInspector #filterInput:focus-within {
+    border-color: rgb(var(--primary-70));
+    box-shadow: 0 0 0 4px rgb(var(--primary-70) / 0.14);
+}
+
+#netInspector #filterInput > input {
+    background: transparent;
+    min-height: 2.1rem;
+    padding-inline: 0.75rem;
+}
+
+#netInspector #filterInput > input::placeholder,
+#infoInspector .permatoolbar input[type="search"]::placeholder {
+    color: var(--ink-3);
+}
+
+#netInspector #filterExprButton {
+    background: transparent;
+    border: 0;
+    border-inline-start: 1px solid rgb(255 255 255 / 0.08);
+    color: inherit;
+    min-width: 2.35rem;
+    padding-inline: 0.7rem;
+}
+
+#netInspector #filterExprButton:hover {
+    background-color: rgb(var(--primary-70) / 0.12);
+}
+
+#netInspector #filterExprPicker {
+    background: var(--surface-raised-strong);
+    border: 1px solid var(--border-1);
+    border-radius: 16px;
+    box-shadow: var(--panel-shadow);
+    margin-top: 0.4rem;
+    overflow: hidden;
+}
+
+#vwRenderer .logEntry {
+    background-color: transparent;
+}
+
+#vwRenderer .logEntry > div {
+    border-bottom-color: rgb(255 255 255 / 0.04);
+}
+
+#vwRenderer .logEntry > div:hover > span {
+    background-color: rgb(255 255 255 / 0.05);
+}
+
+#modalOverlay {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#modalOverlay > div,
+#modalOverlayContainer {
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+#modalOverlay .closeButton,
+#modalOverlayContainer {
+    background: var(--surface-raised-strong);
+    border: 1px solid var(--border-1);
+    box-shadow: var(--panel-shadow);
+}
+
+#modalOverlay .closeButton:hover {
+    background-color: rgb(var(--primary-70) / 0.14) !important;
+}
+
+#loggerExportDialog .options span[data-i18n],
+#loggerExportDialog .options span.pushbutton {
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+}
+
+#loggerExportDialog .output,
+#loggerSettingsDialog {
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: 18px;
+    padding: 0.85rem;
+}
+
+#infoInspector .permatoolbar input[type="search"] {
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: 999px;
+    min-height: 2.1rem;
+    min-width: clamp(12rem, 30vw, 20rem);
+    padding-inline: 0.75rem;
+}
+
+@media (max-width: 780px) {
+    #inspectors {
+        padding: 8px;
+    }
+
+    body > .permatoolbar {
+        padding: 0.55rem 0.65rem;
+    }
+}
 
 .hide {
     display: none !important;

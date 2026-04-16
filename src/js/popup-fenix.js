@@ -576,11 +576,17 @@ const renderPrivacyExposure = function() {
 /******************************************************************************/
 
 const updateHnSwitches = function() {
-    dom.cl.toggle('#no-popups', 'on', popupData.noPopups === true);
-    dom.cl.toggle('#no-large-media', 'on', popupData.noLargeMedia === true);
-    dom.cl.toggle('#no-cosmetic-filtering', 'on',popupData.noCosmeticFiltering === true);
-    dom.cl.toggle('#no-remote-fonts', 'on', popupData.noRemoteFonts === true);
-    dom.cl.toggle('#no-scripting', 'on', popupData.noScripting === true);
+    const switches = [
+        [ '#no-popups', popupData.noPopups === true ],
+        [ '#no-large-media', popupData.noLargeMedia === true ],
+        [ '#no-cosmetic-filtering', popupData.noCosmeticFiltering === true ],
+        [ '#no-remote-fonts', popupData.noRemoteFonts === true ],
+        [ '#no-scripting', popupData.noScripting === true ],
+    ];
+    for ( const [ selector, state ] of switches ) {
+        dom.cl.toggle(selector, 'on', state);
+        dom.attr(selector, 'aria-pressed', state ? 'true' : 'false');
+    }
 };
 
 /******************************************************************************/
@@ -597,6 +603,7 @@ const renderPopup = function() {
     dom.cl.toggle(dom.body, 'advancedUser', popupData.advancedUserEnabled === true);
     dom.cl.toggle(dom.body, 'off', popupData.pageURL === '' || isFiltering !== true);
     dom.cl.toggle(dom.body, 'needSave', popupData.matrixIsDirty === true);
+    dom.attr('#switch', 'aria-pressed', isFiltering === true ? 'true' : 'false');
 
     // The hostname information below the power switch
     {

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>Code viewer</title>
+<title>uBlockVanced Code Viewer</title>
 <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
 <link rel="stylesheet" href="lib/codemirror/theme/night.css">
 <link rel="stylesheet" href="lib/codemirror/addon/search/matchesonscrollbar.css">
@@ -19,8 +19,8 @@
 <div id="header">
     <div id="currentURL">
         <input type="url" value="" spellcheck="false" autofocus="false">
-        <span id="reloadURL" class="fa-icon">refresh</span>
-        <span id="removeURL" class="fa-icon">trash-o</span>
+        <button id="reloadURL" class="fa-icon" type="button" aria-label="Reload current resource">refresh</button>
+        <button id="removeURL" class="fa-icon" type="button" aria-label="Remove current resource from history">trash-o</button>
     </div>
     <div id="pastURLs"></div>
 </div>

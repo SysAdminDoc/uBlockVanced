@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock — Your filters</title>
+<title>uBlockVanced — My filters</title>
 
 <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
 <link rel="stylesheet" href="lib/codemirror/addon/hint/show-hint.css">
@@ -23,20 +23,33 @@
 
 <div class="body">
     <div id="cloudWidget" class="hide" data-cloud-entry="myFiltersPane"></div>
-    <p>
+    <header class="editorHero">
+        <div class="editorHeroCopy">
+            <div class="editorEyebrow" translate="no">uBlockVanced</div>
+            <h1 class="editorTitle" data-i18n="1pPageName"></h1>
+            <p class="editorLead" data-i18n="1pEditorLead"></p>
+        </div>
+        <div id="userFiltersStatus" class="editorStatus" role="status" aria-live="polite" aria-atomic="true">
+            <span id="userFiltersSaveState" class="statusPill"></span>
+            <span id="userFiltersEnabledState" class="statusPill"></span>
+            <span id="userFiltersTrustState" class="statusPill"></span>
+        </div>
+    </header>
+    <div class="editorToolbar">
         <button id="userFiltersApply" class="preferred iconified" type="button" disabled><span class="fa-icon">check</span><span data-i18n="1pApplyChanges">_</span><span class="hover"></span></button>
         <button id="userFiltersRevert" class="iconified" type="button" disabled><span class="fa-icon">undo</span><span data-i18n="genericRevert">_</span><span class="hover"></span></button>
-        &emsp;
         <button id="importUserFiltersFromFile" class="iconified" type="button"><span class="fa-icon">download-alt</span><span data-i18n="1pImport">_</span><span class="hover"></span></button>
         <button id="exportUserFiltersToFile" class="iconified" type="button"><span class="fa-icon">upload-alt</span><span data-i18n="1pExport">_</span><span class="hover"></span></button>
-    </p>
-    <p data-i18n="1pTrustWarning"></p>
-    <div class="li"><label><span id="enableMyFilters" class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="1pEnableMyFiltersLabel"></span></label></div>
-    <div id="trustMyFilters" class="li"><label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="1pTrustMyFiltersLabel"></span></label></div>
+    </div>
+    <p class="trustWarning" data-i18n="1pTrustWarning"></p>
+    <div class="editorOptions">
+        <div class="li"><label><span id="enableMyFilters" class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="1pEnableMyFiltersLabel"></span></label></div>
+        <div id="trustMyFilters" class="li"><label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="1pTrustMyFiltersLabel"></span></label></div>
+    </div>
 </div>
 <div id="userFilters" class="codeMirrorContainer codeMirrorBreakAll cm-theme-override" spellcheck="false"></div>
 <div class="hidden">
-    <input id="importFilePicker" type="file" accept="text/plain">
+    <input id="importFilePicker" type="file" name="userFiltersImport" accept="text/plain,.txt">
 </div>
 
 <script src="lib/codemirror/lib/codemirror.js"></script>

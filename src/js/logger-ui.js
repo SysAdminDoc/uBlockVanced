@@ -76,6 +76,12 @@ const dispatchTabidChange = vAPI.defer.create(( ) => {
 
 const escapeRegexStr = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+const setBooleanAttribute = function(target, attr, state) {
+    const elem = typeof target === 'string' ? qs$(target) : target;
+    if ( elem === null ) { return; }
+    elem.setAttribute(attr, state ? 'true' : 'false');
+};
+
 /******************************************************************************/
 /******************************************************************************/
 
@@ -86,6 +92,7 @@ const modalDialog = (( ) => {
     const container = qs$('#modalOverlayContainer');
     const closeButton = qs$(overlay, ':scope .closeButton');
     let onDestroyed;
+    let lastFocusedElement;
 
     const removeChildren = logger.removeAllChildren = function(node) {
         while ( node.firstChild ) {
@@ -96,6 +103,8 @@ const modalDialog = (( ) => {
     const create = function(selector, destroyListener) {
         const template = qs$(selector);
         const dialog = dom.clone(template);
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-modal', 'true');
         removeChildren(container);
         container.appendChild(dialog);
         onDestroyed = destroyListener;
@@ -103,17 +112,25 @@ const modalDialog = (( ) => {
     };
 
     const show = function() {
+        lastFocusedElement = document.activeElement;
+        overlay.setAttribute('aria-hidden', 'false');
         dom.cl.add(overlay, 'on');
+        closeButton.focus();
     };
 
     const destroy = function() {
         dom.cl.remove(overlay, 'on');
+        overlay.setAttribute('aria-hidden', 'true');
         const dialog = container.firstElementChild;
         removeChildren(container);
         if ( typeof onDestroyed === 'function' ) {
             onDestroyed(dialog);
         }
         onDestroyed = undefined;
+        if ( lastFocusedElement instanceof HTMLElement ) {
+            lastFocusedElement.focus();
+        }
+        lastFocusedElement = undefined;
     };
 
     const onClose = function(ev) {
@@ -123,6 +140,12 @@ const modalDialog = (( ) => {
     };
     dom.on(overlay, 'click', onClose);
     dom.on(closeButton, 'click', onClose);
+    dom.on(overlay, 'keydown', ev => {
+        if ( ev.key === 'Escape' ) {
+            destroy();
+        }
+    });
+    overlay.setAttribute('aria-hidden', 'true');
 
     return { create, show, destroy };
 })();
@@ -212,6 +235,7 @@ const nodeFromURL = function(parent, url, re, type) {
         }
         dom.attr(a, 'href', href);
         dom.attr(a, 'target', '_blank');
+        dom.attr(a, 'rel', 'noopener noreferrer');
         fragment.appendChild(a);
     }
     parent.appendChild(fragment);
@@ -1575,6 +1599,8 @@ dom.on(document, 'keydown', ev => {
                 a = qs$(span, 'a:nth-of-type(2)');
                 if ( list.supportURL ) {
                     dom.attr(a, 'href', list.supportURL);
+                    dom.attr(a, 'title', i18n$('loggerOpenSupportTip'));
+                    dom.attr(a, 'aria-label', i18n$('loggerOpenSupportTip'));
                 } else {
                     a.style.display = 'none';
                 }
@@ -2096,6 +2122,7 @@ const consolePane = (( ) => {
     dom.on('button.logConsole', 'click', ev => {
         const active = dom.cl.toggle('#inspectors', 'console');
         dom.cl.toggle(ev.currentTarget, 'active', active);
+        setBooleanAttribute(ev.currentTarget, 'aria-pressed', active);
     });
 
     dom.on('#infoInspector button#clearConsole', 'click', ( ) => {
@@ -2108,6 +2135,7 @@ const consolePane = (( ) => {
 
     dom.on('#infoInspector button#logLevel', 'click', ev => {
         const level = dom.cl.toggle(ev.currentTarget, 'active') ? 2 : 1;
+        setBooleanAttribute(ev.currentTarget, 'aria-pressed', level === 2);
         broadcast({ what: 'loggerLevelChanged', level });
     });
 
@@ -2128,14 +2156,43 @@ const consolePane = (( ) => {
 const rowFilterer = (( ) => {
     const userFilters = [];
     const builtinFilters = [];
+    const filterButton = qs$('#filterButton');
+    const filterExprGroup = qs$('#filterExprGroup');
+    const filterExprButton = qs$('#filterExprButton');
+    const filterExprPicker = qs$('#filterExprPicker');
+    const filterInput = qs$('#filterInput > input');
 
     let masterFilterSwitch = true;
     let filters = [];
 
+    const syncMasterFilterState = function() {
+        dom.cl.toggle('#netInspector', 'f', masterFilterSwitch);
+        setBooleanAttribute(filterButton, 'aria-pressed', masterFilterSwitch);
+    };
+
+    const syncExtraFilterState = function(expanded) {
+        dom.cl.toggle(filterExprGroup, 'expanded', expanded);
+        dom.cl.toggle(filterExprButton, 'expanded', expanded);
+        setBooleanAttribute(filterExprButton, 'aria-expanded', expanded);
+    };
+
+    const syncBuiltinFilterTokens = function() {
+        const filtexElems = qsa$(filterExprPicker, '[data-filtex]');
+        for ( const filtexElem of filtexElems ) {
+            filtexElem.setAttribute('role', 'button');
+            filtexElem.tabIndex = 0;
+            setBooleanAttribute(
+                filtexElem,
+                'aria-pressed',
+                dom.cl.has(filtexElem, 'on')
+            );
+        }
+    };
+
     const parseInput = function() {
         userFilters.length = 0;
 
-        const rawParts = qs$('#filterInput > input').value.trim().split(/\s+/);
+        const rawParts = filterInput.value.trim().split(/\s+/);
         const n = rawParts.length;
         const reStrs = [];
         let not = false;
@@ -2245,17 +2302,18 @@ const rowFilterer = (( ) => {
 
     const onFilterButton = function() {
         masterFilterSwitch = !masterFilterSwitch;
-        dom.cl.toggle('#netInspector', 'f', masterFilterSwitch);
+        syncMasterFilterState();
         filterAll();            
     };
 
     const onToggleExtras = function(ev) {
-        dom.cl.toggle(ev.target, 'expanded');
+        ev.preventDefault();
+        syncExtraFilterState(dom.cl.has(filterExprGroup, 'expanded') === false);
     };
 
     const builtinFilterExpression = function() {
         builtinFilters.length = 0;
-        const filtexElems = qsa$('#filterExprPicker [data-filtex]');
+        const filtexElems = qsa$(filterExprPicker, '[data-filtex]');
         const orExprs = [];
         let not = false;
         for ( const filtexElem of filtexElems ) {
@@ -2281,23 +2339,39 @@ const rowFilterer = (( ) => {
             });
         }
         filters = builtinFilters.concat(userFilters);
-        dom.cl.toggle('#filterExprButton', 'active', builtinFilters.length !== 0);
+        dom.cl.toggle(filterExprButton, 'active', builtinFilters.length !== 0);
+        syncBuiltinFilterTokens();
         filterAll();
     };
 
     dom.on('#filterButton', 'click', onFilterButton);
-    dom.on('#filterInput > input', 'input', onFilterChangedAsync);
+    dom.on(filterInput, 'input', onFilterChangedAsync);
     dom.on('#filterExprButton', 'click', onToggleExtras);
     dom.on('#filterExprPicker', 'click', '[data-filtex]', ev => {
         dom.cl.toggle(ev.target, 'on');
         builtinFilterExpression();
     });
-    dom.on('#filterInput > input', 'drop', ev => {
+    dom.on(filterExprPicker, 'keydown', '[data-filtex]', ev => {
+        if ( ev.key !== 'Enter' && ev.key !== ' ' ) { return; }
+        ev.preventDefault();
+        ev.target.click();
+    });
+    dom.on(filterExprGroup, 'keydown', ev => {
+        if ( ev.key !== 'Escape' ) { return; }
+        syncExtraFilterState(false);
+        filterExprButton.focus();
+    });
+    dom.on(document, 'click', ev => {
+        if ( dom.cl.has(filterExprGroup, 'expanded') === false ) { return; }
+        if ( filterExprGroup.contains(ev.target) ) { return; }
+        syncExtraFilterState(false);
+    });
+    dom.on(filterInput, 'drop', ev => {
         const dropItem = item => {
             if ( item.kind !== 'string' ) { return false; }
             if ( item.type !== 'text/plain' ) { return false; }
             item.getAsString(s => {
-                qs$('#filterInput > input').value = s;
+                filterInput.value = s;
                 parseInput();
                 filterAll();
             });
@@ -2312,6 +2386,8 @@ const rowFilterer = (( ) => {
 
     // https://github.com/gorhill/uBlock/issues/404
     //   Ensure page state is in sync with the state of its various widgets.
+    syncMasterFilterState();
+    syncExtraFilterState(dom.cl.has(filterExprButton, 'expanded'));
     parseInput();
     builtinFilterExpression();
     filterAll();
@@ -2533,6 +2609,7 @@ const rowJanitor = (( ) => {
 
 const pauseNetInspector = function() {
     netInspectorPaused = dom.cl.toggle('#netInspector', 'paused');
+    setBooleanAttribute('#pause', 'aria-pressed', netInspectorPaused);
 };
 
 /******************************************************************************/
@@ -2833,11 +2910,19 @@ const loggerStats = (( ) => {
     const setRadioButton = function(group, value) {
         if ( Object.hasOwn(options, group) === false ) { return; }
         const groupEl = qs$(dialog, `[data-radio="${group}"]`);
+        groupEl.setAttribute('role', 'radiogroup');
         const buttonEls = qsa$(groupEl, '[data-radio-item]');
         for ( const buttonEl of buttonEls ) {
+            buttonEl.setAttribute('role', 'radio');
+            buttonEl.tabIndex = 0;
             dom.cl.toggle(
                 buttonEl,
                 'on',
+                dom.attr(buttonEl, 'data-radio-item') === value
+            );
+            setBooleanAttribute(
+                buttonEl,
+                'aria-checked',
                 dom.attr(buttonEl, 'data-radio-item') === value
             );
         }
@@ -2874,6 +2959,14 @@ const loggerStats = (( ) => {
         ev.stopPropagation();
     };
 
+    const onOptionKeydown = function(ev) {
+        if ( ev.key !== 'Enter' && ev.key !== ' ' ) { return; }
+        const target = ev.target.closest('span[data-i18n]');
+        if ( target === null ) { return; }
+        ev.preventDefault();
+        target.click();
+    };
+
     const toggleOn = function() {
         dialog = modalDialog.create(
             '#loggerExportDialog',
@@ -2889,7 +2982,13 @@ const loggerStats = (( ) => {
         collectLines();
         format();
 
-        dom.on(qs$(dialog, '.options'), 'click', onOption, { capture: true });
+        const optionsContainer = qs$(dialog, '.options');
+        const copyButton = qs$(optionsContainer, '.pushbutton');
+        copyButton.setAttribute('role', 'button');
+        copyButton.tabIndex = 0;
+
+        dom.on(optionsContainer, 'click', onOption, { capture: true });
+        dom.on(optionsContainer, 'keydown', onOptionKeydown, { capture: true });
 
         modalDialog.show();
     };

@@ -17,7 +17,7 @@
 
 <div class="permatoolbar">
     <div>
-        <select id="pageSelector">
+        <select id="pageSelector" data-i18n-title="loggerPageSelectorLabel" aria-label="data-title">
             <option value="0" data-i18n="logAll">
             <option value="-1" data-i18n="logBehindTheScene">
             <option value="_" data-i18n="loggerCurrentTab">
@@ -27,10 +27,10 @@
         <button id="showpopup" class="iconified notext disabled needdom" data-i18n-title="loggerPopupPanelTip" type="button"><span class="fa-icon"><svg><use href="/img/ublock-defs.svg#ubo-solid"></use></svg></span><span class="hover"></span></button>
     </div>
     <div>
-        <button class="logConsole iconified notext" title="Show/hide console" type="button"><span class="fa-icon">terminal</span><span class="hover"></span></button>
+        <button class="logConsole iconified notext" data-i18n-title="loggerConsoleTip" aria-pressed="false" type="button"><span class="fa-icon">terminal</span><span class="hover"></span></button>
     </div>
     <div>
-        <a class="wikilink fa-icon" href="https://github.com/gorhill/uBlock/wiki/The-logger" target="_blank" data-i18n-title="loggerInfoTip">book</a>
+        <a class="wikilink fa-icon" href="https://github.com/gorhill/uBlock/wiki/The-logger" target="_blank" rel="noopener noreferrer" data-i18n-title="loggerInfoTip">book</a>
     </div>
 </div>
 
@@ -38,11 +38,11 @@
     <div id="domInspector" class="inspector hCompact">
         <div class="permatoolbar">
             <div>
-                <button class="iconified notext vExpandToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-                <button class="iconified notext vCompactToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-                <button class="iconified notext hCompactToggler"><span class="fa-icon">double-angle-left</span><span class="hover"></span></button>
-                <button class="iconified notext revert disabled"><span class="fa-icon">eraser</span><span class="hover"></span></button>
-                <button class="iconified notext commit disabled"><span class="fa-icon">floppy-o</span><span class="hover"></span></button>
+                <button class="iconified notext vExpandToggler" data-i18n-title="loggerInspectorExpandTip" type="button"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
+                <button class="iconified notext vCompactToggler" data-i18n-title="loggerInspectorCompactHeightTip" type="button"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
+                <button class="iconified notext hCompactToggler" data-i18n-title="loggerInspectorCompactWidthTip" type="button"><span class="fa-icon">double-angle-left</span><span class="hover"></span></button>
+                <button class="iconified notext revert disabled" data-i18n-title="loggerInspectorRevertTip" type="button"><span class="fa-icon">eraser</span><span class="hover"></span></button>
+                <button class="iconified notext commit disabled" data-i18n-title="loggerInspectorCommitTip" type="button"><span class="fa-icon">floppy-o</span><span class="hover"></span></button>
             </div>
         </div>
         <div class="vscrollable">
@@ -52,15 +52,15 @@
     <div id="netInspector" class="inspector f">
         <div class="permatoolbar">
             <div>
-                <button class="iconified notext vCompactToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-                <button id="clean" class="iconified notext disabled"><span class="fa-icon">times</span><span class="hover"></span></button>
+                <button class="iconified notext vCompactToggler" data-i18n-title="loggerInspectorCompactHeightTip" type="button"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
+                <button id="clean" class="iconified notext disabled" data-i18n-title="loggerCleanTip" type="button"><span class="fa-icon">times</span><span class="hover"></span></button>
                 <button id="clear" class="iconified notext disabled" data-i18n-title="loggerClearTip"><span class="fa-icon">eraser</span><span class="hover"></span></button>
-                <button id="pause" class="iconified notext"><span class="fa-icon" data-i18n-title="loggerPauseTip">pause-circle-o</span><span class="fa-icon" data-i18n-title="loggerUnpauseTip">play-circle-o</span><span class="hover"></span></button>&ensp;
+                <button id="pause" class="iconified notext" aria-pressed="false" type="button"><span class="fa-icon" data-i18n-title="loggerPauseTip">pause-circle-o</span><span class="fa-icon" data-i18n-title="loggerUnpauseTip">play-circle-o</span><span class="hover"></span></button>&ensp;
                 <span id="filterExprGroup">
-                    <button id="filterButton" class="iconified notext" data-i18n-title="loggerRowFiltererButtonTip"><span class="fa-icon">filter</span><span class="hover"></span></button>
+                    <button id="filterButton" class="iconified notext" data-i18n-title="loggerRowFiltererButtonTip" aria-pressed="true" type="button"><span class="fa-icon">filter</span><span class="hover"></span></button>
                     <span id="filterInput">
-                        <input type="search" placeholder="logFilterPrompt" spellcheck="false">
-                        <span id="filterExprButton" class="button fa-icon expanded" data-i18n-title="loggerRowFiltererBuiltinTip">angle-up</span>
+                        <input id="loggerFilterInput" type="search" placeholder="logFilterPrompt" data-i18n-title="logFilterPrompt" aria-label="data-title" spellcheck="false">
+                        <button id="filterExprButton" class="button fa-icon" data-i18n-title="loggerRowFiltererBuiltinTip" aria-controls="filterExprPicker" aria-expanded="false" aria-haspopup="true" type="button">angle-up</button>
                         <div id="filterExprPicker">
                             <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span><span data-filtex="\x1F--\x1F|\x1F<<\x1F|\x1F##" data-i18n="loggerRowFiltererBuiltinBlocked"></span><span data-filtex="\x1F\+\+\x1F|\x1F\*\*\x1F|\x1F#@#" data-i18n="loggerRowFiltererBuiltinAllowed"></span><span data-filtex="[$,](?:csp|permissions|removeparam|redirect-rule|replace|urlskip|ur[il]transform)=|\x1F\<\<\x1F" data-i18n="loggerRowFiltererBuiltinModified"></span></div>
                             <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span>
@@ -87,9 +87,9 @@
                 </span>
             </div>
             <div>
-                <button id="loggerStats" class="iconified notext" style="display: none;"><span class="fa-icon">bar-chart</span><span class="hover"></span></button>
-                <button id="loggerExport" class="iconified notext"><span class="fa-icon">clipboard</span><span class="hover"></span></button>
-                <button id="loggerSettings" class="iconified notext"><span class="fa-icon">cog</span><span class="hover"></span></button>
+                <button id="loggerStats" class="iconified notext" data-i18n-title="loggerStatsTip" type="button" style="display: none;"><span class="fa-icon">bar-chart</span><span class="hover"></span></button>
+                <button id="loggerExport" class="iconified notext" data-i18n-title="loggerExportTip" type="button"><span class="fa-icon">clipboard</span><span class="hover"></span></button>
+                <button id="loggerSettings" class="iconified notext" data-i18n-title="loggerSettingsTip" type="button"><span class="fa-icon">cog</span><span class="hover"></span></button>
             </div>
         </div>
         <div class="vscrollable">
@@ -109,9 +109,9 @@
     <div id="infoInspector" class="inspector">
         <div class="permatoolbar">
             <div>
-                <button id="clearConsole" class="iconified notext"><span class="fa-icon">eraser</span><span class="hover"></span></button>
-                <button id="logLevel" class="iconified notext" title="Toggle verbose mode" type="button"><span class="fa-icon">volume-up</span><span class="hover"></span></button>&ensp;
-                <input type="search" placeholder="Filter output" spellcheck="false">
+                <button id="clearConsole" class="iconified notext" data-i18n-title="loggerClearConsoleTip" type="button"><span class="fa-icon">eraser</span><span class="hover"></span></button>
+                <button id="logLevel" class="iconified notext" data-i18n-title="loggerVerboseTip" aria-pressed="false" type="button"><span class="fa-icon">volume-up</span><span class="hover"></span></button>&ensp;
+                <input id="loggerConsoleFilter" type="search" placeholder="loggerConsoleFilterPrompt" data-i18n-title="loggerConsoleFilterPrompt" aria-label="data-title" spellcheck="false">
             </div>
         </div>
         <div class="vscrollable">
@@ -122,7 +122,7 @@
 
 <div id="modalOverlay">
     <div>
-        <div class="closeButton"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></div>
+        <button class="closeButton iconified notext" data-i18n-title="loggerCloseDialogTip" type="button"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></button>
         <div id="modalOverlayContainer"></div>
     </div>
 </div>
@@ -182,8 +182,8 @@
 
     <div id="filterFinderListEntry">
         <span class="listEntry"><!--
-         --><a href="asset-viewer.html?url=" target="_blank"></a>&nbsp;<!--
-         --><a href="#" class="fa-icon" target="_blank">home</a><!--
+         --><a href="asset-viewer.html?url=" target="_blank" rel="noopener noreferrer"></a>&nbsp;<!--
+         --><a href="#" class="fa-icon" target="_blank" rel="noopener noreferrer">home</a><!--
      --></span>
     </div>
 

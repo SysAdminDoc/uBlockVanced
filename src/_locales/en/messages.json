@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "uBlockForge",
+    "message": "uBlockVanced",
     "description": "extension name."
   },
   "extShortDesc": {
-    "message": "An efficient content blocker with advanced element hiding. Forged from uBlock Origin.",
+    "message": "An efficient content blocker with advanced element hiding. Based on uBlock Origin.",
     "description": "this will be in the Chrome web store: must be 132 characters or less"
   },
   "dashboardName": {
-    "message": "uBlockForge -- Dashboard",
-    "description": "English: uBlockForge -- Dashboard"
+    "message": "uBlockVanced -- Dashboard",
+    "description": "English: uBlockVanced -- Dashboard"
   },
   "dashboardUnsavedWarning": {
     "message": "Warning: you have unsaved changes!",
@@ -35,6 +35,34 @@
     "message": "My filters",
     "description": "appears as tab name in dashboard"
   },
+  "1pEditorLead": {
+    "message": "Create, import, and review your custom static filters before applying them.",
+    "description": "Supporting text at the top of the 'My filters' pane"
+  },
+  "1pEditorStatusSaved": {
+    "message": "All changes applied",
+    "description": "Status pill shown when there are no pending changes in the 'My filters' pane"
+  },
+  "1pEditorStatusUnsaved": {
+    "message": "Changes not applied yet",
+    "description": "Status pill shown when there are pending changes in the 'My filters' pane"
+  },
+  "1pEditorStateEnabled": {
+    "message": "My filters enabled",
+    "description": "Status pill shown when custom filters are enabled"
+  },
+  "1pEditorStateDisabled": {
+    "message": "My filters disabled",
+    "description": "Status pill shown when custom filters are disabled"
+  },
+  "1pEditorTrustEnabled": {
+    "message": "Trusted scriptlets allowed",
+    "description": "Status pill shown when trusted custom filters are allowed"
+  },
+  "1pEditorTrustStandard": {
+    "message": "Standard filtering only",
+    "description": "Status pill shown when trusted custom filters are not allowed"
+  },
   "rulesPageName": {
     "message": "My rules",
     "description": "appears as tab name in dashboard"
@@ -43,12 +71,36 @@
     "message": "Trusted sites",
     "description": "appears as tab name in dashboard"
   },
+  "whitelistEditorLead": {
+    "message": "Review where uBlockVanced should stand down, then import, export, or apply trusted-site directives with confidence.",
+    "description": "Supporting text at the top of the 'Trusted sites' pane"
+  },
+  "whitelistStatusSaved": {
+    "message": "All changes applied",
+    "description": "Status pill shown when there are no pending changes in the 'Trusted sites' pane"
+  },
+  "whitelistStatusUnsaved": {
+    "message": "Changes not applied yet",
+    "description": "Status pill shown when there are pending changes in the 'Trusted sites' pane"
+  },
+  "whitelistStatusValid": {
+    "message": "Syntax looks good",
+    "description": "Status pill shown when all trusted-site directives are valid"
+  },
+  "whitelistStatusNeedsReview": {
+    "message": "Review invalid directives",
+    "description": "Status pill shown when trusted-site directives need attention"
+  },
+  "whitelistDirectiveCount": {
+    "message": "Custom directives: {{count}}",
+    "description": "Status pill summarizing the number of custom trusted-site directives"
+  },
   "shortcutsPageName": {
     "message": "Shortcuts",
     "description": "appears as tab name in dashboard"
   },
   "statsPageName": {
-    "message": "uBlock₀ — Logger",
+    "message": "uBlockVanced — Logger",
     "description": "Title for the logger window"
   },
   "aboutPageName": {
@@ -60,12 +112,352 @@
     "description": "appears as tab name in dashboard"
   },
   "assetViewerPageName": {
-    "message": "uBlock₀ — Asset viewer",
+    "message": "uBlockVanced — Asset viewer",
     "description": "Title for the asset viewer page"
+  },
+  "assetViewerLead": {
+    "message": "Inspect raw list content, review the source, and subscribe only when it matches what you expect.",
+    "description": "Supporting copy at the top of the asset viewer page"
+  },
+  "assetViewerUntitledAsset": {
+    "message": "Asset details",
+    "description": "Fallback heading when the asset viewer has no title parameter"
+  },
+  "assetViewerNoAssetSelected": {
+    "message": "No asset URL was provided.",
+    "description": "Fallback metadata text when the asset viewer is opened without a target asset"
+  },
+  "assetViewerStatusLoading": {
+    "message": "Loading asset content…",
+    "description": "Primary status shown while the asset viewer is loading content"
+  },
+  "assetViewerStatusReady": {
+    "message": "Asset ready to inspect",
+    "description": "Primary status shown after the asset viewer loads content"
+  },
+  "assetViewerStatusMissing": {
+    "message": "No asset selected",
+    "description": "Primary status shown when the asset viewer is opened without a target asset"
+  },
+  "assetViewerStatusLoadError": {
+    "message": "This asset could not be loaded",
+    "description": "Primary status shown when the asset viewer cannot load content"
+  },
+  "assetViewerStatusUnavailable": {
+    "message": "Source details unavailable",
+    "description": "Secondary status shown when the asset viewer cannot resolve source metadata"
+  },
+  "assetViewerStatusTrusted": {
+    "message": "Trusted source",
+    "description": "Secondary status shown when the asset comes from a trusted source"
+  },
+  "assetViewerStatusExternal": {
+    "message": "External source",
+    "description": "Secondary status shown when the asset comes from an external or untrusted source"
+  },
+  "assetViewerStatusSubscribing": {
+    "message": "Adding this list…",
+    "description": "Primary status shown while the asset viewer is subscribing to a list"
+  },
+  "assetViewerStatusSubscribed": {
+    "message": "List added",
+    "description": "Primary status shown after the asset viewer successfully subscribes to a list"
+  },
+  "assetViewerStatusSubscribeError": {
+    "message": "The list could not be added",
+    "description": "Primary status shown when the asset viewer fails to subscribe to a list"
+  },
+  "assetViewerLineCount": {
+    "message": "{{count}} lines",
+    "description": "Summary of the number of lines in the loaded asset"
+  },
+  "assetViewerOpenSource": {
+    "message": "Open source page",
+    "description": "Label for the source link button in the asset viewer"
+  },
+  "assetViewerSubscribeEyebrow": {
+    "message": "Subscribe to this list",
+    "description": "Small heading above the subscribe card in the asset viewer"
+  },
+  "assetViewerSubscribeHint": {
+    "message": "Review the source first, then add the list when you trust its purpose and maintainer.",
+    "description": "Supporting copy in the subscribe card of the asset viewer"
+  },
+  "assetViewerSubscribePending": {
+    "message": "Ready to subscribe",
+    "description": "Status shown in the subscribe card before the user subscribes to a list"
+  },
+  "assetViewerSubscribeWorking": {
+    "message": "Adding list…",
+    "description": "Status shown in the subscribe card while a list is being added"
+  },
+  "assetViewerSubscribeDone": {
+    "message": "List added successfully",
+    "description": "Status shown in the subscribe card after a list has been added"
+  },
+  "assetViewerSubscribeError": {
+    "message": "Could not add this list",
+    "description": "Status shown in the subscribe card when adding a list fails"
+  },
+  "assetViewerLoadError": {
+    "message": "The asset viewer could not retrieve this content.",
+    "description": "Error message displayed inside the asset viewer editor when content loading fails"
   },
   "advancedSettingsPageName": {
     "message": "Advanced settings",
     "description": "Title for the advanced settings page"
+  },
+  "advancedSettingsLead": {
+    "message": "Fine-tune expert preferences, review policy-locked values, and apply changes only when the diff looks intentional.",
+    "description": "Supporting copy at the top of the advanced settings page"
+  },
+  "advancedSettingsRiskEyebrow": {
+    "message": "Expert workspace",
+    "description": "Small eyebrow label above the advanced settings warning card"
+  },
+  "advancedSettingsRiskTitle": {
+    "message": "Handle advanced changes carefully",
+    "description": "Headline for the advanced settings warning card"
+  },
+  "advancedSettingsGuideAction": {
+    "message": "Open guide",
+    "description": "Label for the documentation link in the advanced settings warning card"
+  },
+  "advancedSettingsToolbarHint": {
+    "message": "Use Revert to discard in-progress edits and return to the current saved state.",
+    "description": "Helper text beside the advanced settings action buttons"
+  },
+  "advancedSettingsStatusSaved": {
+    "message": "Current settings loaded",
+    "description": "Status pill shown when the advanced settings editor has no pending changes"
+  },
+  "advancedSettingsStatusUnsaved": {
+    "message": "Changes not applied yet",
+    "description": "Status pill shown when the advanced settings editor has pending changes"
+  },
+  "advancedSettingsStatusSaving": {
+    "message": "Applying changes...",
+    "description": "Status pill shown while the advanced settings editor is saving changes"
+  },
+  "advancedSettingsStatusApplied": {
+    "message": "Changes applied",
+    "description": "Status pill shown after the advanced settings editor saves changes"
+  },
+  "advancedSettingsStatusReverted": {
+    "message": "Edits reverted",
+    "description": "Status pill shown after the advanced settings editor discards in-progress edits"
+  },
+  "advancedSettingsStatusSaveError": {
+    "message": "Could not apply changes",
+    "description": "Status pill shown when the advanced settings editor fails to save changes"
+  },
+  "advancedSettingsCustomizedCount": {
+    "message": "Customized settings: {{count}}",
+    "description": "Status pill showing how many advanced settings differ from their defaults"
+  },
+  "advancedSettingsLockCount": {
+    "message": "Admin-locked: {{count}}",
+    "description": "Status pill showing how many advanced settings are locked by administrative policy"
+  },
+  "advancedSettingsLockCountNone": {
+    "message": "No admin locks",
+    "description": "Status pill shown when no advanced settings are locked by administrative policy"
+  },
+  "advancedSettingsPolicyHintLocked": {
+    "message": "{{count}} of {{total}} settings are enforced by policy and stay read-only here.",
+    "description": "Supporting copy in the advanced settings warning card when policy-locked settings are present"
+  },
+  "advancedSettingsPolicyHintClear": {
+    "message": "{{total}} settings are available to review and adjust on this device.",
+    "description": "Supporting copy in the advanced settings warning card when no policy-locked settings are present"
+  },
+  "devtoolsPageName": {
+    "message": "uBlockVanced — DevTools",
+    "description": "Title for the DevTools window"
+  },
+  "devtoolsPageTitle": {
+    "message": "DevTools workspace",
+    "description": "Main heading for the DevTools page"
+  },
+  "devtoolsPageLead": {
+    "message": "Inspect internal filter data, capture targeted dumps, and run engine benchmarks from one focused workspace.",
+    "description": "Supporting copy at the top of the DevTools page"
+  },
+  "devtoolsQueryHelp": {
+    "message": "Type <code>snfe? script example.com source.com</code> on a new line to expand an inline SNFE query.",
+    "description": "Inline helper copy explaining the SNFE query shortcut on the DevTools page"
+  },
+  "devtoolsStatusReady": {
+    "message": "Console ready",
+    "description": "Primary status shown when the DevTools page is idle"
+  },
+  "devtoolsStatusHint": {
+    "message": "Run a dump, benchmark, or cache action to prepend the latest result here.",
+    "description": "Secondary status shown when the DevTools page is idle"
+  },
+  "devtoolsStatusWorking": {
+    "message": "Working on the latest request…",
+    "description": "Secondary status shown while a DevTools action is running"
+  },
+  "devtoolsStatusLatestResult": {
+    "message": "Newest output is pinned to the top of the console.",
+    "description": "Secondary status shown after a DevTools action finishes"
+  },
+  "devtoolsStatusTryAgain": {
+    "message": "Review the console output and try again if needed.",
+    "description": "Secondary status shown after a DevTools action fails"
+  },
+  "devtoolsStatusBenchmarksEnabled": {
+    "message": "Benchmark actions are available in this session.",
+    "description": "Secondary status shown when benchmark actions are enabled"
+  },
+  "devtoolsStatusBenchmarksUnavailable": {
+    "message": "Benchmark actions are unavailable in this session.",
+    "description": "Secondary status shown when benchmark actions cannot be used"
+  },
+  "devtoolsStatusRequestFailed": {
+    "message": "The request could not be completed.",
+    "description": "Primary status shown after a DevTools action fails"
+  },
+  "devtoolsStatusCleared": {
+    "message": "Console cleared",
+    "description": "Primary status shown after clearing the DevTools console"
+  },
+  "devtoolsStatusFolded": {
+    "message": "Collapsed one fold level",
+    "description": "Primary status shown after collapsing a fold level in the DevTools console"
+  },
+  "devtoolsStatusUnfolded": {
+    "message": "Expanded one fold level",
+    "description": "Primary status shown after expanding a fold level in the DevTools console"
+  },
+  "devtoolsStatusNothingToFold": {
+    "message": "Nothing left to collapse",
+    "description": "Primary status shown when there are no more foldable sections in the DevTools console"
+  },
+  "devtoolsStatusNothingToUnfold": {
+    "message": "Nothing left to expand",
+    "description": "Primary status shown when there are no more folded sections in the DevTools console"
+  },
+  "devtoolsStatusSnfeDumpRunning": {
+    "message": "Running the SNFE dump…",
+    "description": "Primary status shown while the SNFE dump action is running"
+  },
+  "devtoolsStatusSnfeDumpDone": {
+    "message": "SNFE dump added",
+    "description": "Primary status shown after the SNFE dump action completes"
+  },
+  "devtoolsStatusSnfeToDnrRunning": {
+    "message": "Converting SNFE data to DNR output…",
+    "description": "Primary status shown while the SNFE to DNR action is running"
+  },
+  "devtoolsStatusSnfeToDnrDone": {
+    "message": "DNR-ready output added",
+    "description": "Primary status shown after the SNFE to DNR action completes"
+  },
+  "devtoolsStatusCfeDumpRunning": {
+    "message": "Running the CFE dump…",
+    "description": "Primary status shown while the CFE dump action is running"
+  },
+  "devtoolsStatusCfeDumpDone": {
+    "message": "CFE dump added",
+    "description": "Primary status shown after the CFE dump action completes"
+  },
+  "devtoolsStatusPurgeRunning": {
+    "message": "Purging extension caches…",
+    "description": "Primary status shown while the purge-caches action is running"
+  },
+  "devtoolsStatusPurgeDone": {
+    "message": "All caches purged",
+    "description": "Primary status shown after the purge-caches action completes"
+  },
+  "devtoolsStatusSnfeBenchmarkRunning": {
+    "message": "Running the SNFE benchmark…",
+    "description": "Primary status shown while the SNFE benchmark is running"
+  },
+  "devtoolsStatusSnfeBenchmarkDone": {
+    "message": "SNFE benchmark added",
+    "description": "Primary status shown after the SNFE benchmark completes"
+  },
+  "devtoolsStatusCfeBenchmarkRunning": {
+    "message": "Running the CFE benchmark…",
+    "description": "Primary status shown while the CFE benchmark is running"
+  },
+  "devtoolsStatusCfeBenchmarkDone": {
+    "message": "CFE benchmark added",
+    "description": "Primary status shown after the CFE benchmark completes"
+  },
+  "devtoolsStatusSfeBenchmarkRunning": {
+    "message": "Running the SFE benchmark…",
+    "description": "Primary status shown while the SFE benchmark is running"
+  },
+  "devtoolsStatusSfeBenchmarkDone": {
+    "message": "SFE benchmark added",
+    "description": "Primary status shown after the SFE benchmark completes"
+  },
+  "devtoolsStatusQueryRunning": {
+    "message": "Expanding the SNFE query…",
+    "description": "Primary status shown while an inline SNFE query is being resolved"
+  },
+  "devtoolsStatusQueryDone": {
+    "message": "SNFE query result added",
+    "description": "Primary status shown after an inline SNFE query is resolved"
+  },
+  "devtoolsConsoleGroup": {
+    "message": "Console",
+    "description": "Section label for the console controls on the DevTools page"
+  },
+  "devtoolsNetworkGroup": {
+    "message": "Network engine",
+    "description": "Section label for the network-engine controls on the DevTools page"
+  },
+  "devtoolsCosmeticGroup": {
+    "message": "Cosmetic engines",
+    "description": "Section label for the cosmetic-engine controls on the DevTools page"
+  },
+  "devtoolsMaintenanceGroup": {
+    "message": "Maintenance",
+    "description": "Section label for the maintenance controls on the DevTools page"
+  },
+  "devtoolsConsoleClearTip": {
+    "message": "Clear console output",
+    "description": "Tooltip for the clear-console button on the DevTools page"
+  },
+  "devtoolsConsoleFoldTip": {
+    "message": "Collapse one fold level",
+    "description": "Tooltip for the fold button on the DevTools page"
+  },
+  "devtoolsConsoleUnfoldTip": {
+    "message": "Expand one fold level",
+    "description": "Tooltip for the unfold button on the DevTools page"
+  },
+  "devtoolsSnfeDump": {
+    "message": "SNFE dump",
+    "description": "Label for the SNFE dump button on the DevTools page"
+  },
+  "devtoolsSnfeToDnr": {
+    "message": "SNFE to DNR",
+    "description": "Label for the SNFE-to-DNR button on the DevTools page"
+  },
+  "devtoolsSnfeBenchmark": {
+    "message": "SNFE benchmark",
+    "description": "Label for the SNFE benchmark button on the DevTools page"
+  },
+  "devtoolsCfeDump": {
+    "message": "CFE dump",
+    "description": "Label for the CFE dump button on the DevTools page"
+  },
+  "devtoolsCfeBenchmark": {
+    "message": "CFE benchmark",
+    "description": "Label for the CFE benchmark button on the DevTools page"
+  },
+  "devtoolsSfeBenchmark": {
+    "message": "SFE benchmark",
+    "description": "Label for the SFE benchmark button on the DevTools page"
+  },
+  "devtoolsPurgeCachesTip": {
+    "message": "Purge all caches",
+    "description": "Tooltip for the purge-caches button on the DevTools page"
   },
   "popupPowerSwitchInfo": {
     "message": "Click: disable/enable uBlock₀ for this site.\n\nCtrl+click: disable uBlock₀ only on this page.",
@@ -343,6 +735,10 @@
     "message": "Theme",
     "description": "Label for checkbox to enable a custom dark theme"
   },
+  "settingsThemeAccentColorLabel": {
+    "message": "Custom accent color picker",
+    "description": "Accessible label for the custom accent color picker in Settings"
+  },
   "settingsThemeAccent0Label": {
     "message": "Custom accent color",
     "description": "Label for checkbox to pick an accent color"
@@ -411,6 +807,10 @@
     "message": "advanced settings",
     "description": "For the tooltip of a link which gives access to advanced settings"
   },
+  "settingsLargeMediaSizeLabel": {
+    "message": "Maximum large media size in kilobytes",
+    "description": "Accessible label for the number input used with the 'Block media elements larger than' setting"
+  },
   "settingsLastRestorePrompt": {
     "message": "Last restore:",
     "description": "English: Last restore:"
@@ -467,6 +867,14 @@
     "message": "Apply changes",
     "description": "English: Apply changes"
   },
+  "3pSearchLists": {
+    "message": "Search filter lists…",
+    "description": "Search field placeholder and accessible label in the _3rd-party filters_ pane"
+  },
+  "3pToggleListGroup": {
+    "message": "Show or hide this section",
+    "description": "Accessible label for buttons which expand or collapse a filter list section"
+  },
   "3pGroupDefault": {
     "message": "Built-in",
     "description": "Filter lists section name"
@@ -518,6 +926,14 @@
   "3pExternalListObsolete": {
     "message": "Out of date.",
     "description": "used as a tooltip for the out-of-date icon beside a list"
+  },
+  "3pRemoveExternalList": {
+    "message": "Remove imported list",
+    "description": "Accessible label for the remove button beside an imported filter list"
+  },
+  "3pReadInstructions": {
+    "message": "Open setup instructions",
+    "description": "Accessible label for documentation links beside filter list controls"
   },
   "3pViewContent": {
     "message": "view content",
@@ -628,7 +1044,7 @@
     "description": "English: a sort option for list of rules."
   },
   "whitelistPrompt": {
-    "message": "The trusted site directives dictate on which web pages uBlock Origin should be disabled. One entry per line.",
+    "message": "Trusted site directives control which web pages uBlockVanced should stay disabled on. Use one entry per line.",
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
@@ -688,12 +1104,48 @@
     "description": "Tooltip for the popup panel button in the logger page"
   },
   "loggerInfoTip": {
-    "message": "uBlock Origin wiki: The logger",
+    "message": "Open the logger guide",
     "description": "Tooltip for the top-right info label in the logger page"
+  },
+  "loggerPageSelectorLabel": {
+    "message": "Choose which tab or context to inspect",
+    "description": "Accessible label for the logger page selector"
+  },
+  "loggerConsoleTip": {
+    "message": "Toggle the console stream",
+    "description": "Tooltip for the console toggle button in the logger page"
+  },
+  "loggerInspectorExpandTip": {
+    "message": "Expand the inspector",
+    "description": "Tooltip for the inspector expansion button in the logger page"
+  },
+  "loggerInspectorCompactHeightTip": {
+    "message": "Toggle compact height",
+    "description": "Tooltip for the inspector compact-height button in the logger page"
+  },
+  "loggerInspectorCompactWidthTip": {
+    "message": "Toggle compact width",
+    "description": "Tooltip for the inspector compact-width button in the logger page"
+  },
+  "loggerInspectorRevertTip": {
+    "message": "Revert pending inspector changes",
+    "description": "Tooltip for the inspector revert button in the logger page"
+  },
+  "loggerInspectorCommitTip": {
+    "message": "Apply inspector changes",
+    "description": "Tooltip for the inspector commit button in the logger page"
+  },
+  "loggerCleanTip": {
+    "message": "Remove hidden and voided rows",
+    "description": "Tooltip for the cleanup button in the logger page"
   },
   "loggerClearTip": {
     "message": "Clear logger",
     "description": "Tooltip for the eraser in the logger page; used to blank the content of the logger"
+  },
+  "loggerClearConsoleTip": {
+    "message": "Clear console output",
+    "description": "Tooltip for the console clear button in the logger page"
   },
   "loggerPauseTip": {
     "message": "Pause logger (discard all incoming data)",
@@ -703,17 +1155,45 @@
     "message": "Unpause logger",
     "description": "Tooltip for the play button in the logger page"
   },
+  "loggerVerboseTip": {
+    "message": "Toggle verbose console output",
+    "description": "Tooltip for the verbose-mode button in the logger page"
+  },
+  "loggerStatsTip": {
+    "message": "Open filter insights",
+    "description": "Tooltip for the filter insights button in the logger page"
+  },
+  "loggerExportTip": {
+    "message": "Export logger output",
+    "description": "Tooltip for the logger export button in the logger page"
+  },
+  "loggerSettingsTip": {
+    "message": "Open logger settings",
+    "description": "Tooltip for the logger settings button in the logger page"
+  },
   "loggerRowFiltererButtonTip": {
     "message": "Toggle logger filtering",
     "description": "Tooltip for the row filterer button in the logger page"
   },
   "logFilterPrompt": {
-    "message": "filter logger content",
+    "message": "Filter logger output",
     "description": "Placeholder string for logger output filtering input field"
   },
   "loggerRowFiltererBuiltinTip": {
     "message": "Logger filtering options",
     "description": "Tooltip for the button to bring up logger output filtering options"
+  },
+  "loggerConsoleFilterPrompt": {
+    "message": "Filter console output",
+    "description": "Placeholder string for console output filtering input field in the logger page"
+  },
+  "loggerCloseDialogTip": {
+    "message": "Close dialog",
+    "description": "Accessible label for the dialog close button in the logger page"
+  },
+  "loggerOpenSupportTip": {
+    "message": "Open the source page",
+    "description": "Accessible label for icon-only links to a filter list source or support page in the logger"
   },
   "loggerRowFiltererBuiltinNot": {
     "message": "Not",
@@ -1020,17 +1500,57 @@
     "message": "Privacy policy",
     "description": "Link to privacy policy on GitHub (English)"
   },
+  "aboutLead": {
+    "message": "uBlockVanced stays strongest when its behavior is transparent. This page collects the links, credits, and infrastructure details that help the product feel inspectable and trustworthy.",
+    "description": "Supporting copy at the top of the About page"
+  },
+  "aboutOpenSourceBadge": {
+    "message": "Open-source build",
+    "description": "Badge shown in the hero area of the About page"
+  },
+  "aboutCommunityBadge": {
+    "message": "Community maintained",
+    "description": "Badge shown in the hero area of the About page"
+  },
+  "aboutVersionBadge": {
+    "message": "Version {{version}}",
+    "description": "Badge shown in the hero area of the About page with the current version"
+  },
+  "aboutSectionProduct": {
+    "message": "Product and policy",
+    "description": "Section heading for key product links on the About page"
+  },
+  "aboutPrivacyLead": {
+    "message": "See how the extension handles data, storage, and privacy-sensitive behavior.",
+    "description": "Supporting copy for the privacy policy link card on the About page"
+  },
   "aboutChangelog": {
     "message": "Changelog",
     "description": ""
+  },
+  "aboutChangelogLead": {
+    "message": "Review recent releases and the user-facing changes that shipped with them.",
+    "description": "Supporting copy for the changelog link card on the About page"
   },
   "aboutCode": {
     "message": "Source code (GPLv3)",
     "description": "English: Source code (GPLv3)"
   },
+  "aboutCodeLead": {
+    "message": "Inspect the GPLv3 codebase, development history, and implementation details directly.",
+    "description": "Supporting copy for the source code link card on the About page"
+  },
   "aboutContributors": {
     "message": "Contributors",
     "description": "English: Contributors"
+  },
+  "aboutSectionContributors": {
+    "message": "Community and contributors",
+    "description": "Section heading for community links on the About page"
+  },
+  "aboutContributorsLead": {
+    "message": "Upstream development, translation work, and filter-list maintenance all shape the experience you use every day.",
+    "description": "Supporting copy for the contributors section on the About page"
   },
   "aboutSourceCode": {
     "message": "Source code",
@@ -1048,13 +1568,29 @@
     "message": "External dependencies (GPLv3-compatible):",
     "description": "Shown in the About pane"
   },
+  "aboutSectionDependencies": {
+    "message": "Dependencies and libraries",
+    "description": "Section heading for third-party dependencies on the About page"
+  },
+  "aboutDependenciesLead": {
+    "message": "These third-party projects help power editing, parsing, rendering, and diagnostics across the extension.",
+    "description": "Supporting copy for the dependencies section on the About page"
+  },
   "aboutCDNs": {
-    "message": "uBO's own filter lists are freely hosted on the following <a href=\"https://wikipedia.org/wiki/Content_delivery_network\">CDNs</a>:",
+    "message": "uBlockVanced's filter lists are freely hosted on the following <a href=\"https://wikipedia.org/wiki/Content_delivery_network\">CDNs</a>:",
     "description": "Shown in the About pane"
+  },
+  "aboutSectionInfrastructure": {
+    "message": "Distribution and hosting",
+    "description": "Section heading for CDN and infrastructure information on the About page"
   },
   "aboutCDNsInfo": {
     "message": "A randomly picked CDN is used when a filter list needs to be updated.",
     "description": "Shown in the About pane"
+  },
+  "aboutCopyright": {
+    "message": "Copyright © Raymond Hill 2014-present. This build continues the open-source uBlock lineage with transparent, inspectable distribution.",
+    "description": "Footer note at the bottom of the About page"
   },
   "aboutBackupDataButton": {
     "message": "Back up to file…",
@@ -1133,7 +1669,7 @@
     "description": "Used as a title for the document-blocked page"
   },
   "docblockedPrompt1": {
-    "message": "uBlock Origin has prevented the following page from loading:",
+    "message": "uBlockVanced has prevented the following page from loading:",
     "description": "Used in the strict-blocking page"
   },
   "docblockedPrompt2": {
@@ -1217,7 +1753,7 @@
     "description": "used as a prompt for the user to provide a custom device name"
   },
   "advancedSettingsWarning": {
-    "message": "Warning! Change these advanced settings at your own risk.",
+    "message": "Advanced settings are meant for expert adjustments. Change them only when you understand the effect of the value you are editing.",
     "description": "A warning to users at the top of 'Advanced settings' page"
   },
   "genericSubmit": {
@@ -1231,6 +1767,10 @@
   "genericRevert": {
     "message": "Revert",
     "description": "for generic 'Revert' buttons"
+  },
+  "genericOpenDocumentation": {
+    "message": "Open documentation",
+    "description": "Accessible label for icon-only links that open documentation or help pages"
   },
   "genericBytes": {
     "message": "bytes",
@@ -1251,6 +1791,10 @@
   "contextMenuViewSource": {
     "message": "View source code…",
     "description": "A context menu entry, to view the source code of the target resource"
+  },
+  "contextMenuElementProbe": {
+    "message": "Inspect with Element Probe",
+    "description": "A context menu entry, to open the Element Probe DevTools panel for deep element inspection"
   },
   "shortcutCapturePlaceholder": {
     "message": "Type a shortcut",

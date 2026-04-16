@@ -36,11 +36,12 @@ if ( vAPI.contextMenu === undefined ) {
 
 /******************************************************************************/
 
-const BLOCK_ELEMENT_BIT          = 0b00001;
-const BLOCK_RESOURCE_BIT         = 0b00010;
-const TEMP_ALLOW_LARGE_MEDIA_BIT = 0b00100;
-const SUBSCRIBE_TO_LIST_BIT      = 0b01000;
-const VIEW_SOURCE_BIT            = 0b10000;
+const BLOCK_ELEMENT_BIT          = 0b000001;
+const BLOCK_RESOURCE_BIT         = 0b000010;
+const TEMP_ALLOW_LARGE_MEDIA_BIT = 0b000100;
+const SUBSCRIBE_TO_LIST_BIT      = 0b001000;
+const VIEW_SOURCE_BIT            = 0b010000;
+const ELEMENT_PROBE_BIT          = 0b100000;
 
 /******************************************************************************/
 
@@ -133,6 +134,30 @@ const onViewSource = function(details, tab) {
 
 /******************************************************************************/
 
+const onElementProbe = function(details, tab) {
+    if ( tab === undefined ) { return; }
+    if ( /^https?:\/\//.test(tab.url) === false ) { return; }
+    // Inject a content script that selects the right-clicked element for
+    // inspection in Element Probe's DevTools panel.
+    // The element is stored on the page so $0 can reference it when the
+    // user switches to the Element Probe panel.
+    const frameId = details.frameId || 0;
+    vAPI.tabs.executeScript(tab.id, {
+        frameId,
+        code: `(function(){
+            var el = document.elementFromPoint(
+                ${details.clientX || 0}, ${details.clientY || 0}
+            );
+            if (!el) return;
+            window.__ubp_target__ = el;
+            inspect(el);
+        })()`,
+        runAt: 'document_start',
+    }).catch(() => {});
+};
+
+/******************************************************************************/
+
 const onEntryClicked = function(details, tab) {
     if ( details.menuItemId === 'uBlock0-blockElement' ) {
         return onBlockElement(details, tab);
@@ -151,6 +176,9 @@ const onEntryClicked = function(details, tab) {
     }
     if ( details.menuItemId === 'uBlock0-viewSource' ) {
         return onViewSource(details, tab);
+    }
+    if ( details.menuItemId === 'uBlock0-elementProbe' ) {
+        return onElementProbe(details, tab);
     }
 };
 
@@ -193,6 +221,12 @@ const menuEntries = {
         contexts: [ 'page', 'frame', 'link' ],
         documentUrlPatterns: [ 'http://*/*', 'https://*/*' ],
     },
+    elementProbe: {
+        id: 'uBlock0-elementProbe',
+        title: i18n$('contextMenuElementProbe'),
+        contexts: [ 'all' ],
+        documentUrlPatterns: [ 'http://*/*', 'https://*/*' ],
+    },
 };
 
 /******************************************************************************/
@@ -210,6 +244,7 @@ const update = function(tabId = undefined) {
                 } else {
                     newBits |= BLOCK_RESOURCE_BIT;
                 }
+                newBits |= ELEMENT_PROBE_BIT;
             }
             if ( pageStore.largeMediaCount !== 0 ) {
                 newBits |= TEMP_ALLOW_LARGE_MEDIA_BIT;
@@ -238,6 +273,9 @@ const update = function(tabId = undefined) {
     }
     if ( (newBits & VIEW_SOURCE_BIT) !== 0 ) {
         usedEntries.push(menuEntries.viewSource);
+    }
+    if ( (newBits & ELEMENT_PROBE_BIT) !== 0 ) {
+        usedEntries.push(menuEntries.elementProbe);
     }
     vAPI.contextMenu.setEntries(usedEntries, onEntryClicked);
 };

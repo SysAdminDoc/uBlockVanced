@@ -4,16 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock — About</title>
+<title>uBlockVanced - Dashboard unavailable</title>
 <link rel="stylesheet" type="text/css" href="css/themes/default.css">
 <link rel="stylesheet" type="text/css" href="css/common.css">
 <link rel="stylesheet" type="text/css" href="css/dashboard-common.css">
+<link rel="stylesheet" type="text/css" href="css/no-dashboard.css">
 </head>
 
 <body>
 
-<div style="align-items:center;display:flex;height:50vh;justify-content:center;" data-i18n="noDashboardNotice">
-    Your administrator removed the ability to access the dashboard
+<div class="restrictedShell">
+    <section class="restrictedCard" aria-labelledby="restrictedTitle">
+        <div class="restrictedMark" aria-hidden="true">
+            <img src="img/ublock.svg" alt="">
+        </div>
+        <p class="restrictedEyebrow" data-i18n="extName">uBlockVanced</p>
+        <h1 id="restrictedTitle">Dashboard unavailable</h1>
+        <p class="restrictedNotice" data-i18n="noDashboardNotice">
+            Your administrator removed the ability to access the dashboard.
+        </p>
+        <p class="restrictedMeta" data-i18n="extShortDesc">
+            An efficient content blocker with advanced element hiding. Based on uBlock Origin.
+        </p>
+    </section>
 </div>
 
 <script src="lib/hsluv/hsluv-0.1.0.min.js"></script>

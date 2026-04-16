@@ -20,7 +20,7 @@
 */
 
 function getActualTheme(nominalTheme) {
-    // uBlockForge: dark theme is always the default
+    // uBlockVanced: dark theme is always the default
     let theme = nominalTheme || 'dark';
     if ( nominalTheme === 'auto' ) {
         if ( typeof self.matchMedia === 'function' ) {

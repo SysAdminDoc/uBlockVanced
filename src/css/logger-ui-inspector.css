@@ -41,7 +41,7 @@
     vertical-align: middle;
     }
 #domInspector li > span {
-    color: #aaa;
+    color: var(--ink-3, #6c7086);
     }
 #domInspector li > span:first-child {
     color: var(--ink-1);
@@ -69,7 +69,7 @@
     content: '\25be';
     }
 #domInspector li.branch.hasCosmeticHide > span:first-child:before {
-    color: red;
+    color: #f38ba8;
     }
 #domInspector li > code {
     cursor: pointer;
@@ -121,3 +121,98 @@
     white-space: pre;
     word-wrap: normal;
     }
+
+/*
+ * uBlockForge premium logger inspector polish
+ */
+#domInspector {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 55%),
+        rgb(var(--surface-0-rgb) / 78%);
+}
+
+#domInspector .permatoolbar {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 58%),
+        rgb(var(--surface-0-rgb) / 86%);
+    border-bottom: 1px solid rgb(255 255 255 / 0.05);
+    padding: 0.55rem 0.7rem;
+}
+
+#domInspector .permatoolbar > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+#domInspector .vscrollable {
+    padding: 0.85rem;
+}
+
+#domInspector ul {
+    background-color: transparent;
+    padding-left: 1.15rem;
+}
+
+#domInspector #domTree {
+    padding-left: 0.25rem;
+}
+
+#domInspector li {
+    border-radius: 0.7rem;
+    margin: 0.1rem 0;
+    padding: 0.12rem 0.2rem;
+    transition: background-color var(--transition-fast);
+}
+
+#domInspector li:hover {
+    background-color: rgb(var(--surface-0-rgb) / 40%);
+}
+
+#domInspector li > span:first-child {
+    border-radius: 999px;
+    padding: 0.12rem 0.35rem 0.12rem 0.18rem;
+}
+
+#domInspector li > code {
+    background-color: rgb(var(--surface-0-rgb) / 48%);
+    border: 1px solid rgb(255 255 255 / 0.04);
+    border-radius: 999px;
+    max-width: min(32rem, 100%);
+    padding: 0.18rem 0.55rem;
+}
+
+#domInspector li > code.filter {
+    background-color: rgb(var(--red-40) / 0.12);
+    border-color: rgb(var(--red-40) / 0.2);
+}
+
+#domInspector li > span[data-cnt] {
+    background-color: rgb(var(--primary-70) / 0.14);
+    border-radius: 999px;
+    color: var(--ink-2);
+    font-size: 0.78rem;
+    min-width: 2.1rem;
+    padding: 0.15rem 0.45rem;
+    text-align: center;
+}
+
+#domInspector li.isCosmeticHide,
+#domInspector li.isCosmeticHide ul,
+#domInspector li.isCosmeticHide li {
+    background-color: rgb(var(--red-40) / 0.05);
+}
+
+#cosmeticFilteringDialog .dialog {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 55%),
+        rgb(var(--surface-0-rgb) / 94%);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    box-shadow: var(--panel-shadow);
+    padding: 1rem;
+}
+
+#cosmeticFilteringDialog .dialog textarea {
+    border-radius: var(--radius-medium);
+}
