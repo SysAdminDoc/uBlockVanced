@@ -401,8 +401,21 @@
 
     /* logger */
     --logger-modified-surface: rgba(203, 166, 247, 0.35); /* Mauve */
+    --logger-modified-em-surface: rgba(203, 166, 247, 0.55); /* Mauve strong */
     --logger-redirected-surface: rgba(249, 226, 175, 0.3); /* Yellow */
     --logger-scriptlet-surface: rgba(249, 226, 175, 0.3); /* Yellow */
+    --logger-noop-surface: rgb(108 112 134 / 0.1); /* Overlay0 */
+    --logger-noop-em-surface: rgb(108 112 134 / 0.2); /* Overlay0 strong */
+    --logger-noop-solid: rgb(108 112 134); /* Overlay0 */
+    --logger-allow-surface: rgb(166 227 161 / 0.3); /* Green */
+    --logger-allow-solid: rgb(166 227 161); /* Green */
+    --logger-allow-own-surface: rgb(166 227 161); /* Green solid */
+    --logger-block-surface: rgb(243 139 168 / 0.3); /* Red */
+    --logger-block-solid: rgb(243 139 168); /* Red */
+    --logger-block-own-surface: rgb(243 139 168); /* Red solid */
+    --logger-hover-surface: rgb(205 214 244 / 0.04); /* Text */
+    --logger-row-shadow: rgb(17 17 27 / 0.5); /* Crust */
+    --logger-strikethrough-ink: rgb(137 180 250 / 0.7); /* Blue */
 }
 
 :root.dark {
@@ -614,6 +627,15 @@
     --popup-cell-block-own-surface-rgb:   0 120 216; /* h:252  S:100 Luv:50 */
     --popup-cell-noop-own-surface-rgb:  119 119 119; /* h:0    S:0   Luv:50 */
     --popup-cell-label-mixed-surface: #ff6a00;  /* TODO: fix */
+    --logger-noop-surface: rgb(96 96 96 / 0.1);
+    --logger-noop-em-surface: rgb(96 96 96 / 0.2);
+    --logger-noop-solid: rgb(96 96 96);
+    --logger-allow-surface: rgb(255 194 57 / 0.4);
+    --logger-allow-solid: rgb(255 194 57);
+    --logger-allow-own-surface: rgb(255 194 57);
+    --logger-block-surface: rgb(0 19 110 / 0.4);
+    --logger-block-solid: rgb(0 19 110);
+    --logger-block-own-surface: rgb(0 19 110);
 }
 :root.colorBlind:not(.dark) {
     --popup-cell-allow-surface-rgb:     223 178  92; /* h:58.5 S:75  Luv:75 */

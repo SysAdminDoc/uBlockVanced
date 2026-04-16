@@ -3,9 +3,8 @@ body {
     }
 
 .synopsis {
-    color: var(--ink-0);
+    color: var(--ink-3);
     font-size: var(--font-size-smaller);
-    opacity: var(--medium-em);
     }
 .settings-note {
     margin: 0;
@@ -16,26 +15,40 @@ body {
     align-items: stretch;
     align-self: stretch;
     display: inline-flex;
+    gap: 1px;
     justify-content: stretch;
+    overflow: hidden;
     user-select: none;
     }
 #themeMood > span {
-    border: 1px solid var(--ink-1);
-    color: var(--ink-1);
-    display: inline-flex;
-    background-color: var(--surface-1);
+    background-color: var(--field-surface);
+    border: 1px solid var(--border-1);
+    color: var(--ink-2);
     display: inline-block;
-    padding: 0 0.5em;
+    padding: 0.35em 0.65em;
     text-align: center;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
     user-select: none;
+    }
+#themeMood > span:first-child {
+    border-radius: var(--radius-small) 0 0 var(--radius-small);
+    }
+#themeMood > span:last-child {
+    border-radius: 0 var(--radius-small) var(--radius-small) 0;
+    }
+#themeMood > span:hover {
+    background-color: var(--field-surface-hover);
+    color: var(--ink-1);
     }
 
 /* primary color */
 #themePrimary {
     align-items: stretch;
     align-self: stretch;
+    border-radius: var(--radius-small);
     display: inline-flex;
     justify-content: stretch;
+    overflow: hidden;
     position: relative;
     }
 #themePrimary > span {
