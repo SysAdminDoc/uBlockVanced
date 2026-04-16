@@ -18,9 +18,6 @@ a {
         fill: var(--info0-ink);
     font-size: 115%;
     }
-.fa-icon.info:hover {
-    transform: scale(1.25);
-    }
 .fa-icon.info.important {
     color: var(--info2-ink);
         fill: var(--info2-ink);
@@ -97,10 +94,16 @@ h3 {
     display: inline-flex;
     justify-content: center;
     padding: 0.3rem;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
-.fa-icon.info:hover {
+.fa-icon.info:hover,
+.fa-icon.info:focus-visible {
     background: var(--field-surface-hover);
+    border-color: var(--border-2);
     transform: translateY(-1px);
 }
 
@@ -111,5 +114,100 @@ input[type="number"] {
 @media (max-width: 640px) {
     body > div.body {
         padding: 14px 12px 28px;
+    }
+}
+
+/*
+ * Shared editor-page hero / status-pill system
+ * Used by 1p-filters, whitelist, and any other editor surface
+ */
+.editorHero {
+    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap);
+    justify-content: space-between;
+    margin: 0 0 var(--default-gap);
+}
+
+.editorEyebrow {
+    color: var(--ink-0);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.35rem;
+    opacity: var(--high-em);
+    text-transform: uppercase;
+}
+
+.editorTitle {
+    font-family: var(--font-family-display);
+    font-size: clamp(1.5rem, 1.15rem + 1vw, 2.1rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+}
+
+.editorLead {
+    color: var(--ink-2);
+    font-size: var(--font-size-smaller);
+    margin: 0.55rem 0 0;
+    max-width: 66ch;
+}
+
+.editorStatus {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap-xsmall);
+    justify-content: flex-end;
+}
+
+.statusPill {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-1);
+    border-radius: 999px;
+    color: var(--ink-1);
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 600;
+    gap: 0.35rem;
+    padding: 0.38rem 0.8rem;
+    white-space: nowrap;
+}
+
+.statusPill.is-warning {
+    background: var(--warning-surface);
+    border-color: var(--warning-border);
+}
+
+.statusPill.is-success {
+    background: var(--success-surface);
+    border-color: var(--success-border);
+}
+
+.statusPill.is-danger {
+    background: var(--danger-surface);
+    border-color: var(--danger-border);
+}
+
+.statusPill.is-muted {
+    background: var(--surface-2);
+    color: var(--ink-2);
+}
+
+.statusPill.is-accent {
+    background: rgb(var(--primary-50) / 0.14);
+    border-color: rgb(var(--primary-50) / 0.24);
+}
+
+@media (max-width: 640px) {
+    .editorHero {
+        align-items: stretch;
+    }
+
+    .editorStatus {
+        justify-content: flex-start;
     }
 }
