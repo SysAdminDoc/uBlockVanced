@@ -1346,10 +1346,17 @@ body.off #moreOrLess > span {
 #actionSelector > #dynaCounts {
     background-color: var(--field-surface);
     border: 1px solid transparent;
+    min-height: 2rem;
+    padding: 0.45em 0;
     transition:
         background-color var(--transition-fast),
         border-color var(--transition-fast),
         box-shadow var(--transition-fast);
+}
+
+#firewall > div > span:first-of-type ~ span {
+    align-items: center;
+    justify-content: center;
 }
 
 #firewall > div[data-des="*"] > span:first-of-type,
@@ -1417,6 +1424,7 @@ body.advancedUser #firewall > div > span[data-src]:focus-visible {
 }
 
 body.advancedUser #firewall > div > span[data-src] {
+    cursor: pointer;
     font-variant-numeric: tabular-nums;
 }
 
