@@ -29,6 +29,24 @@
     </div>
 </div>
 
+<div class="panel-overview" aria-label="Workflow summary">
+    <div class="overview-card">
+        <span class="overview-label">Target</span>
+        <strong class="overview-value" id="overviewTargetValue">Top document</strong>
+        <span class="overview-hint" id="overviewTargetHint">Inspecting the main page context.</span>
+    </div>
+    <div class="overview-card">
+        <span class="overview-label">Selection</span>
+        <strong class="overview-value" id="overviewSelectionValue">Waiting for a node</strong>
+        <span class="overview-hint" id="overviewSelectionHint">Select in Elements or use Pick on page.</span>
+    </div>
+    <div class="overview-card">
+        <span class="overview-label">Output</span>
+        <strong class="overview-value" id="overviewOutputValue">No output yet</strong>
+        <span class="overview-hint" id="overviewOutputHint">Inspect an element to generate selectors and cosmetic rules.</span>
+    </div>
+</div>
+
 <div class="panel-body">
     <!-- Inspect Controls -->
     <div class="section">
@@ -124,6 +142,10 @@
         <div class="section-body">
             <div class="filter-output">
                 <textarea id="filterOutput" placeholder="Select a selector or procedural filter above to build a filter..." spellcheck="false"></textarea>
+            </div>
+            <div class="filter-hint">
+                <span class="filter-hint-badge" id="filterHintBadge">Selection required</span>
+                <span class="filter-hint-text" id="filterHintText">Choose a selector or procedural filter to build a rule.</span>
             </div>
             <div class="filter-actions">
                 <button class="btn success" id="btnApplyFilter">Save filter</button>

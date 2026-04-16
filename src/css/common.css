@@ -394,6 +394,10 @@ select {
 html {
     accent-color: rgb(var(--primary-60));
     color-scheme: light dark;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    scrollbar-color: var(--border-3) transparent;
+    scrollbar-gutter: stable;
 }
 
 ::selection {
@@ -436,6 +440,14 @@ textarea:focus-visible {
     box-shadow: var(--focus-ring);
 }
 
+[role="button"] {
+    cursor: pointer;
+}
+
+[role="button"]:focus-visible {
+    outline: none;
+}
+
 button {
     border: 1px solid transparent;
     background:
@@ -443,15 +455,21 @@ button {
         var(--button-surface);
     border-radius: var(--radius-small);
     box-shadow: var(--panel-shadow);
+    gap: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.01em;
+    min-height: 2.625rem;
+    padding-inline: 0.95rem;
 }
 
 button:not(.disabled):not([disabled]):hover {
+    border-color: rgb(var(--primary-70) / 0.18);
+    box-shadow: var(--panel-shadow-strong);
     transform: translateY(-1px);
 }
 
 button:not(.disabled):not([disabled]):active {
+    box-shadow: var(--panel-shadow);
     transform: translateY(0);
 }
 
@@ -459,6 +477,14 @@ button.preferred:not(.disabled):not([disabled]) {
     box-shadow:
         0 1px 0 rgb(255 255 255 / 0.08),
         0 18px 44px rgb(var(--primary-50) / 0.22);
+}
+
+button.disabled,
+button[disabled] {
+    border-color: transparent;
+    box-shadow: none;
+    filter: none;
+    opacity: 0.55;
 }
 
 button.iconified.notext {
@@ -474,6 +500,7 @@ textarea {
     background-color: var(--field-surface);
     border: 1px solid var(--field-border);
     border-radius: var(--radius-small);
+    box-shadow: var(--field-shadow);
     color: var(--ink-1);
     font: inherit;
     min-height: 2.5rem;
@@ -485,6 +512,7 @@ select:hover,
 textarea:hover {
     background-color: var(--field-surface-hover);
     border-color: var(--border-3);
+    box-shadow: var(--panel-shadow);
 }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):focus-visible,
@@ -524,6 +552,12 @@ label {
     gap: var(--default-gap-xsmall);
 }
 
+.li > label,
+.li > .labelled,
+.li > .reportField {
+    width: 100%;
+}
+
 .checkbox > input[type="checkbox"] + svg {
     border-radius: 6px;
 }
@@ -549,10 +583,15 @@ section.notice {
 }
 
 .fieldset {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     background: var(--surface-raised);
     border: 1px solid var(--border-1);
     border-radius: var(--radius-large);
     box-shadow: var(--panel-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
     overflow: hidden;
     padding: clamp(16px, 2vw, 22px);
     position: relative;
@@ -568,6 +607,7 @@ section.notice {
 }
 
 .fieldset-header {
+    color: var(--ink-1);
     font-family: var(--font-family-display);
     font-size: 15px;
     letter-spacing: 0.04em;
@@ -578,8 +618,14 @@ section.notice {
 .li {
     align-items: flex-start;
     gap: var(--default-gap-small);
+    line-height: 1.55;
     margin: 0;
+    min-height: 2.75rem;
     padding-block: 0.65rem;
+}
+
+.li.synopsis {
+    color: var(--ink-2);
 }
 
 .wikilink.fa-icon {
@@ -592,4 +638,15 @@ section.notice {
 .wikilink.fa-icon:hover {
     background: var(--field-surface-hover);
     transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+    }
 }

@@ -188,6 +188,25 @@ let intlNumberFormat;
 
 /******************************************************************************/
 
+const setPopupStatFill = function(selector, value, total) {
+    const elem = qs$(selector);
+    if ( elem === null ) { return; }
+
+    const ratio = total > 0
+        ? Math.max(0, Math.min(100, Math.round(value * 100 / total)))
+        : 0;
+
+    elem.style.setProperty('--stat-fill', `${ratio}%`);
+    dom.attr(elem, 'data-tone',
+        total === 0 ? 'empty' :
+        ratio >= 70 ? 'strong' :
+        ratio >= 35 ? 'mid' :
+        'soft'
+    );
+};
+
+/******************************************************************************/
+
 const safePunycodeToUnicode = function(hn) {
     const pretty = punycode.toUnicode(hn);
     return pretty === hn ||
@@ -195,6 +214,80 @@ const safePunycodeToUnicode = function(hn) {
            reCyrillicNonAmbiguous.test(pretty)
         ? pretty
         : hn;
+};
+
+/******************************************************************************/
+
+const updatePageContext = function() {
+    const elem = qs$('#pageTitle');
+    if ( elem === null ) { return; }
+
+    const rawTitle = typeof popupData.tabTitle === 'string'
+        ? popupData.tabTitle.trim()
+        : '';
+
+    const fallbackTitle = safePunycodeToUnicode(
+        popupData.pageHostname || popupData.pageDomain || popupData.appName || ''
+    );
+
+    dom.text(elem, rawTitle || fallbackTitle);
+};
+
+/******************************************************************************/
+
+const setQuickActionAvailability = function(selector, available) {
+    const elem = qs$(selector);
+    if ( elem === null ) { return; }
+    dom.cl.toggle(elem, 'canPick', available);
+    dom.cl.toggle(elem, 'isDisabled', available === false);
+    dom.attr(elem, 'aria-disabled', available ? 'false' : 'true');
+    dom.attr(elem, 'tabindex', available ? '0' : '-1');
+};
+
+/******************************************************************************/
+
+const syncFilterExpressionAccessibility = function() {
+    for ( const chip of qsa$('#firewall .filterExpressions span[data-expr]') ) {
+        dom.attr(chip, 'aria-pressed', dom.cl.has(chip, 'on') ? 'true' : 'false');
+        const label = chip.textContent.trim();
+        if ( label !== '' ) {
+            dom.attr(chip, 'aria-label', label);
+        }
+    }
+};
+
+/******************************************************************************/
+
+const isFirewallRowExpanded = row =>
+    dom.cl.has('#firewall', 'expanded') !== dom.cl.has(row, 'expandException');
+
+/******************************************************************************/
+
+const updateFirewallExpandAffordances = function() {
+    const globalToggle =
+        qs$('#firewall > div[data-des="*"][data-type="*"] > span:first-of-type');
+    if ( globalToggle !== null ) {
+        dom.attr(
+            globalToggle,
+            'aria-expanded',
+            dom.cl.has('#firewall', 'expanded') ? 'true' : 'false'
+        );
+    }
+
+    for ( const row of qsa$('#firewall > div.isDomain') ) {
+        const label = qs$(row, ':scope > span:first-of-type');
+        if ( label === null ) { continue; }
+        const expandable = dom.cl.has(row, 'hasSubdomains');
+        if ( expandable ) {
+            dom.attr(label, 'role', 'button');
+            dom.attr(label, 'tabindex', '0');
+            dom.attr(label, 'aria-expanded', isFirewallRowExpanded(row) ? 'true' : 'false');
+        } else {
+            dom.attr(label, 'role', null);
+            dom.attr(label, 'tabindex', null);
+            dom.attr(label, 'aria-expanded', null);
+        }
+    }
 };
 
 /******************************************************************************/
@@ -505,6 +598,7 @@ dom.on('#firewall .filterExpressions', 'click', 'span[data-expr]', ev => {
         break;
     }
     filterFirewallRows();
+    syncFilterExpressionAccessibility();
     const elems = qsa$('#firewall .filterExpressions span[data-expr]');
     const filters = Array.from(elems) .map(el => dom.cl.has(el, 'on') ? '1' : '0');
     filters.unshift('00');
@@ -523,6 +617,7 @@ dom.on('#firewall .filterExpressions', 'click', 'span[data-expr]', ev => {
             dom.cl.add(elems[i], 'on');
         }
         filterFirewallRows();
+        syncFilterExpressionAccessibility();
     });
 }
 
@@ -571,6 +666,8 @@ const renderPrivacyExposure = function() {
         .replace('{{count}}', touchedDomainCount.toLocaleString())
         .replace('{{total}}', allDomainCount.toLocaleString());
     dom.text('[data-i18n^="popupDomainsConnected"] + span', summary);
+
+    return { touchedDomainCount, allDomainCount };
 };
 
 /******************************************************************************/
@@ -604,6 +701,7 @@ const renderPopup = function() {
     dom.cl.toggle(dom.body, 'off', popupData.pageURL === '' || isFiltering !== true);
     dom.cl.toggle(dom.body, 'needSave', popupData.matrixIsDirty === true);
     dom.attr('#switch', 'aria-pressed', isFiltering === true ? 'true' : 'false');
+    updatePageContext();
 
     // The hostname information below the power switch
     {
@@ -622,10 +720,12 @@ const renderPopup = function() {
     }
 
     const canPick = popupData.canElementPicker && isFiltering;
-
-    dom.cl.toggle('#gotoZap', 'canPick', canPick);
-    dom.cl.toggle('#gotoPick', 'canPick', canPick && popupData.userFiltersAreEnabled);
-    dom.cl.toggle('#gotoReport', 'canPick', canPick);
+    setQuickActionAvailability('#gotoZap', canPick);
+    setQuickActionAvailability(
+        '#gotoPick',
+        canPick && popupData.userFiltersAreEnabled
+    );
+    setQuickActionAvailability('#gotoReport', canPick);
 
     let blocked, total;
     if ( popupData.pageCounts !== undefined ) {
@@ -644,6 +744,7 @@ const renderPopup = function() {
                        .replace('{{percent}}', formatNumber(Math.floor(blocked * 100 / total)));
     }
     dom.text('[data-i18n^="popupBlockedOnThisPage"] + span', text);
+    setPopupStatFill('#basicStats [data-stat="page"]', blocked, total);
 
     blocked = popupData.globalBlockedRequestCount;
     total = popupData.globalAllowedRequestCount + blocked;
@@ -654,9 +755,15 @@ const renderPopup = function() {
                        .replace('{{percent}}', formatNumber(Math.floor(blocked * 100 / total)));
     }
     dom.text('[data-i18n^="popupBlockedSinceInstall"] + span', text);
+    setPopupStatFill('#basicStats [data-stat="global"]', blocked, total);
 
     // This will collate all domains, touched or not
-    renderPrivacyExposure();
+    const { touchedDomainCount, allDomainCount } = renderPrivacyExposure();
+    setPopupStatFill(
+        '#basicStats [data-stat="domains"]',
+        touchedDomainCount,
+        allDomainCount
+    );
 
     // Extra tools
     updateHnSwitches();
@@ -694,6 +801,8 @@ const renderPopup = function() {
         buildAllFirewallRows();
     }
 
+    updateFirewallExpandAffordances();
+    syncFilterExpressionAccessibility();
     renderTooltips();
 };
 
@@ -877,13 +986,21 @@ const renderPopupLazy = (( ) => {
 
 const toggleNetFilteringSwitch = function(ev) {
     if ( !popupData || !popupData.pageURL ) { return; }
+    const nextState = dom.cl.toggle(dom.body, 'off') === false;
     messaging.send('popupPanel', {
         what: 'toggleNetFiltering',
         url: popupData.pageURL,
         scope: ev.ctrlKey || ev.metaKey ? 'page' : '',
-        state: dom.cl.toggle(dom.body, 'off') === false,
+        state: nextState,
         tabId: popupData.tabId,
     });
+    dom.attr('#switch', 'aria-pressed', nextState ? 'true' : 'false');
+    setQuickActionAvailability('#gotoZap', popupData.canElementPicker && nextState);
+    setQuickActionAvailability(
+        '#gotoPick',
+        popupData.canElementPicker && nextState && popupData.userFiltersAreEnabled
+    );
+    setQuickActionAvailability('#gotoReport', popupData.canElementPicker && nextState);
     renderTooltips('#switch');
     hashFromPopupData();
 };
@@ -891,6 +1008,7 @@ const toggleNetFilteringSwitch = function(ev) {
 /******************************************************************************/
 
 const gotoZap = function() {
+    if ( dom.attr('#gotoZap', 'aria-disabled') === 'true' ) { return; }
     messaging.send('popupPanel', {
         what: 'launchElementPicker',
         tabId: popupData.tabId,
@@ -903,6 +1021,7 @@ const gotoZap = function() {
 /******************************************************************************/
 
 const gotoPick = function() {
+    if ( dom.attr('#gotoPick', 'aria-disabled') === 'true' ) { return; }
     messaging.send('popupPanel', {
         what: 'launchElementPicker',
         tabId: popupData.tabId,
@@ -914,6 +1033,7 @@ const gotoPick = function() {
 /******************************************************************************/
 
 const gotoReport = function() {
+    if ( dom.attr('#gotoReport', 'aria-disabled') === 'true' ) { return; }
     const popupPanel = {
         blocked: popupData.pageCounts.blocked.any,
     };
@@ -1216,6 +1336,13 @@ dom.on(document, 'keydown', ev => {
     ev.stopPropagation();
 }, { capture: true });
 
+dom.on(document, 'keydown', '[role="button"]', ev => {
+    if ( ev.isComposing ) { return; }
+    if ( ev.key !== 'Enter' && ev.key !== ' ' ) { return; }
+    ev.preventDefault();
+    ev.currentTarget.click();
+});
+
 /******************************************************************************/
 
 const expandExceptions = new Set();
@@ -1245,6 +1372,7 @@ const setGlobalExpand = function(state, internal = false) {
     } else {
         dom.cl.remove('#firewall', 'expanded');
     }
+    updateFirewallExpandAffordances();
     if ( internal ) { return; }
     popupData.firewallPaneMinimized = !state;
     expandExceptions.clear();
@@ -1263,6 +1391,7 @@ const setSpecificExpand = function(domain, state, internal = false) {
     } else {
         dom.cl.remove(elems, 'expandException');
     }
+    updateFirewallExpandAffordances();
     if ( internal ) { return; }
     if ( state ) {
         expandExceptions.add(domain);
@@ -1292,7 +1421,7 @@ dom.on('[data-i18n="popupAnyRulePrompt"]', 'click', ev => {
     setGlobalExpand(dom.cl.has('#firewall', 'expanded') === false);
 });
 
-dom.on('#firewall', 'click', '.isDomain[data-type="*"] > span:first-of-type', ev => {
+dom.on('#firewall', 'click', '.isDomain.hasSubdomains[data-type="*"] > span:first-of-type', ev => {
     const div = ev.target.closest('[data-des]');
     if ( div === null ) { return; }
     setSpecificExpand(
