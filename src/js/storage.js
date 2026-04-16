@@ -599,18 +599,22 @@ onBroadcast(msg => {
     if (
         options instanceof Object &&
         options.autoComment === true &&
+        typeof options.docURL === 'string' &&
         this.hiddenSettings.autoCommentFilterTemplate.indexOf('{{') !== -1
     ) {
-        const d = new Date();
-        const url = new URL(options.docURL);
-        comment = '! ' +
-            this.hiddenSettings.autoCommentFilterTemplate
-                .replace('{{isodate}}', d.toISOString().split('T')[0])
-                .replace('{{date}}', d.toLocaleDateString(undefined, { dateStyle: 'medium' }))
-                .replace('{{time}}', d.toLocaleTimeString())
-                .replace('{{hostname}}', url.hostname)
-                .replace('{{origin}}', url.origin)
-                .replace('{{url}}', url.href);
+        let url;
+        try { url = new URL(options.docURL); } catch(_) { }
+        if ( url !== undefined ) {
+            const d = new Date();
+            comment = '! ' +
+                this.hiddenSettings.autoCommentFilterTemplate
+                    .replace('{{isodate}}', d.toISOString().split('T')[0])
+                    .replace('{{date}}', d.toLocaleDateString(undefined, { dateStyle: 'medium' }))
+                    .replace('{{time}}', d.toLocaleTimeString())
+                    .replace('{{hostname}}', url.hostname)
+                    .replace('{{origin}}', url.origin)
+                    .replace('{{url}}', url.href);
+        }
     }
 
     const details = await this.loadUserFilters();
@@ -679,8 +683,10 @@ onBroadcast(msg => {
 µb.removeUserFilter = async function(details) {
     const filters = details.filters;
     if ( typeof filters !== 'string' || filters.trim() === '' ) { return; }
-    const content = await this.loadUserFilters();
-    const lines = content.filters.split('\n');
+    const result = await this.loadUserFilters();
+    if ( result.error ) { return; }
+    if ( typeof result.content !== 'string' ) { return; }
+    const lines = result.content.split('\n');
     const filterLines = filters.split('\n').map(f => f.trim());
     const remaining = lines.filter(line => !filterLines.includes(line.trim()));
     const newContent = remaining.join('\n');

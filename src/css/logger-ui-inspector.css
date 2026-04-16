@@ -69,7 +69,7 @@
     content: '\25be';
     }
 #domInspector li.branch.hasCosmeticHide > span:first-child:before {
-    color: #f38ba8;
+    color: var(--cm-negative);
     }
 #domInspector li > code {
     cursor: pointer;

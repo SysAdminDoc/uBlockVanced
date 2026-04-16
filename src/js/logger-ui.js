@@ -335,7 +335,12 @@ const processLoggerEntries = function(response) {
     const previousCount = filteredLoggerEntries.length;
 
     for ( const entry of entries ) {
-        const unboxed = JSON.parse(entry);
+        let unboxed;
+        try {
+            unboxed = JSON.parse(entry);
+        } catch(ex) {
+            continue;
+        }
         if ( unboxed.filter instanceof Object ){
             loggerStats.processFilter(unboxed.filter);
         }
