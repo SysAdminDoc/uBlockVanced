@@ -116,7 +116,7 @@ const userSettingsDefault = {
     importedLists: [],
     largeMediaSize: 50,
     parseAllABPHideFilters: true,
-    popupPanelSections: 0b111,
+    popupPanelSections: 0b100,
     prefetchingDisabled: true,
     requestLogMaxEntries: 1000,
     showIconBadge: true,

@@ -33,8 +33,8 @@ vAPI.localStorage.getItemAsync('popupFontSize').then(value => {
 });
 
 // https://github.com/chrisaljoudi/uBlock/issues/996
-//   Experimental: mitigate glitchy popup UI: immediately set the firewall
-//   pane visibility to its last known state. By default the pane is hidden.
+//   Experimental: mitigate glitchy popup UI: immediately set the popup
+//   sections to their last known state.
 vAPI.localStorage.getItemAsync('popupPanelSections').then(bits => {
     if ( typeof bits !== 'number' ) { return; }
     setSections(bits);
@@ -48,8 +48,6 @@ const scopeToSrcHostnameMap = {
     '.': ''
 };
 const hostnameToSortableTokenMap = new Map();
-const statsStr = i18n$('popupBlockedStats');
-const domainsHitStr = i18n$('popupHitDomainCount');
 
 let popupData = {};
 let dfPaneBuilt = false;
@@ -146,95 +144,6 @@ const gtz = n => typeof n === 'number' && n > 0;
 
 /******************************************************************************/
 
-const formatNumber = function(count) {
-    if ( typeof count !== 'number' ) { return ''; }
-    if ( count < 1e6 ) { return count.toLocaleString(); }
-
-    if (
-        intlNumberFormat === undefined &&
-        Intl.NumberFormat instanceof Function
-    ) {
-        const intl = new Intl.NumberFormat(undefined, {
-            notation: 'compact',
-            maximumSignificantDigits: 4
-        });
-        if (
-            intl.resolvedOptions instanceof Function &&
-            Object.hasOwn(intl.resolvedOptions(), 'notation')
-        ) {
-            intlNumberFormat = intl;
-        }
-    }
-
-    if ( intlNumberFormat ) {
-        return intlNumberFormat.format(count);
-    }
-
-    // https://github.com/uBlockOrigin/uBlock-issues/issues/1027#issuecomment-629696676
-    //   For platforms which do not support proper number formatting, use
-    //   a poor's man compact form, which unfortunately is not i18n-friendly.
-    count /= 1000000;
-    if ( count >= 100 ) {
-        count = Math.floor(count * 10) / 10;
-    } else if ( count > 10 ) {
-        count = Math.floor(count * 100) / 100;
-    } else {
-        count = Math.floor(count * 1000) / 1000;
-    }
-    return (count).toLocaleString(undefined) + '\u2009M';
-};
-
-let intlNumberFormat;
-
-/******************************************************************************/
-
-const setPopupStatFill = function(selector, value, total) {
-    const elem = qs$(selector);
-    if ( elem === null ) { return; }
-
-    const ratio = total > 0
-        ? Math.max(0, Math.min(100, Math.round(value * 100 / total)))
-        : 0;
-
-    elem.style.setProperty('--stat-fill', `${ratio}%`);
-    dom.attr(elem, 'data-tone',
-        total === 0 ? 'empty' :
-        ratio >= 70 ? 'strong' :
-        ratio >= 35 ? 'mid' :
-        'soft'
-    );
-};
-
-/******************************************************************************/
-
-const safePunycodeToUnicode = function(hn) {
-    const pretty = punycode.toUnicode(hn);
-    return pretty === hn ||
-           reCyrillicAmbiguous.test(pretty) === false ||
-           reCyrillicNonAmbiguous.test(pretty)
-        ? pretty
-        : hn;
-};
-
-/******************************************************************************/
-
-const updatePageContext = function() {
-    const elem = qs$('#pageTitle');
-    if ( elem === null ) { return; }
-
-    const rawTitle = typeof popupData.tabTitle === 'string'
-        ? popupData.tabTitle.trim()
-        : '';
-
-    const fallbackTitle = safePunycodeToUnicode(
-        popupData.pageHostname || popupData.pageDomain || popupData.appName || ''
-    );
-
-    dom.text(elem, rawTitle || fallbackTitle);
-};
-
-/******************************************************************************/
-
 const setQuickActionAvailability = function(selector, available) {
     const elem = qs$(selector);
     if ( elem === null ) { return; }
@@ -255,6 +164,40 @@ const syncFilterExpressionAccessibility = function() {
         }
     }
 };
+
+/******************************************************************************/
+
+const syncPopupDensity = (( ) => {
+    let rafId = 0;
+
+    const measure = ( ) => {
+        rafId = 0;
+
+        if ( dom.cl.has(dom.root, 'intab') ) { return; }
+
+        const main = qs$('#main');
+        if ( main === null ) { return; }
+
+        dom.cl.remove(dom.body, 'compact', 'compactStats');
+
+        const availableHeight = Math.max(0, self.innerHeight - 2);
+        if ( availableHeight === 0 ) { return; }
+
+        if ( main.getBoundingClientRect().height > availableHeight ) {
+            dom.cl.add(dom.body, 'compact');
+        }
+        if ( main.getBoundingClientRect().height > availableHeight ) {
+            dom.cl.add(dom.body, 'compactStats');
+        }
+    };
+
+    return ( ) => {
+        if ( rafId !== 0 ) {
+            self.cancelAnimationFrame(rafId);
+        }
+        rafId = self.requestAnimationFrame(measure);
+    };
+})();
 
 /******************************************************************************/
 
@@ -662,11 +605,6 @@ const renderPrivacyExposure = function() {
         desHostnameDone.add(des);
     }
 
-    const summary = domainsHitStr
-        .replace('{{count}}', touchedDomainCount.toLocaleString())
-        .replace('{{total}}', allDomainCount.toLocaleString());
-    dom.text('[data-i18n^="popupDomainsConnected"] + span', summary);
-
     return { touchedDomainCount, allDomainCount };
 };
 
@@ -701,72 +639,20 @@ const renderPopup = function() {
     dom.cl.toggle(dom.body, 'off', popupData.pageURL === '' || isFiltering !== true);
     dom.cl.toggle(dom.body, 'needSave', popupData.matrixIsDirty === true);
     dom.attr('#switch', 'aria-pressed', isFiltering === true ? 'true' : 'false');
-    updatePageContext();
-
-    // The hostname information below the power switch
-    {
-        const [ elemHn, elemDn ] = qs$('#hostname').children;
-        const { pageDomain, pageHostname } = popupData;
-        if ( pageDomain !== '' ) {
-            dom.text(elemDn, safePunycodeToUnicode(pageDomain));
-            dom.text(elemHn, pageHostname !== pageDomain
-                ? safePunycodeToUnicode(pageHostname.slice(0, -pageDomain.length - 1)) + '.'
-                : ''
-            );
-        } else {
-            dom.text(elemDn, '');
-            dom.text(elemHn, '');
-        }
-    }
 
     const canPick = popupData.canElementPicker && isFiltering;
-    setQuickActionAvailability('#gotoZap', canPick);
     setQuickActionAvailability(
         '#gotoPick',
         canPick && popupData.userFiltersAreEnabled
     );
-    setQuickActionAvailability('#gotoReport', canPick);
 
-    let blocked, total;
-    if ( popupData.pageCounts !== undefined && popupData.pageCounts !== null ) {
-        const counts = popupData.pageCounts;
-        blocked = counts.blocked?.any || 0;
-        total = blocked + (counts.allowed?.any || 0);
-    } else {
-        blocked = 0;
-        total = 0;
-    }
-    let text;
-    if ( total === 0 ) {
-        text = formatNumber(0);
-    } else {
-        text = statsStr.replace('{{count}}', formatNumber(blocked))
-                       .replace('{{percent}}', formatNumber(Math.floor(blocked * 100 / total)));
-    }
-    dom.text('[data-i18n^="popupBlockedOnThisPage"] + span', text);
-    setPopupStatFill('#basicStats [data-stat="page"]', blocked, total);
-
-    blocked = popupData.globalBlockedRequestCount;
-    total = popupData.globalAllowedRequestCount + blocked;
-    if ( total === 0 ) {
-        text = formatNumber(0);
-    } else {
-        text = statsStr.replace('{{count}}', formatNumber(blocked))
-                       .replace('{{percent}}', formatNumber(Math.floor(blocked * 100 / total)));
-    }
-    dom.text('[data-i18n^="popupBlockedSinceInstall"] + span', text);
-    setPopupStatFill('#basicStats [data-stat="global"]', blocked, total);
-
-    // This will collate all domains, touched or not
-    const { touchedDomainCount, allDomainCount } = renderPrivacyExposure();
-    setPopupStatFill(
-        '#basicStats [data-stat="domains"]',
-        touchedDomainCount,
-        allDomainCount
-    );
+    // Build the hostname list even when the summary cards are removed.
+    renderPrivacyExposure();
 
     // Extra tools
     updateHnSwitches();
+
+    let total;
 
     // Report popup count on badge
     total = popupData.popupBlockedCount;
@@ -797,13 +683,14 @@ const renderPopup = function() {
     setGlobalExpand(popupData.firewallPaneMinimized === false, true);
 
     // Build dynamic filtering pane only if in use
-    if ( (computedSections() & sectionFirewallBit) !== 0 ) {
+    if ( (sectionBitsFromAttribute() & sectionFirewallBit) !== 0 ) {
         buildAllFirewallRows();
     }
 
     updateFirewallExpandAffordances();
     syncFilterExpressionAccessibility();
     renderTooltips();
+    syncPopupDensity();
 };
 
 /******************************************************************************/
@@ -995,27 +882,12 @@ const toggleNetFilteringSwitch = function(ev) {
         tabId: popupData.tabId,
     });
     dom.attr('#switch', 'aria-pressed', nextState ? 'true' : 'false');
-    setQuickActionAvailability('#gotoZap', popupData.canElementPicker && nextState);
     setQuickActionAvailability(
         '#gotoPick',
         popupData.canElementPicker && nextState && popupData.userFiltersAreEnabled
     );
-    setQuickActionAvailability('#gotoReport', popupData.canElementPicker && nextState);
     renderTooltips('#switch');
     hashFromPopupData();
-};
-
-/******************************************************************************/
-
-const gotoZap = function() {
-    if ( dom.attr('#gotoZap', 'aria-disabled') === 'true' ) { return; }
-    messaging.send('popupPanel', {
-        what: 'launchElementPicker',
-        tabId: popupData.tabId,
-        zap: true,
-    });
-
-    vAPI.closePopup();
 };
 
 /******************************************************************************/
@@ -1025,54 +897,6 @@ const gotoPick = function() {
     messaging.send('popupPanel', {
         what: 'launchElementPicker',
         tabId: popupData.tabId,
-    });
-
-    vAPI.closePopup();
-};
-
-/******************************************************************************/
-
-const gotoReport = function() {
-    if ( dom.attr('#gotoReport', 'aria-disabled') === 'true' ) { return; }
-    const popupPanel = {
-        blocked: popupData.pageCounts.blocked.any,
-    };
-    const reportedStates = [
-        { name: 'enabled', prop: 'netFilteringSwitch', expected: true },
-        { name: 'no-cosmetic-filtering', prop: 'noCosmeticFiltering', expected: false },
-        { name: 'no-large-media', prop: 'noLargeMedia', expected: false },
-        { name: 'no-popups', prop: 'noPopups', expected: false },
-        { name: 'no-remote-fonts', prop: 'noRemoteFonts', expected: false },
-        { name: 'no-scripting', prop: 'noScripting', expected: false },
-        { name: 'can-element-picker', prop: 'canElementPicker', expected: true },
-    ];
-    for ( const { name, prop, expected } of reportedStates ) {
-        if ( popupData[prop] === expected ) { continue; }
-        popupPanel[name] = !expected;
-    }
-    if ( hostnameToSortableTokenMap.size !== 0 ) {
-        const network = {};
-        const hostnames =
-            Array.from(hostnameToSortableTokenMap.keys()).sort(hostnameCompare);
-        for ( const hostname of hostnames ) {
-            const entry = popupData.hostnameDict[hostname];
-            const count = entry.counts.blocked.any;
-            if ( count === 0 ) { continue; }
-            const domain = entry.domain;
-            if ( network[domain] === undefined ) {
-                network[domain] = 0;
-            }
-            network[domain] += count;
-        }
-        if ( Object.keys(network).length !== 0 ) {
-            popupPanel.network = network;
-        }
-    }
-    messaging.send('popupPanel', {
-        what: 'launchReporter',
-        tabId: popupData.tabId,
-        pageURL: popupData.rawURL,
-        popupPanel,
     });
 
     vAPI.closePopup();
@@ -1112,12 +936,23 @@ const gotoURL = function(ev) {
 // be toggled on/off.
 
 const maxNumberOfSections = 6;
+const retiredSectionBits = 0b00011;
 const sectionFirewallBit = 0b10000;
 
+const sanitizeSectionBits = bits => bits & ~retiredSectionBits;
+
+const effectiveDisabledSectionBits = ( ) =>
+    (popupData.popupPanelDisabledSections ?? 0) | retiredSectionBits;
+
+const effectiveLockedSectionBits = ( ) =>
+    sanitizeSectionBits(popupData.popupPanelLockedSections ?? 0);
+
 const computedSections = ( ) =>
-    popupData.popupPanelSections &
-   ~popupData.popupPanelDisabledSections |
-    popupData.popupPanelLockedSections;
+    sanitizeSectionBits(
+        popupData.popupPanelSections &
+       ~effectiveDisabledSectionBits() |
+        effectiveLockedSectionBits()
+    );
 
 const sectionBitsFromAttribute = function() {
     const attr = document.body.dataset.more;
@@ -1140,20 +975,21 @@ const sectionBitsToAttribute = function(bits) {
 };
 
 const setSections = function(bits) {
-    const value = sectionBitsToAttribute(bits);
-    const min = sectionBitsToAttribute(popupData.popupPanelLockedSections);
+    const value = sectionBitsToAttribute(sanitizeSectionBits(bits));
+    const min = sectionBitsToAttribute(effectiveLockedSectionBits());
     const max = sectionBitsToAttribute(
-        (1 << maxNumberOfSections) - 1 & ~popupData.popupPanelDisabledSections
+        (1 << maxNumberOfSections) - 1 & ~effectiveDisabledSectionBits()
     );
     document.body.dataset.more = value;
     dom.cl.toggle('#lessButton', 'disabled', value === min);
     dom.cl.toggle('#moreButton', 'disabled', value === max);
+    syncPopupDensity();
 };
 
 const toggleSections = function(more) {
-    const offbits = ~popupData.popupPanelDisabledSections;
-    const onbits = popupData.popupPanelLockedSections;
-    let currentBits = sectionBitsFromAttribute();
+    const offbits = ~effectiveDisabledSectionBits();
+    const onbits = effectiveLockedSectionBits();
+    let currentBits = sanitizeSectionBits(sectionBitsFromAttribute());
     let newBits = currentBits;
     for ( let i = 0; i < maxNumberOfSections; i++ ) {
         const bit = 1 << (more ? i : maxNumberOfSections - i - 1);
@@ -1162,7 +998,7 @@ const toggleSections = function(more) {
         } else {
             newBits &= ~bit;
         }
-        newBits = newBits & offbits | onbits;
+        newBits = sanitizeSectionBits(newBits & offbits | onbits);
         if ( newBits !== currentBits ) { break; }
     }
     if ( newBits === currentBits ) { return; }
@@ -1654,6 +1490,7 @@ const getPopupData = async function(tabId, first = false) {
             dom.cl.add(dom.root, 'intab');
         }
         await nextFrames(1);
+        syncPopupDensity();
         dom.cl.remove(dom.body, 'loading');
     };
 
@@ -1674,12 +1511,11 @@ const getPopupData = async function(tabId, first = false) {
 /******************************************************************************/
 
 dom.on('#switch', 'click', toggleNetFilteringSwitch);
-dom.on('#gotoZap', 'click', gotoZap);
 dom.on('#gotoPick', 'click', gotoPick);
-dom.on('#gotoReport', 'click', gotoReport);
 dom.on('.hnSwitch', 'click', ev => { toggleHostnameSwitch(ev); });
 dom.on('#saveRules', 'click', saveFirewallRules);
 dom.on('#revertRules', 'click', ( ) => { revertFirewallRules(); });
 dom.on('a[href]', 'click', gotoURL);
+dom.on(self, 'resize', ( ) => { syncPopupDensity(); }, { passive: true });
 
 /******************************************************************************/

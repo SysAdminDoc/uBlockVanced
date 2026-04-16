@@ -15,57 +15,63 @@
 
 <body>
 
-<div class="body">
+<div class="body filtersDashboard">
 
 <div id="cloudWidget" class="hide" data-cloud-entry="tpFiltersPane"></div>
-<p id="actions">
-    <button id="buttonApply" class="preferred disabled iconified dontshrink" type="button" data-i18n-title="3pApplyChanges"><span class="fa-icon">check</span><span data-i18n="3pApplyChanges">_</span><span class="hover"></span></button>
-    <button id="buttonUpdate" class="preferred disabled iconified" type="button" data-i18n-title="3pUpdateNow"><span class="fa-icon">refresh</span><span data-i18n="3pUpdateNow">_</span><span class="hover"></span></button>
-</p>
+<header class="filtersHero">
+    <div class="filtersHeroCopy">
+        <div class="editorEyebrow" translate="no">uBlockVanced</div>
+        <h1 class="editorTitle" data-i18n="3pPageName"></h1>
+        <p id="listsCatalogSummary" class="editorLead"></p>
+    </div>
+    <div class="editorStatus filtersHeroStatus" role="status" aria-live="polite" aria-atomic="true">
+        <span id="filtersEnabledCount" class="statusPill is-accent"></span>
+        <span id="filtersAvailableCount" class="statusPill is-muted"></span>
+    </div>
+</header>
 
-<div>
-    <div class="li">
-        <label><span class="input checkbox"><input type="checkbox" id="autoUpdate"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="3pAutoUpdatePrompt1"></span></label>
+<section class="filtersControls">
+    <div class="filtersToolbar">
+        <p id="actions">
+            <button id="buttonApply" class="preferred disabled iconified dontshrink" type="button" data-i18n-title="3pApplyChanges"><span class="fa-icon">check</span><span data-i18n="3pApplyChanges">_</span><span class="hover"></span></button>
+            <button id="buttonUpdate" class="preferred disabled iconified" type="button" data-i18n-title="3pUpdateNow"><span class="fa-icon">refresh</span><span data-i18n="3pUpdateNow">_</span><span class="hover"></span></button>
+        </p>
+        <div class="searchfield filtersSearch"><input type="search" name="filterListsSearch" autocomplete="off" spellcheck="false" placeholder="3pSearchLists" data-i18n-title="3pSearchLists" aria-label="data-title" /><span class="fa-icon" aria-hidden="true">search</span></div>
     </div>
-    <div class="li">
-        <label><span class="input checkbox"><input type="checkbox" id="suspendUntilListsAreLoaded"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="3pSuspendUntilListsAreLoaded"></span></label>
+    <div class="filtersSettings">
+        <div class="li">
+            <label><span class="input checkbox"><input type="checkbox" id="autoUpdate"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="3pAutoUpdatePrompt1"></span></label>
+        </div>
+        <div class="li">
+            <label><span class="input checkbox"><input type="checkbox" id="suspendUntilListsAreLoaded"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span data-i18n="3pSuspendUntilListsAreLoaded"></span></label>
+        </div>
+        <div class="li">
+            <label><span class="input checkbox"><input type="checkbox" id="parseCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pParseAllABPHideFiltersPrompt1"></span>&nbsp;<span class="fa-icon info" data-i18n-title="3pParseAllABPHideFiltersInfo">question-circle</span></span></label>
+        </div>
+        <div class="li">
+            <label><span class="input checkbox"><input type="checkbox" id="ignoreGenericCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pIgnoreGenericCosmeticFilters"></span>&nbsp;<span class="fa-icon info" data-i18n-title="3pIgnoreGenericCosmeticFiltersInfo">question-circle</span></span></label>
+        </div>
     </div>
-    <div class="li">
-        <label><span class="input checkbox"><input type="checkbox" id="parseCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pParseAllABPHideFiltersPrompt1"></span>&nbsp;<span class="fa-icon info" data-i18n-title="3pParseAllABPHideFiltersInfo">question-circle</span></span></label>
-    </div>
-    <div class="li">
-        <label><span class="input checkbox"><input type="checkbox" id="ignoreGenericCosmeticFilters"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span data-i18n="3pIgnoreGenericCosmeticFilters"></span>&nbsp;<span class="fa-icon info" data-i18n-title="3pIgnoreGenericCosmeticFiltersInfo">question-circle</span></span></label>
-    </div>
-</div>
+</section>
 
-<div>
-</div>
-
-<div id="lists">
-    <div class="rootstats expandable" data-key="*">
-        <button id="listsOfBlockedHostsToggle" class="listToggle" type="button" aria-expanded="false">
-            <span class="fa-icon listExpander" aria-hidden="true">angle-up</span><span id="listsOfBlockedHostsPrompt"></span>
-        </button>
-    </div>
-    <div class="searchfield"><input type="search" name="filterListsSearch" autocomplete="off" spellcheck="false" placeholder="3pSearchLists" data-i18n-title="3pSearchLists" aria-label="data-title" /><span class="fa-icon" aria-hidden="true">search</span></div>
+<section id="lists">
     <div class="listEntries"></div>
-    <div class="li listEntry expandable" data-role="import">
-        <span class="detailbar">
-            <button class="listToggle" type="button" aria-expanded="false"><span class="fa-icon listExpander" aria-hidden="true">angle-up</span><span class="listname" data-i18n="3pImport"></span></button>
+    <div class="li listEntry filtersImport" data-role="import">
+        <div class="detailbar">
+            <span class="listname" data-i18n="3pImport"></span>
             <a class="fa-icon info towiki" href="https://github.com/gorhill/uBlock/wiki/Filter-lists-from-around-the-web" target="_blank" data-i18n-title="3pReadInstructions" aria-label="data-title">info-circle</a>
-        </span>
+        </div>
         <textarea dir="ltr" name="externalLists" autocomplete="off" spellcheck="false" placeholder="3pExternalListsHint" data-i18n-title="3pImport" aria-label="data-title"></textarea>
     </div>
-</div>
+</section>
 
 </div>
 
 <div id="templates" style="display: none;">
     <div class="listEntries"></div>
     <div class="li listEntry" data-role="leaf">
-        <span class="detailbar">
-            <label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span><span class="listname forinput"></span>
-            </span></label>
+        <div class="detailbar">
+            <label class="listControl"><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span class="listMeta"><span class="listname forinput"></span><span class="leafstats"></span></span></label>
             <span class="iconbar"><!--
              --><a class="fa-icon content" href="#" type="text/plain" target="_blank" data-i18n-title="3pViewContent">eye-open</a><!--
              --><a class="fa-icon support" href="#" target="_blank">home</a><!--
@@ -77,14 +83,12 @@
              --><span class="fa-icon status updating" data-i18n-title="3pUpdating">spinner</span><!--
              --><span class="fa-icon status failed" data-i18n-title="3pNetworkError">unlink</span>
             </span>
-            <span class="leafstats"></span>
-        </span>
+        </div>
     </div>
-    <div class="li listEntry expandable" data-role="node">
-        <span class="detailbar">
-            <label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span class="listname forinput"></span></label>
-            <button class="nodestats" type="button" data-i18n-title="3pToggleListGroup" aria-label="data-title"></button>
-            <span class="fa-icon listExpander" data-i18n-title="3pToggleListGroup" aria-label="data-title">angle-up</span>
+    <div class="li listEntry" data-role="node">
+        <div class="detailbar">
+            <label class="listControl"><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span class="listMeta"><span class="listname forinput"></span><span class="leafstats"></span></span></label>
+            <span class="nodestats"></span>
             <span class="iconbar"><!--
              --><a class="fa-icon support" href="#" target="_blank">home</a><!--
              --><a class="fa-icon mustread" href="#" target="_blank" data-i18n-title="3pReadInstructions" aria-label="data-title">info-circle</a><!--
@@ -93,14 +97,13 @@
              --><span class="fa-icon status updating" data-i18n-title="3pUpdating">spinner</span><!--
              --><span class="fa-icon status failed" data-i18n-title="3pNetworkError">unlink</span>
             </span>
-            <span class="leafstats"></span>
-        </span>
+        </div>
     </div>
-    <div class="li listEntry expandable" data-parent="root" data-role="node">
-        <span class="detailbar">
-            <button class="listToggle" type="button" aria-expanded="false"><span class="fa-icon listExpander" aria-hidden="true">angle-up</span><span class="listname"></span></button>
-            <button class="nodestats" type="button" data-i18n-title="3pToggleListGroup" aria-label="data-title"></button>
-        </span>
+    <div class="li listEntry" data-parent="root" data-role="node">
+        <div class="detailbar">
+            <span class="listname"></span>
+            <span class="nodestats"></span>
+        </div>
     </div>
 </div>
 

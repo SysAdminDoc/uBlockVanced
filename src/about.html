@@ -13,43 +13,26 @@
 
 <body>
 
-<div class="body">
-    <div class="about-hero">
-        <img class="about-icon" src="img/icon_64.png" alt="" aria-hidden="true">
-        <div class="about-copy">
-            <p class="eyebrow">uBlockVanced</p>
+<div class="body aboutPage">
+    <section class="fieldset about-summary">
+        <div class="about-summary-top">
             <div id="aboutNameVer" class="about-title"></div>
-            <p class="about-tagline" data-i18n="extShortDesc"></p>
-            <p class="about-lead" data-i18n="aboutLead"></p>
-            <div class="about-badges">
-                <span id="aboutVersionBadge" class="about-badge"></span>
-                <span class="about-badge" data-i18n="aboutOpenSourceBadge"></span>
-                <span class="about-badge" data-i18n="aboutCommunityBadge"></span>
-            </div>
+            <span id="aboutVersionBadge" class="about-badge"></span>
         </div>
-    </div>
+        <p class="about-tagline" data-i18n="extShortDesc"></p>
+    </section>
 
     <section class="fieldset about-section">
         <h2 class="fieldset-header" data-i18n="aboutSectionProduct"></h2>
-        <div class="about-link-grid">
-            <a class="about-link-card" href="https://github.com/gorhill/uBlock/wiki/Privacy-policy">
-                <span class="about-link-title" data-i18n="aboutPrivacyPolicy"></span>
-                <span class="about-link-copy" data-i18n="aboutPrivacyLead"></span>
-            </a>
-            <a class="about-link-card" href="https://github.com/gorhill/uBlock/releases">
-                <span class="about-link-title" data-i18n="aboutChangelog"></span>
-                <span class="about-link-copy" data-i18n="aboutChangelogLead"></span>
-            </a>
-            <a class="about-link-card" href="https://github.com/gorhill/uBlock">
-                <span class="about-link-title" data-i18n="aboutCode"></span>
-                <span class="about-link-copy" data-i18n="aboutCodeLead"></span>
-            </a>
+        <div class="about-pill-links">
+            <a class="about-pill-link" href="https://github.com/gorhill/uBlock/wiki/Privacy-policy" data-i18n="aboutPrivacyPolicy"></a>
+            <a class="about-pill-link" href="https://github.com/gorhill/uBlock/releases" data-i18n="aboutChangelog"></a>
+            <a class="about-pill-link" href="https://github.com/gorhill/uBlock" data-i18n="aboutCode"></a>
         </div>
     </section>
 
     <section class="fieldset about-section">
         <h2 class="fieldset-header" data-i18n="aboutSectionContributors"></h2>
-        <p class="about-section-copy" data-i18n="aboutContributorsLead"></p>
         <div class="about-pill-links">
             <a class="about-pill-link" href="https://github.com/gorhill/uBlock/graphs/contributors" data-i18n="aboutSourceCode"></a>
             <a class="about-pill-link" href="https://crowdin.com/project/ublock" data-i18n="aboutTranslations"></a>
@@ -59,7 +42,6 @@
 
     <section class="fieldset about-section">
         <h2 class="fieldset-header" data-i18n="aboutSectionDependencies"></h2>
-        <p class="about-section-copy" data-i18n="aboutDependenciesLead"></p>
         <ul class="about-credit-list">
             <li><span><a href="https://codemirror.net/">CodeMirror</a> by <a href="https://github.com/marijnh">Marijn Haverbeke</a></span></li>
             <li><span><a href="https://github.com/mathiasbynens/punycode.js">Punycode.js</a> by <a href="https://github.com/mathiasbynens">Mathias Bynens</a></span></li>

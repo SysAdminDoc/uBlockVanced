@@ -20,27 +20,23 @@
 
 <body>
 
-<div class="body">
+<div class="body whitelistWorkbench">
     <div id="cloudWidget" class="hide" data-cloud-entry="whitelistPane"></div>
-    <header class="editorHero">
-        <div class="editorHeroCopy">
-            <div class="editorEyebrow" translate="no">uBlockVanced</div>
-            <h1 class="editorTitle" data-i18n="whitelistPageName"></h1>
-            <p class="editorLead" data-i18n="whitelistEditorLead"></p>
+    <div class="actionBar whitelistActions">
+        <div class="toolbarActions">
+            <button id="importWhitelistFromFile" class="iconified" type="button"><span class="fa-icon">download-alt</span><span data-i18n="whitelistImport">_</span><span class="hover"></span></button>
+            <button id="exportWhitelistToFile" class="iconified" type="button"><span class="fa-icon">upload-alt</span><span data-i18n="whitelistExport">_</span><span class="hover"></span></button>
+        </div>
+        <div class="toolbarActions">
+            <button id="whitelistApply" class="preferred iconified" type="button" disabled><span class="fa-icon">check</span><span data-i18n="whitelistApply">_</span><span class="hover"></span></button>
+            <button id="whitelistRevert" class="iconified" type="button" disabled><span class="fa-icon">undo</span><span data-i18n="genericRevert">_</span><span class="hover"></span></button>
         </div>
         <div id="whitelistStatus" class="editorStatus" role="status" aria-live="polite" aria-atomic="true">
             <span id="whitelistSaveState" class="statusPill"></span>
             <span id="whitelistValidationState" class="statusPill"></span>
             <span id="whitelistDirectiveCount" class="statusPill"></span>
         </div>
-    </header>
-    <div class="actionBar whitelistActions">
-        <button id="whitelistApply" class="preferred iconified" type="button" disabled><span class="fa-icon">check</span><span data-i18n="whitelistApply">_</span><span class="hover"></span></button>
-        <button id="whitelistRevert" class="iconified" type="button" disabled><span class="fa-icon">undo</span><span data-i18n="genericRevert">_</span><span class="hover"></span></button>
-        <button id="importWhitelistFromFile" class="iconified" type="button"><span class="fa-icon">download-alt</span><span data-i18n="whitelistImport">_</span><span class="hover"></span></button>
-        <button id="exportWhitelistToFile" class="iconified" type="button"><span class="fa-icon">upload-alt</span><span data-i18n="whitelistExport">_</span><span class="hover"></span></button>
     </div>
-    <p class="vverbose whitelistPrompt" data-i18n="whitelistPrompt"></p>
 </div>
 <div id="whitelist" class="codeMirrorContainer cm-theme-override"></div>
 

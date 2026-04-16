@@ -125,15 +125,15 @@ body {
     -webkit-backdrop-filter: blur(18px);
     background: var(--surface-raised-strong);
     border-bottom: 1px solid rgb(var(--primary-70) / 0.18);
-    gap: var(--default-gap-small);
-    padding: 14px 18px;
+    gap: 0.5rem;
+    padding: 10px 14px;
 }
 
 .nav-main {
     align-items: center;
     display: flex;
     flex: 1;
-    gap: 18px;
+    gap: 12px;
     min-width: 0;
 }
 
@@ -144,22 +144,22 @@ body {
     border-radius: 999px;
     display: inline-flex;
     flex-shrink: 0;
-    gap: 10px;
-    padding: 0.55rem 0.95rem 0.55rem 0.7rem;
+    gap: 8px;
+    padding: 0.42rem 0.8rem 0.42rem 0.55rem;
 }
 
 .brandCluster .logo {
     background: linear-gradient(145deg, rgb(var(--primary-70) / 0.24), transparent 75%);
     border-radius: 999px;
     margin: 0;
-    padding: 0.35rem;
-    width: 1.75rem;
+    padding: 0.28rem;
+    width: 1.5rem;
 }
 
 .productName {
     color: var(--ink-1);
     font-family: var(--font-family-display);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     font-weight: 600;
     letter-spacing: 0.03em;
 }
@@ -167,7 +167,7 @@ body {
 .tabStrip {
     display: flex;
     flex: 1;
-    gap: 8px;
+    gap: 6px;
     min-width: 0;
     overflow-x: auto;
     padding-bottom: 2px;
@@ -179,8 +179,8 @@ body {
     border-radius: 999px;
     color: var(--ink-2);
     flex-shrink: 0;
-    min-height: 2.5rem;
-    padding: 0.72rem 1rem;
+    min-height: 2.2rem;
+    padding: 0.54rem 0.84rem;
 }
 
 .tabButton.selected {
@@ -200,10 +200,6 @@ body {
 
 .tabButton:focus-visible {
     box-shadow: var(--focus-ring);
-}
-
-.wikilink.fa-icon {
-    flex-shrink: 0;
 }
 
 #unsavedWarning {
@@ -252,7 +248,7 @@ iframe {
 
 @media (max-width: 860px) {
     #dashboard-nav {
-        padding: 12px;
+        padding: 10px;
     }
 
     .nav-main {
