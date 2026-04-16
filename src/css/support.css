@@ -7,10 +7,13 @@ body {
     margin-bottom: 6rem;
     }
 
-.body > div {
+.supportHero,
+.body > div,
+.body > section {
     max-width: 800px;
+    width: 100%;
     }
-h3 {
+h2 {
     color: var(--fieldset-header-ink);
     margin-bottom: 0;
     }
@@ -30,7 +33,7 @@ h3 {
 :root:not(.mobile) .supportEntry > div:first-of-type {
     margin-inline-end: 2em;
     }
-.supportEntry h3 {
+.supportEntry h2 {
     margin: 1em 0;
     }
 
@@ -44,10 +47,10 @@ h3 {
     min-width: 50%;
     max-width: calc(100% - 1em);
     }
-body:not(.filterIssue) .body > div.e {
+body:not(.filterIssue) .body > .supportSection.e {
     display: none;
 }
-body.filterIssue .body > div:not(.e) {
+body.filterIssue .body > .supportSection:not(.e) {
     display: none;
 }
 body.filterIssue #moreButton {
@@ -108,3 +111,176 @@ body.redacted #unredactButton {
 .cm-string.cm-property {
     color: black;
     }
+
+/*
+ * uBlockForge premium polish
+ */
+.body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap-large);
+}
+
+.supportHero,
+.body > .supportSection {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    box-shadow: var(--panel-shadow);
+    margin: 0;
+    padding: clamp(16px, 2vw, 22px);
+}
+
+.supportHero {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+}
+
+.supportHeroMark {
+    align-items: center;
+    background:
+        radial-gradient(circle at top right, rgb(var(--primary-70) / 0.22), transparent 48%),
+        var(--field-surface);
+    border: 1px solid rgb(var(--primary-70) / 0.16);
+    border-radius: 1.5rem;
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 4.5rem;
+    justify-content: center;
+    width: 4.5rem;
+}
+
+.supportHeroMark img {
+    height: 2.35rem;
+    width: 2.35rem;
+}
+
+.supportHeroCopy {
+    min-width: 0;
+}
+
+.supportEyebrow {
+    color: rgb(var(--primary-70));
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+}
+
+.supportHero h1 {
+    font-family: var(--font-family-display);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 0.65rem;
+    text-wrap: balance;
+}
+
+.supportLead {
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 36rem;
+}
+
+.body > .supportSection > hr:first-of-type {
+    display: none;
+}
+
+.supportSection h2 {
+    margin-top: 0;
+}
+
+.supportEntry {
+    align-items: flex-start;
+    gap: var(--default-gap);
+    margin-block: var(--default-gap-small);
+}
+
+.supportEntry > button {
+    align-self: flex-start;
+    min-width: 9rem;
+}
+
+.supportEntry > div:first-of-type p,
+.supportEntry > p {
+    max-width: 72ch;
+}
+
+.supportSection.e > .supportEntry {
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-medium);
+    padding: var(--default-gap);
+}
+
+.supportSection.e > .supportEntry > hr {
+    margin-top: 0;
+}
+
+.supportSection.e > .supportEntry select {
+    width: min(100%, 32rem);
+}
+
+#supportDiagnostics .CodeMirror {
+    min-height: 18rem;
+}
+
+.reportField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.supportActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+}
+
+#showSupportInfo {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: inherit;
+    display: inline-flex;
+    gap: 0.45rem;
+    padding: 0;
+}
+
+#showSupportInfo:hover {
+    color: var(--link-ink);
+}
+
+#showSupportInfo[aria-expanded="true"] > span {
+    transform: rotate(90deg);
+}
+
+#showSupportInfo > span {
+    transition: transform var(--transition-fast);
+}
+
+@media (max-width: 640px) {
+    .supportHero,
+    .body > .supportSection {
+        padding: 14px;
+    }
+
+    .supportHero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .supportEntry > button {
+        width: 100%;
+    }
+
+    .supportActions {
+        flex-direction: column;
+    }
+}

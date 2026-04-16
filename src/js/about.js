@@ -19,7 +19,8 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-import { dom } from './dom.js';
+import { dom, qs$ } from './dom.js';
+import { i18n$ } from './i18n.js';
 
 /******************************************************************************/
 
@@ -28,5 +29,22 @@ import { dom } from './dom.js';
         what: 'getAppData',
     });
 
-    dom.text('#aboutNameVer', appData.name + ' ' + appData.version);
+    dom.text('#aboutNameVer', appData.name);
+    dom.text(
+        '#aboutVersionBadge',
+        i18n$('aboutVersionBadge').replace('{{version}}', appData.version)
+    );
+
+    for ( const link of document.querySelectorAll('a[href^="http"]') ) {
+        if ( link instanceof HTMLAnchorElement === false ) { continue; }
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+    }
+
+    const leadLink = qs$('.about-note a');
+    if ( leadLink instanceof HTMLAnchorElement ) {
+        const label = i18n$('genericOpenDocumentation');
+        leadLink.title = label;
+        leadLink.setAttribute('aria-label', label);
+    }
 })();

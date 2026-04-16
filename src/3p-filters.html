@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock — Filter lists</title>
+<title>uBlockVanced — Filter lists</title>
 <link rel="stylesheet" type="text/css" href="css/themes/default.css">
 <link rel="stylesheet" type="text/css" href="css/common.css">
 <link rel="stylesheet" type="text/css" href="css/fa-icons.css">
@@ -43,16 +43,18 @@
 
 <div id="lists">
     <div class="rootstats expandable" data-key="*">
-        <span class="fa-icon listExpander">angle-up</span><span id="listsOfBlockedHostsPrompt"></span>
+        <button id="listsOfBlockedHostsToggle" class="listToggle" type="button" aria-expanded="false">
+            <span class="fa-icon listExpander" aria-hidden="true">angle-up</span><span id="listsOfBlockedHostsPrompt"></span>
+        </button>
     </div>
-    <div class="searchfield"><input type="search" spellcheck="false" placeholder="" /><span class="fa-icon">search</span></div>
+    <div class="searchfield"><input type="search" name="filterListsSearch" autocomplete="off" spellcheck="false" placeholder="3pSearchLists" data-i18n-title="3pSearchLists" aria-label="data-title" /><span class="fa-icon" aria-hidden="true">search</span></div>
     <div class="listEntries"></div>
     <div class="li listEntry expandable" data-role="import">
         <span class="detailbar">
-            <label><span class="fa-icon listExpander">angle-up</span><span class="listname" data-i18n="3pImport"></span></label>
-            <a class="fa-icon info towiki" href="https://github.com/gorhill/uBlock/wiki/Filter-lists-from-around-the-web" target="_blank">info-circle</a>
+            <button class="listToggle" type="button" aria-expanded="false"><span class="fa-icon listExpander" aria-hidden="true">angle-up</span><span class="listname" data-i18n="3pImport"></span></button>
+            <a class="fa-icon info towiki" href="https://github.com/gorhill/uBlock/wiki/Filter-lists-from-around-the-web" target="_blank" data-i18n-title="3pReadInstructions" aria-label="data-title">info-circle</a>
         </span>
-        <textarea dir="ltr" spellcheck="false" placeholder="3pExternalListsHint"></textarea>
+        <textarea dir="ltr" name="externalLists" autocomplete="off" spellcheck="false" placeholder="3pExternalListsHint" data-i18n-title="3pImport" aria-label="data-title"></textarea>
     </div>
 </div>
 
@@ -67,11 +69,11 @@
             <span class="iconbar"><!--
              --><a class="fa-icon content" href="#" type="text/plain" target="_blank" data-i18n-title="3pViewContent">eye-open</a><!--
              --><a class="fa-icon support" href="#" target="_blank">home</a><!--
-             --><span class="fa-icon remove">trash-o</span><!--
-             --><a class="fa-icon mustread" href="#" target="_blank">info-circle</a><!--
+             --><button class="fa-icon remove notext" type="button" data-i18n-title="3pRemoveExternalList" aria-label="data-title">trash-o</button><!--
+             --><a class="fa-icon mustread" href="#" target="_blank" data-i18n-title="3pReadInstructions" aria-label="data-title">info-circle</a><!--
              --><span class="fa-icon status unsecure" title="http">unlock-alt</span><!--
              --><span class="fa-icon status obsolete" data-i18n-title="3pExternalListObsolete">exclamation-triangle</span><!--
-             --><span class="fa-icon status cache">clock-o</span><!--
+             --><button class="fa-icon status cache notext" type="button">clock-o</button><!--
              --><span class="fa-icon status updating" data-i18n-title="3pUpdating">spinner</span><!--
              --><span class="fa-icon status failed" data-i18n-title="3pNetworkError">unlink</span>
             </span>
@@ -81,13 +83,13 @@
     <div class="li listEntry expandable" data-role="node">
         <span class="detailbar">
             <label><span class="input checkbox"><input type="checkbox"><svg viewBox="0 0 24 24"><path d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg></span><span class="listname forinput"></span></label>
-            <span class="nodestats"></span>
-            <span class="fa-icon listExpander">angle-up</span>
+            <button class="nodestats" type="button" data-i18n-title="3pToggleListGroup" aria-label="data-title"></button>
+            <span class="fa-icon listExpander" data-i18n-title="3pToggleListGroup" aria-label="data-title">angle-up</span>
             <span class="iconbar"><!--
              --><a class="fa-icon support" href="#" target="_blank">home</a><!--
-             --><a class="fa-icon mustread" href="#" target="_blank">info-circle</a><!--
+             --><a class="fa-icon mustread" href="#" target="_blank" data-i18n-title="3pReadInstructions" aria-label="data-title">info-circle</a><!--
              --><span class="fa-icon status obsolete" data-i18n-title="3pExternalListObsolete">exclamation-triangle</span><!--
-             --><span class="fa-icon status cache">clock-o</span><!--
+             --><button class="fa-icon status cache notext" type="button">clock-o</button><!--
              --><span class="fa-icon status updating" data-i18n-title="3pUpdating">spinner</span><!--
              --><span class="fa-icon status failed" data-i18n-title="3pNetworkError">unlink</span>
             </span>
@@ -96,8 +98,8 @@
     </div>
     <div class="li listEntry expandable" data-parent="root" data-role="node">
         <span class="detailbar">
-            <label><span class="fa-icon listExpander">angle-up</span><span class="listname"></span></label>
-            <span class="nodestats"></span>
+            <button class="listToggle" type="button" aria-expanded="false"><span class="fa-icon listExpander" aria-hidden="true">angle-up</span><span class="listname"></span></button>
+            <button class="nodestats" type="button" data-i18n-title="3pToggleListGroup" aria-label="data-title"></button>
         </span>
     </div>
 </div>

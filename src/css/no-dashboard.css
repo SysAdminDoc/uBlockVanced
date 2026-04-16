@@ -1,0 +1,103 @@
+body {
+    align-items: center;
+    background:
+        radial-gradient(circle at top left, rgb(var(--primary-70) / 0.16), transparent 34%),
+        radial-gradient(circle at top right, rgb(var(--violet-40) / 0.14), transparent 30%),
+        var(--surface-2);
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 1.5rem;
+}
+
+.restrictedShell {
+    display: flex;
+    justify-content: center;
+    width: min(100%, 42rem);
+}
+
+.restrictedCard {
+    backdrop-filter: blur(18px);
+    background:
+        linear-gradient(145deg, rgb(255 255 255 / 0.08), transparent 55%),
+        var(--surface-raised-strong);
+    border: 1px solid var(--border-1);
+    border-radius: 2rem;
+    box-shadow: var(--panel-shadow);
+    padding: clamp(1.4rem, 4vw, 2.25rem);
+    position: relative;
+    text-align: center;
+}
+
+.restrictedCard::before {
+    background: linear-gradient(90deg, rgb(var(--primary-70) / 0.6), transparent 70%);
+    content: '';
+    height: 2px;
+    inset: 0 0 auto;
+    position: absolute;
+}
+
+.restrictedMark {
+    align-items: center;
+    background:
+        radial-gradient(circle at top right, rgb(var(--primary-70) / 0.22), transparent 50%),
+        var(--field-surface);
+    border: 1px solid rgb(var(--primary-70) / 0.18);
+    border-radius: 1.5rem;
+    display: inline-flex;
+    height: 4.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+    width: 4.5rem;
+}
+
+.restrictedMark img {
+    height: 2.4rem;
+    width: 2.4rem;
+}
+
+.restrictedEyebrow {
+    color: rgb(var(--primary-70));
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+}
+
+.restrictedCard h1 {
+    font-family: var(--font-family-display);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 0.8rem;
+}
+
+.restrictedNotice {
+    color: var(--ink-1);
+    font-size: 1rem;
+    line-height: 1.65;
+    margin: 0 auto;
+    max-width: 32rem;
+}
+
+.restrictedMeta {
+    color: var(--ink-3);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin: 1rem auto 0;
+    max-width: 30rem;
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 0.9rem;
+    }
+
+    .restrictedCard {
+        border-radius: 1.4rem;
+        padding: 1.2rem;
+    }
+}

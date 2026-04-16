@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock — Dev tools</title>
+<title data-i18n="devtoolsPageName"></title>
 
 <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
 <link rel="stylesheet" href="lib/codemirror/addon/fold/foldgutter.css">
@@ -21,19 +21,56 @@
 
 <body>
 
-<div class="body">
-    <p>
-        <button id="console-clear" class="iconified" type="button"><span class="fa-icon">trash-o</span><span class="hover"></span></button>
-        <button id="console-fold" class="iconified" type="button"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
-        <button id="console-unfold" class="iconified" type="button"><span class="fa-icon fa-icon-vflipped">double-angle-up</span><span class="hover"></span></button>
-        <button id="snfe-dump" type="button">SNFE: Dump<span class="hover"></span></button>
-        <button id="snfe-todnr" type="button">SNFE: DNR<span class="hover"></span></button>
-        <button id="snfe-benchmark" type="button" disabled>SNFE: Benchmark<span class="hover"></span></button>
-        <button id="cfe-dump" type="button">CFE: Dump<span class="hover"></span></button>
-        <button id="cfe-benchmark" type="button" disabled>CFE: Benchmark<span class="hover"></span></button>
-        <button id="sfe-benchmark" type="button" disabled>SFE: Benchmark<span class="hover"></span></button>
-        <button id="purge-all-caches" type="button" data-i18n-title="3pPurgeAll"><span data-i18n="3pPurgeAll">_</span><span class="hover"></span></button>
-</div>
+<main class="body">
+    <section class="devtoolsHero">
+        <div class="heroCopy">
+            <p class="eyebrow">uBlockVanced</p>
+            <h1 data-i18n="devtoolsPageTitle"></h1>
+            <p class="lead" data-i18n="devtoolsPageLead"></p>
+            <p class="helperCopy" data-i18n="devtoolsQueryHelp"></p>
+        </div>
+        <div id="devtoolsStatus" class="statusCluster" role="status" aria-live="polite" aria-atomic="true">
+            <span id="devtoolsStatusPrimary" class="statusPill" data-tone="neutral" data-i18n="devtoolsStatusReady"></span>
+            <span id="devtoolsStatusSecondary" class="statusPill" data-tone="muted" data-i18n="devtoolsStatusHint"></span>
+        </div>
+    </section>
+
+    <div class="actionBar devtoolsActions" aria-label="DevTools actions">
+        <section class="actionGroup" aria-labelledby="consoleToolsLabel">
+            <p id="consoleToolsLabel" class="actionGroupLabel" data-i18n="devtoolsConsoleGroup"></p>
+            <div class="actionGroupButtons">
+                <button id="console-clear" class="iconified notext" data-i18n-title="devtoolsConsoleClearTip" type="button"><span class="fa-icon">trash-o</span><span class="hover"></span></button>
+                <button id="console-fold" class="iconified notext" data-i18n-title="devtoolsConsoleFoldTip" type="button"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
+                <button id="console-unfold" class="iconified notext" data-i18n-title="devtoolsConsoleUnfoldTip" type="button"><span class="fa-icon fa-icon-vflipped">double-angle-up</span><span class="hover"></span></button>
+            </div>
+        </section>
+
+        <section class="actionGroup" aria-labelledby="networkToolsLabel">
+            <p id="networkToolsLabel" class="actionGroupLabel" data-i18n="devtoolsNetworkGroup"></p>
+            <div class="actionGroupButtons">
+                <button id="snfe-dump" type="button" data-i18n="devtoolsSnfeDump">_<span class="hover"></span></button>
+                <button id="snfe-todnr" type="button" data-i18n="devtoolsSnfeToDnr">_<span class="hover"></span></button>
+                <button id="snfe-benchmark" type="button" data-i18n="devtoolsSnfeBenchmark" disabled>_<span class="hover"></span></button>
+            </div>
+        </section>
+
+        <section class="actionGroup" aria-labelledby="cosmeticToolsLabel">
+            <p id="cosmeticToolsLabel" class="actionGroupLabel" data-i18n="devtoolsCosmeticGroup"></p>
+            <div class="actionGroupButtons">
+                <button id="cfe-dump" type="button" data-i18n="devtoolsCfeDump">_<span class="hover"></span></button>
+                <button id="cfe-benchmark" type="button" data-i18n="devtoolsCfeBenchmark" disabled>_<span class="hover"></span></button>
+                <button id="sfe-benchmark" type="button" data-i18n="devtoolsSfeBenchmark" disabled>_<span class="hover"></span></button>
+            </div>
+        </section>
+
+        <section class="actionGroup" aria-labelledby="maintenanceToolsLabel">
+            <p id="maintenanceToolsLabel" class="actionGroupLabel" data-i18n="devtoolsMaintenanceGroup"></p>
+            <div class="actionGroupButtons">
+                <button id="purge-all-caches" type="button" data-i18n-title="devtoolsPurgeCachesTip"><span data-i18n="3pPurgeAll">_</span><span class="hover"></span></button>
+            </div>
+        </section>
+    </div>
+</main>
 <div id="console" class="codeMirrorContainer codeMirrorBreakAll"></div>
 
 <script src="lib/codemirror/lib/codemirror.js"></script>

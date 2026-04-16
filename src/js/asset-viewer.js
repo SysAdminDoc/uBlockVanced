@@ -23,6 +23,7 @@
 
 import './codemirror/ubo-static-filtering.js';
 import { dom, qs$ } from './dom.js';
+import { i18n$ } from './i18n.js';
 
 /******************************************************************************/
 
@@ -30,18 +31,50 @@ import { dom, qs$ } from './dom.js';
     const subscribeURL = new URL(document.location);
     const subscribeParams = subscribeURL.searchParams;
     const assetKey = subscribeParams.get('url');
-    if ( assetKey === null ) { return; }
-
+    const assetHeading = qs$('#assetHeading');
+    const assetMeta = qs$('#assetMeta');
+    const assetStatusPrimary = qs$('#assetStatusPrimary');
+    const assetTrustState = qs$('#assetTrustState');
+    const assetLineCount = qs$('#assetLineCount');
+    const assetSourceLink = qs$('#assetSourceLink');
     const subscribeElem = subscribeParams.get('subscribe') !== null
         ? qs$('#subscribe')
         : null;
+    const subscribeTitle = qs$('#subscribeTitle');
+    const subscribeTarget = qs$('#subscribeTarget');
+    const subscribeState = qs$('#subscribeState');
+    const subscribeButton = qs$('#subscribeButton');
+
+    const setStatusPill = function(elem, message, tone = 'neutral') {
+        if ( elem === null ) { return; }
+        dom.text(elem, message);
+        elem.dataset.tone = tone;
+    };
+
+    const lineCountFromText = text =>
+        text === ''
+            ? 0
+            : text.split(/\r\n|\r|\n/).length;
+
+    const displayTitle = subscribeParams.get('title') || assetKey || i18n$('assetViewerUntitledAsset');
+    dom.text(assetHeading, displayTitle);
+    dom.text(assetMeta, assetKey || i18n$('assetViewerNoAssetSelected'));
+
+    if ( assetKey === null ) {
+        setStatusPill(assetStatusPrimary, i18n$('assetViewerStatusMissing'), 'warning');
+        dom.cl.remove(dom.body, 'loading');
+        return;
+    }
+
     if ( subscribeElem !== null && subscribeURL.hash !== '#subscribed' ) {
-        const title = subscribeParams.get('title');
-        const promptElem = qs$('#subscribePrompt');
-        dom.text(promptElem.children[0], title);
-        const a = promptElem.children[1];
-        dom.text(a, assetKey);
-        dom.attr(a, 'href', assetKey);
+        dom.text(subscribeTitle, displayTitle);
+        dom.text(subscribeTarget, assetKey);
+        dom.attr(subscribeTarget, 'href', assetKey);
+        setStatusPill(
+            subscribeState,
+            i18n$('assetViewerSubscribePending'),
+            'warning'
+        );
         dom.cl.remove(subscribeElem, 'hide');
     }
 
@@ -78,31 +111,101 @@ import { dom, qs$ } from './dom.js';
         cmEditor.setOption('trustedScriptletTokens', tokens);
     });
 
-    const details = await vAPI.messaging.send('default', {
-        what : 'getAssetContent',
-        url: assetKey,
-    });
+    let details;
+    try {
+        details = await vAPI.messaging.send('default', {
+            what : 'getAssetContent',
+            url: assetKey,
+        });
+    } catch ( reason ) {
+        const message = `${reason instanceof Error ? reason.message : reason || ''}`.trim();
+        setStatusPill(assetStatusPrimary, i18n$('assetViewerStatusLoadError'), 'warning');
+        setStatusPill(assetTrustState, i18n$('assetViewerStatusUnavailable'), 'muted');
+        cmEditor.setValue(
+            `${i18n$('assetViewerLoadError')}${message !== '' ? `\n\n${message}` : ''}`
+        );
+        dom.cl.remove(dom.body, 'loading');
+        return;
+    }
+    const content = details && details.content || '';
     cmEditor.setOption('trustedSource', details.trustedSource === true);
-    cmEditor.setValue(details && details.content || '');
+    cmEditor.setValue(content);
+    setStatusPill(assetStatusPrimary, i18n$('assetViewerStatusReady'), 'success');
+    setStatusPill(
+        assetTrustState,
+        details.trustedSource === true
+            ? i18n$('assetViewerStatusTrusted')
+            : i18n$('assetViewerStatusExternal'),
+        details.trustedSource === true ? 'success' : 'warning'
+    );
+    setStatusPill(
+        assetLineCount,
+        i18n$('assetViewerLineCount')
+            .replace('{{count}}', lineCountFromText(content).toLocaleString()),
+        'muted'
+    );
 
     if ( subscribeElem !== null ) {
-        dom.on('#subscribeButton', 'click', ( ) => {
-            dom.cl.add(subscribeElem, 'hide');
-            vAPI.messaging.send('scriptlets', {
-                what: 'applyFilterListSelection',
-                toImport: assetKey,
-            }).then(( ) => {
-                vAPI.messaging.send('scriptlets', {
+        dom.on(subscribeButton, 'click', async ( ) => {
+            subscribeElem.dataset.busy = 'true';
+            subscribeButton.disabled = true;
+            setStatusPill(
+                subscribeState,
+                i18n$('assetViewerSubscribeWorking'),
+                'running'
+            );
+            setStatusPill(
+                assetStatusPrimary,
+                i18n$('assetViewerStatusSubscribing'),
+                'running'
+            );
+            try {
+                await vAPI.messaging.send('scriptlets', {
+                    what: 'applyFilterListSelection',
+                    toImport: assetKey,
+                });
+                await vAPI.messaging.send('scriptlets', {
                     what: 'reloadAllFilters'
                 });
-            });
-        }, { once: true });
+                setStatusPill(
+                    subscribeState,
+                    i18n$('assetViewerSubscribeDone'),
+                    'success'
+                );
+                setStatusPill(
+                    assetStatusPrimary,
+                    i18n$('assetViewerStatusSubscribed'),
+                    'success'
+                );
+                window.history.replaceState(null, '', '#subscribed');
+            } catch {
+                delete subscribeElem.dataset.busy;
+                subscribeButton.disabled = false;
+                setStatusPill(
+                    subscribeState,
+                    i18n$('assetViewerSubscribeError'),
+                    'warning'
+                );
+                setStatusPill(
+                    assetStatusPrimary,
+                    i18n$('assetViewerStatusSubscribeError'),
+                    'warning'
+                );
+                return;
+            }
+            delete subscribeElem.dataset.busy;
+        });
     }
 
     if ( details.sourceURL ) {
+        dom.attr(assetSourceLink, 'href', details.sourceURL);
+        dom.cl.remove(assetSourceLink, 'hide');
         const a = qs$('.cm-search-widget .sourceURL');
-        dom.attr(a, 'href', details.sourceURL);
-        dom.attr(a, 'title', details.sourceURL);
+        if ( a instanceof HTMLAnchorElement ) {
+            dom.attr(a, 'href', details.sourceURL);
+            dom.attr(a, 'title', details.sourceURL);
+            dom.attr(a, 'rel', 'noopener noreferrer');
+        }
     }
 
     dom.cl.remove(dom.body, 'loading');

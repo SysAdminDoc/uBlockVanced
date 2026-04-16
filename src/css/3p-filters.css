@@ -45,6 +45,41 @@ body.working #actions button {
     transform: rotate(90deg);
     transform-origin: 50%;
     }
+.listToggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-small);
+    color: inherit;
+        fill: inherit;
+    column-gap: var(--default-gap-xsmall);
+    flex: 1 1 auto;
+    font: inherit;
+    justify-content: flex-start;
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+    touch-action: manipulation;
+    }
+.listToggle .listExpander {
+    pointer-events: none;
+    }
+#lists .listEntry > .detailbar .listExpander[role="button"] {
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    padding: 0.2rem;
+    touch-action: manipulation;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+    }
+#lists .listEntry > .detailbar .listExpander[role="button"]:hover {
+    background: var(--surface-2);
+    }
+#lists .rootstats > .listToggle {
+    width: 100%;
+    }
 
 #lists .fa-icon:hover {
     transform: scale(1.25);
@@ -67,10 +102,6 @@ body.working #actions button {
     }
 #lists.searchMode > .listEntries .listExpander {
     visibility: hidden;
-    }
-
-#listsOfBlockedHostsPrompt {
-    cursor: pointer;
     }
 
 #lists .listEntries {
@@ -109,11 +140,22 @@ body.working #actions button {
     }
 #lists .nodestats {
     align-self: flex-end;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-small);
     color: var(--info0-ink);
         fill: var(--info0-ink);
-    cursor: default;
+    cursor: pointer;
     font-size: var(--font-size-smaller);
-}
+    min-height: 0;
+    padding: 0.2rem 0.45rem;
+    touch-action: manipulation;
+    }
+#lists .nodestats:hover {
+    background: var(--surface-2);
+    color: var(--ink-1);
+        fill: var(--ink-1);
+    }
 #lists .iconbar {
     column-gap: var(--default-gap-xxsmall);
     color: var(--info0-ink);
@@ -125,6 +167,16 @@ body.working #actions button {
 #lists .iconbar a {
     color: var(--info0-ink);
         fill: var(--info0-ink);
+    }
+#lists .iconbar button.fa-icon {
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-small);
+    color: inherit;
+        fill: inherit;
+    min-height: 0;
+    padding: 0;
+    touch-action: manipulation;
     }
 #lists .iconbar .fa-icon {
     display: none;
@@ -224,7 +276,7 @@ body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconb
     visibility: visible;
     }
 #lists .listEntry[data-role="import"] textarea {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-2, #45475a);
     box-sizing: border-box;
     display: block;
     font-size: smaller;
@@ -235,3 +287,94 @@ body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconb
     white-space: pre;
     width: 100%;
     }
+#lists .listToggle:focus-visible,
+#lists .listEntry > .detailbar .listExpander[role="button"]:focus-visible,
+#lists .listEntry > .detailbar .nodestats:focus-visible,
+#lists a.fa-icon:focus-visible,
+#lists .iconbar button.fa-icon:focus-visible,
+#lists .searchfield input:focus-visible {
+    outline: 2px solid var(--button-preferred-surface);
+    outline-offset: 2px;
+    }
+
+/*
+ * uBlockForge premium polish
+ */
+#actions {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: var(--surface-raised-strong);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap-small);
+    margin: 0 0 var(--default-gap);
+    padding: 0.9rem;
+    top: 0;
+}
+
+#lists {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    box-shadow: var(--panel-shadow);
+    overflow: hidden;
+    padding: 1rem;
+}
+
+#lists .rootstats {
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-medium);
+    margin-bottom: var(--default-gap-small);
+    padding: 0.85rem 1rem;
+}
+
+#lists .rootstats > .listToggle {
+    font-weight: 600;
+}
+
+#lists .searchfield {
+    margin: 0 0 var(--default-gap-small) var(--checkbox-size);
+    max-width: min(100%, 28rem);
+}
+
+#lists .searchfield input {
+    width: 100%;
+}
+
+#lists .listEntry > .detailbar {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-medium);
+    min-height: 2.75rem;
+    padding: 0.55rem 0.75rem;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+#lists .listEntry > .detailbar:hover {
+    background: var(--field-surface);
+    border-color: var(--border-1);
+}
+
+#lists .listEntry[data-role="import"] textarea {
+    background: var(--field-surface);
+    border-radius: var(--radius-medium);
+    margin-top: var(--default-gap-small);
+    padding: 0.85rem 1rem;
+}
+
+@media (max-width: 640px) {
+    #actions {
+        padding: 0.8rem;
+    }
+
+    #lists {
+        padding: 0.75rem;
+    }
+}

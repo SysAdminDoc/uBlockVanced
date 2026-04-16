@@ -109,6 +109,49 @@ function setEditorText(text) {
 
 /******************************************************************************/
 
+function setStatusPill(target, message, tone) {
+    const node = qs$(target);
+    if ( node === null ) { return; }
+    node.textContent = message;
+    node.className = 'statusPill';
+    if ( tone ) {
+        dom.cl.add(node, tone);
+    }
+}
+
+function syncEditorState(changed, bad) {
+    const text = getEditorText().trim();
+    const exportButton = qs$('#exportWhitelistToFile');
+    const lines = text === '' ? [] : text.split(/\n+/);
+    let customDirectiveCount = 0;
+    for ( const line of lines ) {
+        if ( reComment.test(line) ) { continue; }
+        const directive = directiveFromLine(line);
+        if ( directive === '' ) { continue; }
+        if ( whitelistDefaultSet.has(directive) ) { continue; }
+        customDirectiveCount += 1;
+    }
+    exportButton.disabled = text === '';
+    setStatusPill(
+        '#whitelistSaveState',
+        i18n$(changed ? 'whitelistStatusUnsaved' : 'whitelistStatusSaved'),
+        changed ? 'is-warning' : 'is-success'
+    );
+    setStatusPill(
+        '#whitelistValidationState',
+        i18n$(bad ? 'whitelistStatusNeedsReview' : 'whitelistStatusValid'),
+        bad ? 'is-warning' : 'is-muted'
+    );
+    setStatusPill(
+        '#whitelistDirectiveCount',
+        i18n$('whitelistDirectiveCount')
+            .replace('{{count}}', customDirectiveCount.toLocaleString()),
+        customDirectiveCount === 0 ? 'is-muted' : ''
+    );
+}
+
+/******************************************************************************/
+
 function whitelistChanged() {
     const whitelistElem = qs$('#whitelist');
     const bad = qs$(whitelistElem, '.cm-error') !== null;
@@ -116,6 +159,7 @@ function whitelistChanged() {
     const changed = changedWhitelist !== cachedWhitelist;
     qs$('#whitelistApply').disabled = !changed || bad;
     qs$('#whitelistRevert').disabled = !changed;
+    syncEditorState(changed, bad);
     CodeMirror.commands.save = changed && !bad ? applyChanges : noopFunc;
 }
 
@@ -159,6 +203,7 @@ async function renderWhitelist() {
     if ( first ) {
         cmEditor.clearHistory();
     }
+    whitelistChanged();
 }
 
 /******************************************************************************/
@@ -232,6 +277,7 @@ function setCloudData(data, append) {
         data = uBlockDashboard.mergeNewLines(getEditorText().trim(), data);
     }
     setEditorText(data.trim());
+    whitelistChanged();
 }
 
 self.cloud.onPush = getCloudData;

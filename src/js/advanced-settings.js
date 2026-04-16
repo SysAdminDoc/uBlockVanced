@@ -22,12 +22,16 @@
 /* global CodeMirror, uBlockDashboard */
 
 import { dom, qs$ } from './dom.js';
+import { i18n$ } from './i18n.js';
 
 /******************************************************************************/
 
 let defaultSettings = new Map();
 let adminSettings = new Map();
 let beforeHash = '';
+let isApplying = false;
+let isRendering = false;
+let saveStateOverride;
 
 /******************************************************************************/
 
@@ -85,6 +89,87 @@ const hashFromAdvancedSettings = function(raw) {
 
 /******************************************************************************/
 
+const setStatusPill = function(target, message, tone) {
+    const node = qs$(target);
+    if ( node === null ) { return; }
+    node.textContent = message;
+    node.className = 'statusPill';
+    if ( tone ) {
+        dom.cl.add(node, tone);
+    }
+};
+
+const countCustomizedSettings = function(raw) {
+    let count = 0;
+    for ( const [ key, value ] of arrayFromString(raw) ) {
+        if ( defaultSettings.has(key) === false ) { continue; }
+        if ( value !== defaultSettings.get(key) ) {
+            count += 1;
+        }
+    }
+    return count;
+};
+
+const updatePolicyHint = function() {
+    const hint = qs$('#advancedSettingsPolicyHint');
+    if ( hint === null ) { return; }
+    const template = i18n$(
+        adminSettings.size !== 0
+            ? 'advancedSettingsPolicyHintLocked'
+            : 'advancedSettingsPolicyHintClear'
+    );
+    hint.textContent = template
+        .replace('{{count}}', adminSettings.size)
+        .replace('{{total}}', defaultSettings.size);
+};
+
+const updateEditorState = function() {
+    const changed = hashFromAdvancedSettings(cmEditor.getValue()) !== beforeHash;
+    const customizedCount = countCustomizedSettings(cmEditor.getValue());
+
+    let saveKey, saveTone;
+    if ( saveStateOverride instanceof Object ) {
+        saveKey = saveStateOverride.key;
+        saveTone = saveStateOverride.tone;
+    } else if ( isApplying ) {
+        saveKey = 'advancedSettingsStatusSaving';
+        saveTone = 'is-accent';
+    } else if ( changed ) {
+        saveKey = 'advancedSettingsStatusUnsaved';
+        saveTone = 'is-warning';
+    } else {
+        saveKey = 'advancedSettingsStatusSaved';
+        saveTone = 'is-success';
+    }
+
+    setStatusPill('#advancedSettingsSaveState', i18n$(saveKey), saveTone);
+    setStatusPill(
+        '#advancedSettingsCustomizedState',
+        i18n$('advancedSettingsCustomizedCount')
+            .replace('{{count}}', customizedCount),
+        customizedCount !== 0
+            ? 'is-accent'
+            : 'is-muted'
+    );
+    setStatusPill(
+        '#advancedSettingsLockState',
+        i18n$(
+            adminSettings.size !== 0
+                ? 'advancedSettingsLockCount'
+                : 'advancedSettingsLockCountNone'
+        ).replace('{{count}}', adminSettings.size),
+        adminSettings.size !== 0 ? 'is-warning' : 'is-muted'
+    );
+
+    qs$('#advancedSettingsApply').disabled = changed === false || isApplying;
+    qs$('#advancedSettingsRevert').disabled = changed === false || isApplying;
+    qs$('#advancedSettingsApply').dataset.busy = isApplying ? 'true' : 'false';
+    CodeMirror.commands.save = changed && isApplying === false
+        ? applyChanges
+        : function(){};
+    dom.attr('#advancedSettings', 'data-dirty', changed ? 'true' : 'false');
+};
+
 const arrayFromObject = function(o) {
     const out = [];
     for ( const k in o ) {
@@ -117,14 +202,14 @@ const arrayFromString = function(s) {
 
 const advancedSettingsChanged = (( ) => {
     const handler = ( ) => {
-        const changed = hashFromAdvancedSettings(cmEditor.getValue()) !== beforeHash;
-        qs$('#advancedSettingsApply').disabled = !changed;
-        CodeMirror.commands.save = changed ? applyChanges : function(){};
+        saveStateOverride = undefined;
+        updateEditorState();
     };
 
     const timer = vAPI.defer.create(handler);
 
     return function() {
+        if ( isRendering ) { return; }
         timer.offon(200);
     };
 })();
@@ -137,47 +222,70 @@ const renderAdvancedSettings = async function(first) {
     const details = await vAPI.messaging.send('dashboard', {
         what: 'readHiddenSettings',
     });
-    defaultSettings = new Map(arrayFromObject(details.default));
-    adminSettings = new Map(arrayFromObject(details.admin));
-    beforeHash = hashFromAdvancedSettings(details.current);
-    const pretty = [];
-    const roLines = [];
-    const entries = arrayFromObject(details.current);
-    let max = 0;
-    for ( const [ k ] of entries ) {
-        if ( k.length > max ) { max = k.length; }
-    }
-    for ( let i = 0; i < entries.length; i++ ) {
-        const [ k, v ] = entries[i];
-        pretty.push(' '.repeat(max - k.length) + `${k} ${v}`);
-        if ( adminSettings.has(k) ) {
-            roLines.push(i);
+    isRendering = true;
+    try {
+        defaultSettings = new Map(arrayFromObject(details.default));
+        adminSettings = new Map(arrayFromObject(details.admin));
+        beforeHash = hashFromAdvancedSettings(details.current);
+        const pretty = [];
+        const roLines = [];
+        const entries = arrayFromObject(details.current);
+        let max = 0;
+        for ( const [ k ] of entries ) {
+            if ( k.length > max ) { max = k.length; }
         }
+        for ( let i = 0; i < entries.length; i++ ) {
+            const [ k, v ] = entries[i];
+            pretty.push(' '.repeat(max - k.length) + `${k} ${v}`);
+            if ( adminSettings.has(k) ) {
+                roLines.push(i);
+            }
+        }
+        pretty.push('');
+        cmEditor.setValue(pretty.join('\n'));
+        if ( first ) {
+            cmEditor.clearHistory();
+        }
+        for ( const line of roLines ) {
+            cmEditor.markText(
+                { line, ch: 0 },
+                { line: line + 1, ch: 0 },
+                { readOnly: true }
+            );
+        }
+        updatePolicyHint();
+        updateEditorState();
+        cmEditor.focus();
+    } finally {
+        isRendering = false;
     }
-    pretty.push('');
-    cmEditor.setValue(pretty.join('\n'));
-    if ( first ) {
-        cmEditor.clearHistory();
-    }
-    for ( const line of roLines ) {
-        cmEditor.markText(
-            { line, ch: 0 },
-            { line: line + 1, ch: 0 },
-            { readOnly: true }
-        );
-    }
-    advancedSettingsChanged();
-    cmEditor.focus();
 };
 
 /******************************************************************************/
 
 const applyChanges = async function() {
-    await vAPI.messaging.send('dashboard', {
-        what: 'writeHiddenSettings',
-        content: cmEditor.getValue(),
-    });
-    renderAdvancedSettings();
+    isApplying = true;
+    saveStateOverride = undefined;
+    updateEditorState();
+    try {
+        await vAPI.messaging.send('dashboard', {
+            what: 'writeHiddenSettings',
+            content: cmEditor.getValue(),
+        });
+        isApplying = false;
+        saveStateOverride = {
+            key: 'advancedSettingsStatusApplied',
+            tone: 'is-success',
+        };
+        renderAdvancedSettings();
+    } catch {
+        isApplying = false;
+        saveStateOverride = {
+            key: 'advancedSettingsStatusSaveError',
+            tone: 'is-warning',
+        };
+        updateEditorState();
+    }
 };
 
 /******************************************************************************/
@@ -185,6 +293,13 @@ const applyChanges = async function() {
 dom.on('#advancedSettings', 'input', advancedSettingsChanged);
 dom.on('#advancedSettingsApply', 'click', ( ) => {
     applyChanges();
+});
+dom.on('#advancedSettingsRevert', 'click', ( ) => {
+    saveStateOverride = {
+        key: 'advancedSettingsStatusReverted',
+        tone: 'is-muted',
+    };
+    renderAdvancedSettings();
 });
 
 renderAdvancedSettings(true);

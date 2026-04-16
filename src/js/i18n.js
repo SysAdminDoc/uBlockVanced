@@ -245,7 +245,27 @@ if ( isBackgroundProcess !== true ) {
         for ( const elem of root.querySelectorAll('[data-i18n-title]') ) {
             const text = i18n$(elem.getAttribute('data-i18n-title'));
             if ( !text ) { continue; }
-            elem.setAttribute('title', expandHtmlEntities(text));
+            const expanded = expandHtmlEntities(text);
+            elem.setAttribute('title', expanded);
+            const isInteractive =
+                /^(?:a|button|input|select|textarea)$/i.test(elem.localName) ||
+                elem.getAttribute('role') === 'button';
+            const allowAutoLabel =
+                elem.getAttribute('aria-label') === 'data-title' ||
+                (
+                    elem.hasAttribute('aria-label') === false &&
+                    (
+                        elem.classList.contains('notext') ||
+                        elem.classList.contains('fa-icon')
+                    )
+                );
+            if ( isInteractive === false || allowAutoLabel === false ) {
+                continue;
+            }
+            elem.setAttribute(
+                'aria-label',
+                expanded.replace(/\s*\n+\s*/g, ' ').trim()
+            );
         }
 
         for ( const elem of root.querySelectorAll('[placeholder]') ) {
