@@ -158,10 +158,12 @@ const onElementProbe = function(details, tab) {
 };
 
 // Inject a lightweight listener that marks the right-clicked element so
-// the context-menu handler above can retrieve it.
-const ensureProbeListener = function(tabId, frameId) {
-    vAPI.tabs.executeScript(tabId, {
-        frameId,
+// the context-menu handler above can retrieve it. Installs in the top
+// frame and, when supported, in every sub-frame too — otherwise a
+// right-click inside an iframe would never mark its target and we'd
+// fall back to the top-frame <body> (wrong element).
+const ensureProbeListener = function(tabId) {
+    const script = {
         code: `(function(){
             if ( window.__ubp_ctx_installed__ ) return;
             window.__ubp_ctx_installed__ = true;
@@ -174,7 +176,20 @@ const ensureProbeListener = function(tabId, frameId) {
             }, true);
         })()`,
         runAt: 'document_start',
-    }).catch(( ) => { /* tab may have closed or navigated */ });
+        allFrames: true,
+    };
+    const p = vAPI.tabs.executeScript(tabId, script);
+    if ( p && typeof p.catch === 'function' ) {
+        p.catch(( ) => {
+            // Some frames may reject (e.g. sandboxed / cross-origin in MV2);
+            // retry top frame only so the common case still works.
+            vAPI.tabs.executeScript(tabId, {
+                code: script.code,
+                runAt: script.runAt,
+                frameId: 0,
+            }).catch(( ) => { /* tab closed/navigated */ });
+        });
+    }
 };
 
 /******************************************************************************/
@@ -297,7 +312,7 @@ const update = function(tabId = undefined) {
     }
     if ( (newBits & ELEMENT_PROBE_BIT) !== 0 ) {
         usedEntries.push(menuEntries.elementProbe);
-        if ( tabId ) { ensureProbeListener(tabId, 0); }
+        if ( tabId ) { ensureProbeListener(tabId); }
     }
     vAPI.contextMenu.setEntries(usedEntries, onEntryClicked);
 };

@@ -150,8 +150,11 @@ const onMessage = function(request, sender, callback) {
         break;
 
     case 'createUserFilter':
-        µb.createUserFilters(request);
-        callback();
+        µb.createUserFilters(request).then(() => {
+            callback();
+        }, ( ) => {
+            callback();
+        });
         return;
 
     case 'removeUserFilter':

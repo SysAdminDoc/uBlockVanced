@@ -670,8 +670,8 @@ onBroadcast(msg => {
     broadcast({ what: 'userFiltersUpdated' });
 };
 
-µb.createUserFilters = function(details) {
-    this.appendUserFilters(details.filters, details);
+µb.createUserFilters = async function(details) {
+    await this.appendUserFilters(details.filters, details);
     // https://github.com/gorhill/uBlock/issues/1786
     if ( details.docURL === undefined ) { return; }
     cosmeticFilteringEngine.removeFromSelectorCache(
