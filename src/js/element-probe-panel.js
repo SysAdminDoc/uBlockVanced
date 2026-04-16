@@ -36,6 +36,7 @@ const log = (msg, type = '') => {
         el.firstElementChild.remove();
     }
     el.scrollTop = el.scrollHeight;
+    syncLogState();
 };
 
 let currentSelectors = [];
@@ -58,6 +59,10 @@ const setStatus = (text, state = '') => {
     const dot = $('statusDot');
     dot.className = 'status-dot';
     if (state) dot.classList.add(state);
+    const indicator = document.querySelector('.status-indicator');
+    if (indicator) {
+        indicator.dataset.state = state || 'idle';
+    }
 };
 
 const setSelectionSummary = text => {
@@ -65,6 +70,152 @@ const setSelectionSummary = text => {
     if (el) {
         el.textContent = text;
     }
+    updateWorkflowSummary();
+};
+
+const setText = (id, text) => {
+    const el = $(id);
+    if (el) {
+        el.textContent = text;
+    }
+};
+
+const truncate = (text, max = 88) => {
+    if (typeof text !== 'string') { return ''; }
+    const normalized = text.replace(/\s+/g, ' ').trim();
+    if (normalized.length <= max) { return normalized; }
+    return normalized.slice(0, max - 1) + '\u2026';
+};
+
+const getCurrentFrameLabel = () => {
+    const select = $('frameTarget');
+    if (select && currentFrameUrl) {
+        const option = select.options[select.selectedIndex];
+        if (option && option.textContent) {
+            return option.textContent.trim();
+        }
+        return 'Selected iframe';
+    }
+    return 'Top document';
+};
+
+const formatSelectionLabel = data => {
+    if (!data) { return 'Waiting for a node'; }
+    const label = [];
+    if (data.tag) { label.push(`<${data.tag}>`); }
+    if (data.id) { label.push(`#${data.id}`); }
+    if (Array.isArray(data.classes) && data.classes.length !== 0) {
+        label.push(`.${data.classes[0]}`);
+    }
+    return label.join(' ') || 'Selected element';
+};
+
+const syncLogState = () => {
+    const el = $('log');
+    if (!el) { return; }
+    el.dataset.empty = el.childElementCount === 0 ? 'true' : 'false';
+};
+
+const updateFilterHint = () => {
+    const section = $('filterSection');
+    const output = $('filterOutput');
+    if (!section || !output) { return; }
+    const value = output.value.trim();
+    const hasValue = value !== '';
+    const isProcedural = /:has-text|:upward|:matches-path|:not\(:has-text\(/i.test(value);
+
+    let badge = 'Selection required';
+    let text = 'Choose a selector or procedural filter to build a rule.';
+    let mode = 'idle';
+
+    if (lastInspectedData && hasValue === false) {
+        const selectorCount = currentSelectors.length;
+        badge = 'Choose a selector';
+        text = selectorCount === 0
+            ? 'No stable selectors were generated for this node yet. Try scanning shadow DOM or picking a different ancestor.'
+            : `${selectorCount} selector suggestion${selectorCount === 1 ? '' : 's'} ready. Pick the most stable option before saving.`;
+        mode = 'ready';
+    } else if (hasValue && isProcedural) {
+        badge = 'Procedural rule';
+        text = 'Procedural rules save directly to your filters. In-page preview is unavailable for this rule type.';
+        mode = 'procedural';
+    } else if (hasValue && isHighlighting) {
+        badge = 'Preview active';
+        text = 'The current selector is highlighted in the inspected page. Save it if the match looks right, or clear the preview.';
+        mode = 'preview';
+    } else if (hasValue) {
+        badge = 'Rule ready';
+        text = 'CSS selectors can be previewed before saving, copied for review, or sent straight to your user filters.';
+        mode = 'ready';
+    }
+
+    section.dataset.mode = mode;
+    setText('filterHintBadge', badge);
+    setText('filterHintText', text);
+};
+
+const updateWorkflowSummary = () => {
+    const frameCount = Math.max(($('frameTarget')?.options.length || 1) - 1, 0);
+    const hasFilterValue = $('filterOutput')?.value.trim() !== '';
+    const isProcedural = /:has-text|:upward|:matches-path|:not\(:has-text\(/i.test($('filterOutput')?.value || '');
+
+    setText('overviewTargetValue', currentFrameUrl ? 'Focused iframe' : 'Top document');
+    setText(
+        'overviewTargetHint',
+        currentFrameUrl
+            ? truncate(getCurrentFrameLabel(), 84)
+            : frameCount === 0
+                ? 'Inspecting the main page context.'
+                : `${frameCount} iframe target${frameCount === 1 ? '' : 's'} detected on this page.`
+    );
+
+    if (lastInspectedData) {
+        setText('overviewSelectionValue', formatSelectionLabel(lastInspectedData));
+        setText(
+            'overviewSelectionHint',
+            lastInspectedData.inShadowDOM
+                ? `Inside shadow DOM${lastInspectedData.shadowHost ? ` via ${lastInspectedData.shadowHost}` : ''}.`
+                : truncate(lastInspectedData.textContent || `On ${lastInspectedData.hostname || 'the current page'}`, 84)
+        );
+    } else {
+        setText('overviewSelectionValue', 'Waiting for a node');
+        setText('overviewSelectionHint', 'Select in Elements or use Pick on page.');
+    }
+
+    if (!lastInspectedData) {
+        setText('overviewOutputValue', 'No output yet');
+        setText('overviewOutputHint', 'Inspect an element to generate selectors and cosmetic rules.');
+        return;
+    }
+
+    const proceduralCount = Array.isArray(lastInspectedData.proceduralFilters)
+        ? lastInspectedData.proceduralFilters.length
+        : 0;
+
+    if (hasFilterValue) {
+        if (isProcedural) {
+            setText('overviewOutputValue', 'Procedural rule ready');
+            setText('overviewOutputHint', 'Save it to your filters, then reload the page to validate the result.');
+        } else if (isHighlighting) {
+            setText('overviewOutputValue', 'Previewing rule');
+            setText('overviewOutputHint', 'A live highlight is active on the inspected page for the current selector.');
+        } else {
+            setText('overviewOutputValue', 'Rule ready');
+            setText('overviewOutputHint', 'Preview, copy, or save the current selector as a cosmetic filter.');
+        }
+        return;
+    }
+
+    setText(
+        'overviewOutputValue',
+        `${currentSelectors.length} selector${currentSelectors.length === 1 ? '' : 's'} ready`
+    );
+    setText(
+        'overviewOutputHint',
+        proceduralCount === 0
+            ? 'Pick the most stable selector to continue.'
+            : `${proceduralCount} procedural filter${proceduralCount === 1 ? '' : 's'} also generated for harder targets.`
+    );
 };
 
 function setBusy(buttonId, busy, busyText) {
@@ -88,6 +239,8 @@ function syncFilterActions() {
     $('btnCopyFilter').disabled = !hasValue;
     $('btnTestFilter').disabled = !hasValue || isProcedural;
     $('btnRemoveFilter').disabled = !isHighlighting;
+    updateFilterHint();
+    updateWorkflowSummary();
 }
 
 function setHighlighting(state) {
@@ -122,6 +275,7 @@ async function loadHistory() {
         renderHistory();
     } catch(e) {
         filterHistory = [];
+        renderHistory();
     }
 }
 
@@ -157,13 +311,14 @@ function renderHistory() {
     while ( container.lastChild ) { container.lastChild.remove(); }
 
     const historySection = $('historySection');
+    if (historySection) historySection.style.display = '';
+    $('historyCount').textContent = filterHistory.length + ' filter' + (filterHistory.length !== 1 ? 's' : '');
+    container.dataset.empty = filterHistory.length === 0 ? 'true' : 'false';
+
     if (filterHistory.length === 0) {
-        if (historySection) historySection.style.display = 'none';
+        updateWorkflowSummary();
         return;
     }
-    if (historySection) historySection.style.display = '';
-
-    $('historyCount').textContent = filterHistory.length + ' filter' + (filterHistory.length !== 1 ? 's' : '');
 
     filterHistory.slice(0, 20).forEach((entry, idx) => {
         const item = document.createElement('div');
@@ -210,6 +365,7 @@ function renderHistory() {
         item.appendChild(actions);
         container.appendChild(item);
     });
+    updateWorkflowSummary();
 }
 
 async function undoFilter(idx) {
@@ -1077,6 +1233,8 @@ function displaySelectors(selectors) {
 
     if (selectors.length > 0) {
         selectSelector(0);
+    } else {
+        updateWorkflowSummary();
     }
 }
 
@@ -1089,6 +1247,7 @@ function displayProceduralFilters(filters) {
 
     if (filters.length === 0) {
         $('proceduralSection').style.display = 'none';
+        updateWorkflowSummary();
         return;
     }
 
@@ -1134,6 +1293,7 @@ function displayProceduralFilters(filters) {
 
         container.appendChild(item);
     });
+    updateWorkflowSummary();
 }
 
 function selectSelector(idx) {
@@ -1156,6 +1316,7 @@ function selectSelector(idx) {
         setHighlighting(true);
     }
     syncFilterActions();
+    updateWorkflowSummary();
 }
 
 function generateFilter(sel) {
@@ -1457,6 +1618,7 @@ async function scanFrames() {
             }
         }
 
+        updateWorkflowSummary();
         return frames;
     } catch(e) {
         log('Frame scan failed: ' + (e.message || e), 'error');
@@ -1487,6 +1649,7 @@ $('btnRefreshFrames').addEventListener('click', async () => {
 // Initialize
 loadHistory();
 scanFrames(); // auto-detect iframes on panel open
+syncLogState();
 log('Element Probe v0.2.0 initialized', 'info');
 setStatus('Ready');
 setSelectionSummary('No element selected yet.');
