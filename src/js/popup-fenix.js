@@ -76,11 +76,11 @@ const cachePopupData = function(data) {
     scopeToSrcHostnameMap['.'] = '';
     hostnameToSortableTokenMap.clear();
 
-    if ( typeof data !== 'object' ) {
+    if ( typeof data !== 'object' || data === null ) {
         return popupData;
     }
     popupData = data;
-    popupData.cnameMap = new Map(popupData.cnameMap);
+    popupData.cnameMap = new Map(popupData.cnameMap || []);
     scopeToSrcHostnameMap['.'] = popupData.pageHostname || '';
     const hostnameDict = popupData.hostnameDict;
     if ( typeof hostnameDict !== 'object' ) {
@@ -728,10 +728,10 @@ const renderPopup = function() {
     setQuickActionAvailability('#gotoReport', canPick);
 
     let blocked, total;
-    if ( popupData.pageCounts !== undefined ) {
+    if ( popupData.pageCounts !== undefined && popupData.pageCounts !== null ) {
         const counts = popupData.pageCounts;
-        blocked = counts.blocked.any;
-        total = blocked + counts.allowed.any;
+        blocked = counts.blocked?.any || 0;
+        total = blocked + (counts.allowed?.any || 0);
     } else {
         blocked = 0;
         total = 0;
