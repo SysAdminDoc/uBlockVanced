@@ -31,7 +31,12 @@ const details = {};
 {
     const matches = /details=([^&]+)/.exec(window.location.search);
     if ( matches !== null ) {
-        Object.assign(details, JSON.parse(decodeURIComponent(matches[1])));
+        try {
+            Object.assign(details, JSON.parse(decodeURIComponent(matches[1])));
+        } catch {
+            // Malformed or truncated query payload — fall back to empty
+            // details rather than crashing the blocked-document page.
+        }
     }
 }
 
