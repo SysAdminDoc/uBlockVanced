@@ -58,7 +58,7 @@ body > div.body {
     box-sizing: border-box;
     margin: 0 auto;
     max-width: var(--default-page-max-width);
-    padding: clamp(18px, 2vw, 28px);
+    padding: clamp(14px, 1.5vw, 20px);
     width: 100%;
 }
 
@@ -83,7 +83,7 @@ h3 {
 }
 
 .body > hr {
-    margin: var(--default-gap-large) 0;
+    margin: var(--default-gap) 0;
 }
 
 .fa-icon.info {
@@ -113,7 +113,7 @@ input[type="number"] {
 
 @media (max-width: 640px) {
     body > div.body {
-        padding: 14px 12px 28px;
+        padding: 12px 12px 20px;
     }
 }
 
@@ -125,9 +125,9 @@ input[type="number"] {
     align-items: end;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--default-gap);
+    gap: 0.75rem;
     justify-content: space-between;
-    margin: 0 0 var(--default-gap);
+    margin: 0 0 0.75rem;
 }
 
 .editorEyebrow {
@@ -135,14 +135,14 @@ input[type="number"] {
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.25rem;
     opacity: var(--high-em);
     text-transform: uppercase;
 }
 
 .editorTitle {
     font-family: var(--font-family-display);
-    font-size: clamp(1.5rem, 1.15rem + 1vw, 2.1rem);
+    font-size: clamp(1.32rem, 1.12rem + 0.7vw, 1.8rem);
     letter-spacing: -0.03em;
     line-height: 1.05;
     margin: 0;
@@ -151,8 +151,8 @@ input[type="number"] {
 
 .editorLead {
     color: var(--ink-2);
-    font-size: var(--font-size-smaller);
-    margin: 0.55rem 0 0;
+    font-size: 0.92rem;
+    margin: 0.4rem 0 0;
     max-width: 66ch;
 }
 
@@ -170,10 +170,10 @@ input[type="number"] {
     border-radius: 999px;
     color: var(--ink-1);
     display: inline-flex;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     font-weight: 600;
     gap: 0.35rem;
-    padding: 0.38rem 0.8rem;
+    padding: 0.32rem 0.7rem;
     white-space: nowrap;
 }
 

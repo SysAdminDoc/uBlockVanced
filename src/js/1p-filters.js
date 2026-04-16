@@ -135,10 +135,12 @@ function syncEditorState(changed) {
     const enabled = qs$('#enableMyFilters input').checked;
     const trustedInput = qs$('#trustMyFilters input');
     const exportButton = qs$('#exportUserFiltersToFile');
+    const trustWarning = qs$('.trustWarning');
     const hasContent = getEditorText().trim() !== '';
 
     trustedInput.disabled = enabled === false;
     dom.cl.toggle('#trustMyFilters', 'is-disabled', enabled === false);
+    dom.cl.toggle(trustWarning, 'is-visible', enabled && trustedInput.checked);
     exportButton.disabled = hasContent === false;
 
     setStatusPill(
@@ -347,10 +349,6 @@ function setCloudData(data, append) {
 
 self.cloud.onPush = getCloudData;
 self.cloud.onPull = setCloudData;
-
-/******************************************************************************/
-
-self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-My-filters';
 
 self.hasUnsavedData = function() {
     return currentStateChanged();

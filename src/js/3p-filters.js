@@ -31,6 +31,8 @@ const reValidExternalList = /^[a-z-]+:\/\/(?:\S+\/\S*|\/\S+)/m;
 const recentlyUpdated = 1 * 60 * 60 * 1000; // 1 hour
 
 let listsetDetails = {};
+// Keep low-priority stock groups out of the condensed catalog without resetting them.
+const hiddenGroupKeys = new Set([ 'regions' ]);
 
 /******************************************************************************/
 
@@ -58,7 +60,6 @@ const renderNumber = value => {
 };
 
 const listStatsTemplate = i18n$('3pListsOfBlockedHostsPerListStats');
-const buttonActivationKeys = new Set([ 'Enter', ' ', 'Spacebar' ]);
 
 const renderLeafStats = (used, total) => {
     if ( isNaN(used) || isNaN(total) ) { return ''; }
@@ -70,14 +71,6 @@ const renderLeafStats = (used, total) => {
 const renderNodeStats = (used, total) => {
     if ( isNaN(used) || isNaN(total) ) { return ''; }
     return `${used.toLocaleString()}/${total.toLocaleString()}`;
-};
-
-const isActivationEvent = ev => {
-    if ( ev.type === 'click' ) { return true; }
-    if ( ev.type !== 'keydown' ) { return false; }
-    if ( buttonActivationKeys.has(ev.key) === false ) { return false; }
-    ev.preventDefault();
-    return true;
 };
 
 const normalizeAccessibleText = text =>
@@ -149,6 +142,25 @@ const i18nGroupName = name => {
     const groupname = i18n$('3pGroup' + name.charAt(0).toUpperCase() + name.slice(1));
     if ( groupname !== '' ) { return groupname; }
     return `${name.charAt(0).toLocaleUpperCase}${name.slice(1)}`;
+};
+
+const getListGroupKey = listDetails => listDetails.group2 || listDetails.group || '';
+
+const listIsHiddenFromCatalog = listDetails =>
+    hiddenGroupKeys.has(getListGroupKey(listDetails));
+
+const forEachHiddenList = callback => {
+    for ( const [ listkey, listDetails ] of Object.entries(listsetDetails.available || {}) ) {
+        if ( listIsHiddenFromCatalog(listDetails) === false ) { continue; }
+        callback(listkey, listDetails);
+    }
+};
+
+const renderCatalogOverview = () => {
+    const total = qsa$('#lists .listEntry[data-role="leaf"]').length;
+    const enabled = qsa$('#lists .listEntry[data-role="leaf"].checked:not(.toRemove)').length;
+    dom.text('#filtersEnabledCount', `${renderNumber(enabled)} enabled`);
+    dom.text('#filtersAvailableCount', `${renderNumber(total)} available`);
 };
 
 /******************************************************************************/
@@ -284,7 +296,7 @@ const renderFilterLists = ( ) => {
             );
             if ( listDetails.lists !== undefined ) {
                 listEntry.append(createListEntries(listEntry.dataset.key, listDetails.lists, depth+1));
-                dom.cl.toggle(listEntry, 'expanded', listIsExpanded(listkey));
+                dom.cl.add(listEntry, 'expanded');
                 updateListNode(listEntry);
             } else {
                 initializeListEntry(listDetails, listEntry);
@@ -322,7 +334,8 @@ const renderFilterLists = ( ) => {
             };
         }
         for ( const [ listkey, listDetails ] of Object.entries(response.available) ) {
-            let groupkey = listDetails.group2 || listDetails.group;
+            if ( listIsHiddenFromCatalog(listDetails) ) { continue; }
+            let groupkey = getListGroupKey(listDetails);
             if ( Object.hasOwn(listTree, groupkey) === false ) {
                 groupkey = 'unknown';
             }
@@ -358,7 +371,7 @@ const renderFilterLists = ( ) => {
 
         qs$('#autoUpdate').checked = listsetDetails.autoUpdate === true;
         dom.text(
-            '#listsOfBlockedHostsPrompt',
+            '#listsCatalogSummary',
             i18n$('3pListsOfBlockedHostsPrompt')
                 .replace('{{netFilterCount}}', renderNumber(response.netFilterCount))
                 .replace('{{cosmeticFilterCount}}', renderNumber(response.cosmeticFilterCount))
@@ -374,6 +387,7 @@ const renderFilterLists = ( ) => {
         dom.cl.toggle(dom.body, 'updating', listsetDetails.isUpdating);
 
         renderWidgets();
+        renderCatalogOverview();
         syncListControls();
     };
 
@@ -389,6 +403,7 @@ const renderFilterLists = ( ) => {
 const renderWidgets = ( ) => {
     const updating = dom.cl.has(dom.body, 'updating');
     const hasObsolete = qs$('#lists .listEntry.checked.obsolete:not(.toRemove)') !== null;
+    renderCatalogOverview();
     dom.cl.toggle('#buttonApply', 'disabled',
         filteringSettingsHash === hashFromCurrentFromSettings()
     );
@@ -454,7 +469,11 @@ const hashFromCurrentFromSettings = ( ) => {
         if ( dom.cl.has(liEntry, 'checked') === false ) { continue; }
         listHashes.push(liEntry.dataset.key);
     }
-    const textarea = qs$('#lists .listEntry[data-role="import"].expanded textarea');
+    forEachHiddenList((listkey, listDetails) => {
+        if ( listDetails.off === true ) { return; }
+        listHashes.push(listkey);
+    });
+    const textarea = qs$('#lists .listEntry[data-role="import"] textarea');
     hashParts.push(
         listHashes.sort().join(),
         textarea !== null && textarea.value.trim() || '',
@@ -644,7 +663,7 @@ const selectFilterLists = async ( ) => {
     // External filter lists to import
     // Find stock list matching entries in lists to import
     const toImport = (( ) => {
-        const textarea = qs$('#lists .listEntry[data-role="import"].expanded textarea');
+        const textarea = qs$('#lists .listEntry[data-role="import"] textarea');
         if ( textarea === null ) { return ''; }
         const lists = listsetDetails.available;
         const lines = textarea.value.split(/\s+/);
@@ -664,8 +683,6 @@ const selectFilterLists = async ( ) => {
                 break;
             }
         }
-        dom.cl.remove(textarea.closest('.expandable'), 'expanded');
-        syncExpandableState(textarea.closest('.expandable'));
         textarea.value = '';
         return after.join('\n');
     })();
@@ -708,6 +725,10 @@ const selectFilterLists = async ( ) => {
             listDetails.off = true;
         }
     }
+    forEachHiddenList((listkey, listDetails) => {
+        if ( listDetails.off === true ) { return; }
+        toSelect.push(listkey);
+    });
 
     hashFromListsetDetails();
 
@@ -810,121 +831,6 @@ dom.on('.searchfield input', 'input', searchFilterLists);
 
 /******************************************************************************/
 
-const expandedListSet = new Set([
-    'cookies',
-    'social',
-]);
-
-const listIsExpanded = which => {
-    return expandedListSet.has(which);
-};
-
-const applyListExpansion = listkeys => {
-    if ( listkeys === undefined ) {
-        listkeys = Array.from(expandedListSet);
-    }
-    expandedListSet.clear();
-    dom.cl.remove('#lists [data-role="node"]', 'expanded');
-    listkeys.forEach(which => {
-        expandedListSet.add(which);
-        dom.cl.add(`#lists [data-key="${which}"]`, 'expanded');
-    });
-    syncListControls();
-};
-
-const toggleListExpansion = which => {
-    const isExpanded = expandedListSet.has(which);
-    if ( which === '*' ) {
-        if ( isExpanded ) {
-            expandedListSet.clear();
-            dom.cl.remove('#lists .expandable', 'expanded');
-            dom.cl.remove('#lists .stickied', 'stickied');
-        } else {
-            expandedListSet.clear();
-            expandedListSet.add('*');
-            dom.cl.add('#lists .rootstats', 'expanded');
-            for ( const expandable of qsa$('#lists > .listEntries .expandable') ) {
-                const listkey = expandable.dataset.key || '';
-                if ( listkey === '' ) { continue; }
-                expandedListSet.add(listkey);
-                dom.cl.add(expandable, 'expanded');
-            }
-        }
-    } else {
-        if ( isExpanded ) {
-            expandedListSet.delete(which);
-            const listNode = qs$(`#lists > .listEntries [data-key="${which}"]`);
-            dom.cl.remove(listNode, 'expanded');
-            if ( listNode.dataset.parent === 'root' ) {
-                dom.cl.remove(qsa$(listNode, '.stickied'), 'stickied');
-            }
-        } else {
-            expandedListSet.add(which);
-            dom.cl.add(`#lists > .listEntries [data-key="${which}"]`, 'expanded');
-        }
-    }
-    vAPI.localStorage.setItem('expandedListSet', Array.from(expandedListSet));
-    vAPI.localStorage.removeItem('hideUnusedFilterLists');
-    syncListControls();
-};
-
-dom.on('#listsOfBlockedHostsToggle', 'click', ( ) => {
-    toggleListExpansion('*');
-});
-
-const onListExpanderActivated = ev => {
-    if ( isActivationEvent(ev) === false ) { return; }
-    const expandable = ev.target.closest('.expandable');
-    if ( expandable === null ) { return; }
-    const which = expandable.dataset.key;
-    if ( which !== undefined ) {
-        toggleListExpansion(which);
-    } else {
-        dom.cl.toggle(expandable, 'expanded');
-        if ( expandable.dataset.role === 'import' ) {
-            onFilteringSettingsChanged();
-        }
-    }
-    ev.preventDefault();
-};
-
-dom.on('#lists', 'click', '.listExpander', onListExpanderActivated);
-dom.on('#lists', 'keydown', '.listExpander', onListExpanderActivated);
-
-dom.on('#lists', 'click', '[data-parent="root"] > .detailbar .listToggle', ev => {
-    const listEntry = ev.target.closest('.listEntry');
-    if ( listEntry === null ) { return; }
-    const listkey = listEntry.dataset.key;
-    if ( listkey === undefined ) { return; }
-    toggleListExpansion(listkey);
-    ev.preventDefault();
-});
-
-dom.on('#lists', 'click', '[data-role="import"] > .detailbar .listToggle', ev => {
-    const expandable = ev.target.closest('.listEntry');
-    if ( expandable === null ) { return; }
-    dom.cl.toggle(expandable, 'expanded');
-    syncExpandableState(expandable);
-    ev.preventDefault();
-});
-
-dom.on('#lists', 'click', '.listEntry > .detailbar .nodestats', ev => {
-    const listEntry = ev.target.closest('.listEntry');
-    if ( listEntry === null ) { return; }
-    const listkey = listEntry.dataset.key;
-    if ( listkey === undefined ) { return; }
-    toggleListExpansion(listkey);
-    ev.preventDefault();
-});
-
-// Initialize from saved state.
-vAPI.localStorage.getItemAsync('expandedListSet').then(listkeys => {
-    if ( Array.isArray(listkeys) === false ) { return; }
-    applyListExpansion(listkeys);
-});
-
-/******************************************************************************/
-
 // Cloud storage-related.
 
 self.cloud.onPush = function toCloudData() {
@@ -938,6 +844,10 @@ self.cloud.onPush = function toCloudData() {
     for ( const liEntry of liEntries ) {
         bin.selectedLists.push(liEntry.dataset.key);
     }
+    forEachHiddenList((listkey, listDetails) => {
+        if ( listDetails.off === true ) { return; }
+        bin.selectedLists.push(listkey);
+    });
 
     return bin;
 };
@@ -961,6 +871,12 @@ self.cloud.onPull = function fromCloudData(data, append) {
         if ( mustEnable === false && append ) { continue; }
         toggleFilterList(listEntry, mustEnable);
     }
+    forEachHiddenList((listkey, listDetails) => {
+        const mustEnable = selectedSet.has(listkey);
+        selectedSet.delete(listkey);
+        if ( mustEnable === false && append ) { return; }
+        listDetails.off = mustEnable === false;
+    });
 
     // If there are URL-like list keys left in the selected set, import them.
     for ( const listkey of selectedSet ) {
@@ -975,9 +891,6 @@ self.cloud.onPull = function fromCloudData(data, append) {
         lines.push(...selectedSet);
         if ( lines.length !== 0 ) { lines.push(''); }
         textarea.value = lines.join('\n');
-        const importEntry = qs$('#lists .listEntry[data-role="import"]');
-        dom.cl.toggle(importEntry, 'expanded', textarea.value !== '');
-        syncExpandableState(importEntry);
     }
 
     renderWidgets();

@@ -3,38 +3,37 @@
     }
 
 body {
-    margin-bottom: 6rem;
-    }
+    margin-bottom: 1rem;
+}
 
-.supportHero,
 .body > div,
 .body > section {
-    max-width: 800px;
+    max-width: 920px;
     width: 100%;
-    }
+}
 h2 {
     color: var(--fieldset-header-ink);
     margin-bottom: 0;
-    }
+}
 .supportEntry {
     display: flex;
-    margin-block: 1em;
-    }
+    margin-block: 0.65rem;
+}
 :root.mobile .supportEntry {
     flex-direction: column;
-    }
+}
 .supportEntry > * {
     min-width: 6em;
-    }
+}
 .supportEntry > div:first-of-type {
     flex-grow: 1;
-    }
+}
 :root:not(.mobile) .supportEntry > div:first-of-type {
-    margin-inline-end: 2em;
-    }
+    margin-inline-end: 1.2rem;
+}
 .supportEntry h2 {
     margin: 1em 0;
-    }
+}
 
 .e > .supportEntry {
     flex-direction: column;
@@ -63,49 +62,49 @@ body[data-should-update-lists]:not(.updated) .e .createEntry {
 
 body:not([data-should-update-lists]) .shouldUpdate {
     display: none;
-    }
+}
 body.updating {
     pointer-events: none;
-    }
+}
 body.updating button {
     filter: grayscale(1);
     opacity: 0.5;
-    }
+}
 body.updated .shouldUpdate button {
     display: none;
-    }
+}
 body.updating .shouldUpdate button .fa-icon svg {
     animation: spin 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     transform-origin: 50%;
-    }
+}
 body .shouldUpdate .updated {
     align-self: center;
-    }
+}
 body:not(.updated) .shouldUpdate .updated {
     display: none;
-    }
+}
 
 button {
     align-self: center;
-    }
+}
 span[data-url] {
     color: var(--link-ink);
     cursor: pointer;
-    }
+}
 
 #showSupportInfo {
     cursor: pointer;
-    }
+}
 
 body.redacted #redactButton {
     display: none;
-    }
+}
 #unredactButton {
     display: none;
-    }
+}
 body.redacted #unredactButton {
     display: inline;
-    }
+}
 
 .cm-string.cm-property {
     color: black;
@@ -118,102 +117,49 @@ body.redacted #unredactButton {
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: var(--default-gap-large);
+    gap: 0.55rem;
 }
 
-.supportHero,
 .body > .supportSection {
     background: var(--surface-raised);
     border: 1px solid var(--border-1);
-    border-radius: var(--radius-large);
-    box-shadow: var(--panel-shadow);
+    border-radius: var(--radius-medium);
     margin: 0;
-    padding: clamp(16px, 2vw, 22px);
+    padding: 0.85rem 0.95rem;
 }
 
-.supportHero {
-    align-items: center;
-    display: flex;
-    gap: 1rem;
-}
-
-.supportHeroMark {
-    align-items: center;
-    background:
-        radial-gradient(circle at top right, rgb(var(--primary-70) / 0.22), transparent 48%),
-        var(--field-surface);
-    border: 1px solid rgb(var(--primary-70) / 0.16);
-    border-radius: 1.5rem;
-    display: inline-flex;
-    flex: 0 0 auto;
-    height: 4.5rem;
-    justify-content: center;
-    width: 4.5rem;
-}
-
-.supportHeroMark img {
-    height: 2.35rem;
-    width: 2.35rem;
-}
-
-.supportHeroCopy {
-    min-width: 0;
-}
-
-.supportEyebrow {
-    color: rgb(var(--primary-70));
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    margin: 0 0 0.4rem;
-    text-transform: uppercase;
-}
-
-.supportHero h1 {
-    font-family: var(--font-family-display);
-    font-size: clamp(1.8rem, 4vw, 2.4rem);
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    margin: 0 0 0.65rem;
-    text-wrap: balance;
-}
-
-.supportLead {
-    color: var(--ink-2);
-    line-height: 1.6;
-    margin: 0;
-    max-width: 36rem;
-}
-
-.body > .supportSection > hr:first-of-type {
+.body > .supportSection > hr {
     display: none;
 }
 
 .supportSection h2 {
+    font-size: 1rem;
+    letter-spacing: 0.02em;
     margin-top: 0;
 }
 
 .supportEntry {
     align-items: flex-start;
-    gap: var(--default-gap);
-    margin-block: var(--default-gap-small);
+    gap: 0.6rem;
+    margin-block: 0.5rem;
 }
 
 .supportEntry > button {
     align-self: flex-start;
-    min-width: 9rem;
+    min-width: 7rem;
 }
 
 .supportEntry > div:first-of-type p,
 .supportEntry > p {
     max-width: 72ch;
+    margin-block: 0.2rem;
 }
 
 .supportSection.e > .supportEntry {
     background: var(--field-surface);
     border: 1px solid var(--border-1);
     border-radius: var(--radius-medium);
-    padding: var(--default-gap);
+    padding: 0.62rem 0.72rem;
 }
 
 .supportSection.e > .supportEntry > hr {
@@ -231,14 +177,14 @@ body.redacted #unredactButton {
 .reportField {
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 0.32rem;
 }
 
 .supportActions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 0.9rem;
+    gap: 0.5rem;
+    margin-bottom: 0.65rem;
 }
 
 #showSupportInfo {
@@ -265,14 +211,8 @@ body.redacted #unredactButton {
 }
 
 @media (max-width: 640px) {
-    .supportHero,
     .body > .supportSection {
-        padding: 14px;
-    }
-
-    .supportHero {
-        align-items: flex-start;
-        flex-direction: column;
+        padding: 12px;
     }
 
     .supportEntry > button {
