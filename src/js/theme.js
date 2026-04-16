@@ -130,6 +130,10 @@ function setAccentColor(
         if ( response.uiStyles !== 'unset' ) {
             document.body.style.cssText = response.uiStyles;
         }
+    }).catch(( ) => {
+        // Background may be starting up; fall back to the default dark
+        // theme rather than leaving the document in an unstyled state.
+        setTheme('dark');
     });
 
     const rootcl = document.documentElement.classList;
