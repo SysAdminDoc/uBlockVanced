@@ -783,41 +783,9 @@ body:not([data-more*="e"]) [data-more="e"] {
     }
 
 /* uBlockVanced: premium polish */
-:root.dark #sticky {
-    background: linear-gradient(180deg, rgb(24 24 37 / 95%) 0%, rgb(30 30 46 / 90%) 100%);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    }
-:root.dark #hostname {
-    background: linear-gradient(135deg, rgb(137 180 250 / 12%) 0%, rgb(203 166 247 / 8%) 100%);
-    border-radius: 6px;
-    margin: 0 4px;
-    }
-:root.dark .toolRibbon {
-    background: linear-gradient(135deg, rgb(49 50 68 / 60%) 0%, rgb(69 71 90 / 40%) 100%);
-    }
-:root.dark .toolRibbon .tool:hover {
-    background-color: rgb(137 180 250 / 15%);
-    border-radius: 4px;
-    }
-:root.dark #switch {
-    transition: fill 200ms ease, stroke 200ms ease;
-    }
 :root.dark body:not(.off) #switch {
-    filter: drop-shadow(0 0 8px rgb(137 180 250 / 30%));
+    filter: drop-shadow(0 0 8px rgb(var(--primary-70) / 0.3));
     }
-:root.dark .rulesetTools [id]:hover {
-    background-color: rgb(137 180 250 / 15%);
-    }
-:root.dark #moreOrLess > span {
-    transition: background-color 150ms ease;
-    }
-
-/* Scrollbar styling for dark mode */
-:root.dark ::-webkit-scrollbar { width: 6px; }
-:root.dark ::-webkit-scrollbar-track { background: rgb(24 24 37); }
-:root.dark ::-webkit-scrollbar-thumb { background: rgb(69 71 90); border-radius: 3px; }
-:root.dark ::-webkit-scrollbar-thumb:hover { background: rgb(108 112 134); }
 
 /*
  * uBlockForge premium popup polish
@@ -846,11 +814,13 @@ body:not([data-more*="e"]) [data-more="e"] {
 }
 
 #sticky {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     background:
         radial-gradient(circle at top right, rgb(var(--primary-70) / 0.14), transparent 44%),
-        linear-gradient(180deg, rgb(24 24 37 / 0.92), rgb(30 30 46 / 0.88));
+        linear-gradient(180deg, var(--surface-raised-strong), var(--surface-raised));
     border-bottom: 1px solid rgb(var(--primary-70) / 0.14);
-    padding: 12px 14px 0;
+    padding: 14px 16px 2px;
 }
 
 body.off #main,
@@ -861,7 +831,7 @@ body.off #firewall {
 body.off #sticky {
     background:
         radial-gradient(circle at top right, rgb(var(--red-40) / 0.2), transparent 42%),
-        linear-gradient(180deg, rgb(24 24 37 / 0.92), rgb(30 30 46 / 0.88));
+        linear-gradient(180deg, var(--surface-raised-strong), var(--surface-raised));
     border-bottom-color: rgb(var(--red-40) / 0.18);
 }
 
@@ -884,7 +854,7 @@ body.off #sticky {
 }
 
 body.off #pageTitle {
-    color: rgb(252 228 234 / 0.94);
+    color: rgb(var(--red-20) / 0.94);
 }
 
 #hostname {
@@ -969,7 +939,7 @@ body.needReload #refresh {
     align-items: center;
     background:
         radial-gradient(circle at top, rgb(var(--primary-70) / 0.22), transparent 56%),
-        linear-gradient(180deg, rgb(17 17 27 / 0.94), rgb(30 30 46 / 0.9));
+        linear-gradient(180deg, var(--surface-raised-strong), var(--surface-raised));
     border: 1px solid rgb(var(--primary-70) / 0.16);
     border-radius: 22px;
     box-shadow:
@@ -981,6 +951,7 @@ body.needReload #refresh {
         fill var(--transition-fast),
         stroke var(--transition-fast),
         transform var(--transition-fast),
+        filter var(--transition-fast),
         box-shadow var(--transition-fast);
 }
 
@@ -991,11 +962,11 @@ body.needReload #refresh {
 
 body.off #switch {
     background:
-        linear-gradient(180deg, rgb(17 17 27 / 0.76), rgb(24 24 37 / 0.7));
-    border-color: rgb(243 139 168 / 0.22);
+        linear-gradient(180deg, var(--surface-raised-strong), var(--surface-raised));
+    border-color: rgb(var(--red-40) / 0.22);
     box-shadow:
         inset 0 1px 0 rgb(255 255 255 / 0.04),
-        0 16px 28px rgb(243 139 168 / 0.08);
+        0 16px 28px rgb(var(--red-40) / 0.08);
 }
 
 #basicStats {
@@ -1026,13 +997,14 @@ body.off #switch {
 
 #basicStats .statCard::after {
     background:
-        linear-gradient(90deg, rgb(var(--primary-70) / 0.72), rgb(var(--secondary-60) / 0.62));
+        linear-gradient(90deg, rgb(var(--primary-70) / 0.72), rgb(var(--violet-40) / 0.62));
     border-radius: 999px;
     bottom: 0;
     content: '';
     height: 4px;
     left: 0;
     position: absolute;
+    transition: width var(--transition-normal), opacity var(--transition-normal);
     width: var(--stat-fill, 0%);
 }
 
@@ -1191,8 +1163,8 @@ body.off #moreOrLess > span {
 }
 
 #unprocessedRequestWarning {
-    background: rgb(249 226 175 / 0.18);
-    border: 1px solid rgb(249 226 175 / 0.24);
+    background: var(--warning-surface);
+    border: 1px solid var(--warning-border);
     border-radius: 16px;
     margin: 0 14px 14px;
     padding: 0.75rem 0.9rem;
@@ -1211,8 +1183,9 @@ body.off #moreOrLess > span {
         transform var(--transition-fast);
 }
 
-#unprocessedRequestWarning > .dismiss:hover {
-    background: rgb(0 0 0 / 0.08);
+#unprocessedRequestWarning > .dismiss:hover,
+#unprocessedRequestWarning > .dismiss:focus-visible {
+    background: rgb(var(--ink-rgb) / 0.1);
     transform: scale(1.04);
 }
 

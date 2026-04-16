@@ -396,8 +396,34 @@ html {
     color-scheme: light dark;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    scrollbar-color: var(--border-3) transparent;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    transition: background-color var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 ::selection {

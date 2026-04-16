@@ -118,7 +118,12 @@ textarea {
     position: relative;
     }
 #netInspector #filterButton {
-    opacity: 0.25;
+    opacity: 0.45;
+    transition: opacity var(--transition-fast), background-color var(--transition-fast);
+    }
+#netInspector #filterButton:hover,
+#netInspector #filterButton:focus-visible {
+    opacity: 1;
     }
 #netInspector.f #filterButton {
     opacity: 1;

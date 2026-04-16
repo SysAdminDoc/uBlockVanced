@@ -1,3 +1,32 @@
+# uBlockVanced 0.2.4
+
+- Accessibility: added `lang="en"` to every HTML document across `src/` (including web_accessible_resources: epicker-ui, click2load, dom-inspector, noop). Screen readers previously announced pages with no language declaration.
+- Fixed malformed viewport meta in `document-blocked.html` (`initial-scale=1 user-scalable=yes` → comma-separated list).
+- Resolved 3 outstanding `/* TODO: fix */` color tokens — `--popup-cell-label-mixed-surface` now uses Catppuccin Yellow in dark mode, Catppuccin Yellow-60 in light, and a colorblind-safe amber in the colorblind palette.
+- CSS system consolidation: extracted shared `.editorHero`, `.editorEyebrow`, `.editorTitle`, `.editorLead`, `.editorStatus`, `.statusPill.*` (incl. new `is-danger` variant) from `1p-filters.css`, `whitelist.css`, and `advanced-settings.css` into `dashboard-common.css`. ~180 lines of duplicate CSS removed; single source of truth for editor-page hero / status pill styling.
+- Tokenization: `cloud-ui.css` `#cloudInfo` / `#cloudError` now use `--field-surface` / `--danger-surface`; `advanced-settings.css` `.advancedGuideLink` uses `--warning-surface` / `--warning-border`.
+- `.fa-icon.info` (dashboard-common) gains a transition and focus-visible state; removed dead `transform: scale(1.25)` rule that was silently overridden by the newer `translateY(-1px)` hover.
+- About page: decorative icon marked `aria-hidden="true"` (explicit semantic intent).
+- Element Probe panel document now has `viewport`, `color-scheme`, and a polished `<title>`.
+- Package metadata updated for fork identity: `name`, `version`, `description`, `repository.url`, `author`, `bugs.url`, `homepage`, and SPDX-compliant `GPL-3.0` license identifier (was non-standard `GPLv3`).
+
+----------
+
+# uBlockVanced 0.2.3
+
+- Premium polish: unified scrollbar styling via shared `--scrollbar-*` tokens in `common.css` (removes duplicated dark-mode-only rules from `dashboard.css` and `popup-fenix.css`); lighter, token-driven thumb with smooth hover transition.
+- Tokenized popup dark-polish block: replaced raw Catppuccin `rgb(...)` values in `#sticky`, `#switch`, `#hostname`, `#basicStats`, and `#unprocessedRequestWarning` with `--surface-raised*`, `--warning-surface/border`, `--danger-surface/border`, `--red-40`, and `--ink-rgb`. Removed redundant premium-polish rules superseded by later declarations.
+- Fixed non-existent `--secondary-60` token reference in `#basicStats .statCard::after` gradient — now uses `--violet-40` and animates fill transitions.
+- Settings `#reset`: now uses `--danger-surface` / `--danger-border` with a proper hover state instead of hardcoded red rgb.
+- 3p-filters: normalized focus ring to `box-shadow: var(--focus-ring)` (dropped bespoke 2px outline); added transitions to `.fa-icon` and `.nodestats`; refined spinner timing (`cubic-bezier` easing, 1.1s).
+- Support page: same spinner timing refinement; tidied `@keyframes spin` shorthand.
+- Logger: `#filterButton` starts at 0.45 opacity with hover/focus-visible reveal + smooth transition (was an abrupt 0.25 ↔ 1 flip).
+- Dashboard: removed stale keyboard-nav TODO block left over from upstream.
+- Added `.statusPill.is-danger` and `.statusPill.is-accent` variants to `whitelist.css` for parity with `1p-filters.css`.
+- Element Probe scrollbar: aligned with shared token style (transparent track, padded thumb, rounded 999px).
+
+----------
+
 - [Add `prevent-textContent` scriptlet](https://github.com/gorhill/uBlock/commit/bdd10eb08f)
 - [Minor improvement of `trusted-create-html` scriptlet](https://github.com/gorhill/uBlock/commit/https://github.com/gorhill/uBlock/commit/527939854d)
 

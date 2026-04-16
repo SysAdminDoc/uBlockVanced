@@ -1,6 +1,5 @@
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    to { transform: rotate(360deg); }
     }
 
 body {
@@ -76,7 +75,7 @@ body.updated .shouldUpdate button {
     display: none;
     }
 body.updating .shouldUpdate button .fa-icon svg {
-    animation: spin 1s linear infinite;
+    animation: spin 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     transform-origin: 50%;
     }
 body .shouldUpdate .updated {
