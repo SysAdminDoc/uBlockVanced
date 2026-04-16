@@ -153,6 +153,10 @@ const onMessage = function(request, sender, callback) {
         µb.createUserFilters(request);
         break;
 
+    case 'removeUserFilter':
+        µb.removeUserFilter(request);
+        break;
+
     case 'getAppData':
         response = {
             name: browser.runtime.getManifest().name,

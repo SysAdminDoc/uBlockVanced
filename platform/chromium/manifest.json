@@ -5,11 +5,12 @@
   },
   "browser_action": {
     "default_icon": {
-      "16": "img/icon_16.png",
-      "32": "img/icon_32.png",
-      "64": "img/icon_64.png"
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
     },
-    "default_title": "uBlockForge",
+    "default_title": "uBlockVanced",
     "default_popup": "popup-fenix.html"
   },
   "commands": {},
@@ -49,15 +50,15 @@
   "description": "__MSG_extShortDesc__",
   "devtools_page": "devtools-page.html",
   "icons": {
-    "16": "img/icon_16.png",
-    "32": "img/icon_32.png",
-    "64": "img/icon_64.png",
-    "128": "img/icon_128.png"
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   },
   "incognito": "split",
   "manifest_version": 2,
   "minimum_chrome_version": "93.0",
-  "name": "uBlockForge",
+  "name": "uBlockVanced",
   "options_ui": {
     "page": "dashboard.html",
     "open_in_tab": true
@@ -74,11 +75,11 @@
     "webRequestBlocking",
     "<all_urls>"
   ],
-  "short_name": "uBlockForge",
+  "short_name": "uBlockVanced",
   "storage": {
     "managed_schema": "managed_storage.json"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "web_accessible_resources": [
     "/web_accessible_resources/*"
   ]

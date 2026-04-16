@@ -1,16 +1,18 @@
+/* Catppuccin Mocha tokens — uses shared theme vars with hardcoded fallbacks
+   since this panel loads in its own DevTools HTML context */
 :root {
-    --bg-base: #1e1e2e;
-    --bg-mantle: #181825;
+    --bg-base: var(--surface-1, #1e1e2e);
+    --bg-mantle: var(--surface-2, #181825);
     --bg-crust: #11111b;
     --surface: rgb(24 24 37 / 0.88);
     --surface-strong: rgb(17 17 27 / 0.92);
     --surface-muted: rgb(30 30 46 / 0.84);
     --surface-hover: rgb(49 50 68 / 0.96);
     --surface-highlight: rgb(69 71 90 / 0.82);
-    --text-main: #cdd6f4;
-    --text-sub: #bac2de;
-    --text-dim: #a6adc8;
-    --text-faint: #6c7086;
+    --text-main: var(--ink-1, #cdd6f4);
+    --text-sub: var(--ink-2, #bac2de);
+    --text-dim: var(--ink-3, #a6adc8);
+    --text-faint: var(--ink-4, #6c7086);
     --accent-blue: #89b4fa;
     --accent-green: #a6e3a1;
     --accent-red: #f38ba8;
@@ -22,7 +24,7 @@
     --border-strong: rgb(137 180 250 / 0.24);
     --shadow:
         0 1px 0 rgb(255 255 255 / 0.04),
-        0 24px 60px rgb(0 0 0 / 0.32);
+        0 24px 60px rgb(17 17 27 / 0.32);
     --radius-sm: 12px;
     --radius-md: 18px;
     --radius-lg: 24px;
