@@ -306,7 +306,7 @@
 }
 
 /*
- * uBlockForge: Catppuccin Mocha dark theme
+ * uBlockVanced: Catppuccin Mocha dark theme
  * Based on https://github.com/catppuccin/catppuccin
  *
  * Catppuccin Mocha palette:
@@ -407,6 +407,66 @@
 
 :root.dark {
     color-scheme: dark light;
+}
+
+/*
+ * uBlockForge premium system tokens
+ */
+:root {
+    --font-family-display: Metropolis, Inter, sans-serif;
+    --radius-small: 8px;
+    --radius-medium: 14px;
+    --radius-large: 22px;
+    --transition-fast: 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    --transition-normal: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    --surface-raised: rgb(var(--surface-0-rgb) / 72%);
+    --surface-raised-strong: rgb(var(--surface-0-rgb) / 88%);
+    --surface-muted: rgb(var(--surface-0-rgb) / 60%);
+    --field-surface: rgb(var(--surface-0-rgb) / 68%);
+    --field-surface-hover: rgb(var(--surface-0-rgb) / 82%);
+    --field-surface-active: rgb(var(--surface-0-rgb) / 94%);
+    --field-border: var(--border-2);
+    --field-placeholder: var(--ink-4);
+    --focus-ring: 0 0 0 3px rgb(var(--primary-70) / 28%);
+    --panel-shadow:
+        0 1px 0 rgb(255 255 255 / 0.05),
+        0 18px 44px rgb(15 23 42 / 0.12);
+    --page-accent-glow:
+        radial-gradient(circle at top left, rgb(var(--primary-70) / 0.14), transparent 34%),
+        radial-gradient(circle at top right, rgb(var(--violet-40) / 0.12), transparent 28%);
+}
+
+:root.light {
+    --surface-raised: rgb(255 255 255 / 80%);
+    --surface-raised-strong: rgb(255 255 255 / 94%);
+    --surface-muted: rgb(255 255 255 / 66%);
+    --field-surface: rgb(255 255 255 / 86%);
+    --field-surface-hover: rgb(255 255 255 / 96%);
+    --field-surface-active: rgb(255 255 255);
+    --field-border: rgb(var(--gray-80));
+    --panel-shadow:
+        0 1px 0 rgb(255 255 255 / 0.8),
+        0 18px 44px rgb(15 23 42 / 0.08);
+    --page-accent-glow:
+        radial-gradient(circle at top left, rgb(var(--primary-80) / 0.26), transparent 34%),
+        radial-gradient(circle at top right, rgb(var(--violet-20) / 0.22), transparent 30%);
+}
+
+:root.dark {
+    --surface-raised: rgb(24 24 37 / 82%);
+    --surface-raised-strong: rgb(17 17 27 / 92%);
+    --surface-muted: rgb(17 17 27 / 72%);
+    --field-surface: rgb(24 24 37 / 88%);
+    --field-surface-hover: rgb(30 30 46 / 96%);
+    --field-surface-active: rgb(34 34 56);
+    --field-border: rgb(88 91 112);
+    --focus-ring: 0 0 0 3px rgb(137 180 250 / 32%);
+    --panel-shadow:
+        0 1px 0 rgb(255 255 255 / 0.04),
+        0 22px 52px rgb(0 0 0 / 0.32);
+    --page-accent-glow:
+        radial-gradient(circle at top left, rgb(137 180 250 / 0.16), transparent 36%),
+        radial-gradient(circle at top right, rgb(203 166 247 / 0.14), transparent 30%);
 }
 
 /*

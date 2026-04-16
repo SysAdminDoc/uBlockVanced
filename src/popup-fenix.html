@@ -23,7 +23,7 @@
                     <span id="saveRules" class="fa-icon" data-i18n-title="popupTipSaveRules">lock</span>
                     <span id="revertRules" class="fa-icon" data-i18n-title="popupTipRevertRules">eraser</span>
                 </div>
-                <div id="switch" role="button" aria-label tabindex="0" title>
+                <div id="switch" role="button" aria-label aria-pressed="false" tabindex="0" title>
                     <span class="fa-icon"><!--
                         Power button taken from Font Awesome v4.7.0 by Dave Gandy.
                         Unlike other FA icons, the power button is inlined here so
@@ -44,11 +44,11 @@
             </div>
         </div>
         <div id="extraTools" class="toolRibbon" data-more="d">
-            <span id="no-popups" class="hnSwitch tool enabled" role="button" aria-label tabindex="0" title><span class="fa-icon fa-icon-badged">ph-popups<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoPopups_v2"></span></span>
-            <span id="no-large-media" class="hnSwitch tool enabled" role="button" aria-label tabindex="0" title><span class="fa-icon fa-icon-badged">film<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoLargeMedia_v2"></span></span>
-            <span id="no-cosmetic-filtering" class="hnSwitch tool enabled" role="button" aria-label tabindex="0" title><span class="fa-icon fa-icon-badged">eye-slash<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoCosmeticFiltering_v2"></span></span>
-            <span id="no-remote-fonts" class="hnSwitch tool enabled" role="button" aria-label tabindex="0" title><span class="fa-icon fa-icon-badged">ph-readermode-text-size<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoRemoteFonts_v2"></span></span>
-            <span id="no-scripting" class="hnSwitch tool enabled" role="button" aria-label tabindex="0" title><span class="fa-icon fa-icon-badged">code<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoScripting_v2"></span></span>
+            <span id="no-popups" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-popups<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoPopups_v2"></span></span>
+            <span id="no-large-media" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">film<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoLargeMedia_v2"></span></span>
+            <span id="no-cosmetic-filtering" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">eye-slash<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoCosmeticFiltering_v2"></span></span>
+            <span id="no-remote-fonts" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-readermode-text-size<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoRemoteFonts_v2"></span></span>
+            <span id="no-scripting" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">code<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoScripting_v2"></span></span>
         </div>
         <hr data-more="a">
         <div id="basicStats" data-more="a">
@@ -63,7 +63,7 @@
             <a href="logger-ui.html#_" class="fa-icon tool enabled" target="uBOLogger" tabindex="0" data-i18n-title="popupTipLog">list-alt<span class="caption" data-i18n="popupTipLog"></span></a>
             <a href="dashboard.html" class="fa-icon tool enabled" target="uBODashboard" tabindex="0" data-i18n-title="popupTipDashboard">cogs<span class="caption" data-i18n="popupTipDashboard"></span></a>
         </div>
-        <div id="unprocessedRequestWarning">
+        <div id="unprocessedRequestWarning" role="status" aria-live="polite">
             <span data-i18n="unprocessedRequestTooltip"></span><span class="dismiss"><svg viewBox="0 0 20 20"><path d="M0,0 20,20M0,20 20,0" /></svg></span>
         </div>
         <hr data-more="f">

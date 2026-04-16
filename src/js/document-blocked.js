@@ -35,6 +35,14 @@ const details = {};
     }
 }
 
+const blockedHostname = details.hn || (() => {
+    try {
+        return new URL(details.url).hostname;
+    } catch {
+        return details.url || 'this site';
+    }
+})();
+
 /******************************************************************************/
 
 const urlToFragment = raw => {
@@ -56,6 +64,32 @@ const urlToFragment = raw => {
 
 dom.clear('#theURL > p > span:first-of-type');
 qs$('#theURL > p > span:first-of-type').append(urlToFragment(details.url));
+
+const syncParseToggle = ( ) => {
+    dom.attr(
+        '#toggleParse',
+        'aria-expanded',
+        dom.cl.has('#theURL', 'collapsed') ? 'false' : 'true'
+    );
+};
+
+const updateProceedUI = checked => {
+    dom.prop('#back,#bye', 'disabled', checked);
+    dom.cl.toggle('#back,#bye', 'disabled', checked);
+    dom.cl.toggle('#proceedPanel', 'isPermanent', checked);
+    const modeText = i18n$(
+        checked ? 'docblockedDisablePermanent' : 'docblockedDisableTemporary'
+    );
+    dom.text('#proceedMode', modeText);
+    dom.text('#proceedActionMode', modeText);
+    dom.cl.toggle('#proceedActionMode', 'isPermanent', checked);
+    dom.clear('#proceedCopy');
+    i18n.safeTemplateToDOM(
+        'docblockedProceed',
+        { hostname: blockedHostname },
+        qs$('#proceedCopy')
+    );
+};
 
 /******************************************************************************/
 
@@ -171,6 +205,7 @@ if ( typeof details.to === 'string' && details.to.length !== 0 ) {
 
     dom.on('#toggleParse', 'click', ( ) => {
         dom.cl.toggle('#theURL', 'collapsed');
+        syncParseToggle();
         vAPI.localStorage.setItem(
             'document-blocked-expand-url',
             (dom.cl.has('#theURL', 'collapsed') === false).toString()
@@ -179,6 +214,7 @@ if ( typeof details.to === 'string' && details.to.length !== 0 ) {
 
     vAPI.localStorage.getItemAsync('document-blocked-expand-url').then(value => {
         dom.cl.toggle('#theURL', 'collapsed', value !== 'true' && value !== true);
+        syncParseToggle();
     });
 })();
 
@@ -227,9 +263,7 @@ const proceedPermanent = async function() {
 };
 
 dom.on('#disableWarning', 'change', ev => {
-    const checked = ev.target.checked;
-    dom.cl.toggle('[data-i18n="docblockedBack"]', 'disabled', checked);
-    dom.cl.toggle('[data-i18n="docblockedClose"]', 'disabled', checked);
+    updateProceedUI(ev.target.checked);
 });
 
 dom.on('#proceed', 'click', ( ) => {
@@ -239,6 +273,8 @@ dom.on('#proceed', 'click', ( ) => {
         proceedTemporary();
     }
 });
+
+updateProceedUI(qs$('#disableWarning').checked);
 
 lookupFilterLists().then((lists = []) => {
     let reason = details.reason;

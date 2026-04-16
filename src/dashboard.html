@@ -14,30 +14,35 @@
 
 <body class="notReady">
     
-<div id="dashboard-nav">
-    <span>
-        <span class="logo"><img data-i18n-title="extName" src="img/ublock.svg" alt="uBlock Origin"></span><!--
-     --><button class="tabButton" type="button" data-pane="settings.html" data-i18n="settingsPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="3p-filters.html" data-i18n="3pPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="1p-filters.html" data-i18n="1pPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="dyna-rules.html" data-i18n="rulesPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="whitelist.html" data-i18n="whitelistPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="support.html" data-i18n="supportPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="about.html" data-i18n="aboutPageName" tabindex="0"></button><!--
-     --><button class="tabButton" type="button" data-pane="no-dashboard.html"></button>
-    </span>
+<div id="dashboard-nav" role="navigation" aria-label="uBlockVanced dashboard">
+    <div class="nav-main">
+        <div class="brandCluster">
+            <span class="logo"><img data-i18n-title="extName" src="img/ublock.svg" alt="uBlockVanced"></span>
+            <span class="productName" data-i18n="extName"></span>
+        </div>
+        <div class="tabStrip" role="tablist" aria-label="Dashboard sections">
+            <button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="settings.html" data-i18n="settingsPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="3p-filters.html" data-i18n="3pPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="1p-filters.html" data-i18n="1pPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="dyna-rules.html" data-i18n="rulesPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="whitelist.html" data-i18n="whitelistPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="support.html" data-i18n="supportPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="about.html" data-i18n="aboutPageName"></button><!--
+         --><button class="tabButton" type="button" role="tab" aria-selected="false" tabindex="-1" data-pane="no-dashboard.html"></button>
+        </div>
+    </div>
     <a class="wikilink fa-icon" href="https://github.com/gorhill/uBlock/wiki/Dashboard:-My-filters">book</a>
 </div>
-<section id="unsavedWarning" class="notice">
+<section id="unsavedWarning" class="notice" role="dialog" aria-modal="true" aria-labelledby="unsavedWarningText" tabindex="-1">
     <div>
-        <span data-i18n="dashboardUnsavedWarning"></span>&emsp;
+        <span id="unsavedWarningText" data-i18n="dashboardUnsavedWarning"></span>&emsp;
         <button type="button" data-i18n="dashboardUnsavedWarningStay">_<span class="hover"></span></button>&ensp;
         <button type="button" data-i18n="dashboardUnsavedWarningIgnore">_<span class="hover"></span></button>
     </div>
     <div></div>
 </section>
 
-<iframe id="iframe" src="blank.html"></iframe>
+<iframe id="iframe" src="blank.html" title="Dashboard content"></iframe>
 
 <script src="lib/hsluv/hsluv-0.1.0.min.js"></script>
 

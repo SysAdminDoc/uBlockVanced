@@ -23,6 +23,7 @@
 
 import * as s14e from './s14e-serializer.js';
 import { dom, qs$ } from './dom.js';
+import { i18n$ } from './i18n.js';
 
 /******************************************************************************/
 
@@ -73,11 +74,90 @@ const cmEditor = new CodeMirror(qs$('#console'), {
 });
 
 uBlockDashboard.patchCodeMirrorEditor(cmEditor);
+const statusPrimary = qs$('#devtoolsStatusPrimary');
+const statusSecondary = qs$('#devtoolsStatusSecondary');
 
 /******************************************************************************/
 
 function log(text) {
+    if ( typeof text !== 'string' ) { return; }
+    if ( text.trim() === '' ) { return; }
     cmEditor.replaceRange(text.trim() + '\n\n', { line: 0, ch: 0 });
+}
+
+function setStatusPill(node, text, tone = 'neutral') {
+    if ( node === null ) { return; }
+    node.textContent = text;
+    node.dataset.tone = tone;
+}
+
+function setStatus(primary, secondary, tone = 'neutral', secondaryTone = 'muted') {
+    setStatusPill(statusPrimary, primary, tone);
+    setStatusPill(statusSecondary, secondary, secondaryTone);
+}
+
+function buttonFromEvent(ev) {
+    if ( ev.currentTarget instanceof HTMLButtonElement ) {
+        return ev.currentTarget;
+    }
+    return ev.target.closest('button');
+}
+
+function setButtonBusy(button, state) {
+    if ( button instanceof HTMLButtonElement === false ) { return; }
+    if ( state ) {
+        button.dataset.busy = 'true';
+        button.disabled = true;
+        return;
+    }
+    button.disabled = false;
+    delete button.dataset.busy;
+}
+
+function describeError(reason) {
+    if ( reason instanceof Error ) {
+        return reason.message;
+    }
+    return `${reason ?? ''}`.trim();
+}
+
+async function runLoggedAction(button, options) {
+    const {
+        what,
+        runningKey,
+        doneKey,
+        formatter = result => result,
+    } = options;
+    setButtonBusy(button, true);
+    setStatus(
+        i18n$(runningKey),
+        i18n$('devtoolsStatusWorking'),
+        'running'
+    );
+    try {
+        const result = await vAPI.messaging.send('devTools', { what });
+        const output = formatter(result);
+        log(output);
+        setStatus(
+            i18n$(doneKey),
+            i18n$('devtoolsStatusLatestResult'),
+            'success'
+        );
+        return result;
+    } catch ( reason ) {
+        const message = describeError(reason);
+        setStatus(
+            i18n$('devtoolsStatusRequestFailed'),
+            i18n$('devtoolsStatusTryAgain'),
+            'warning'
+        );
+        if ( message !== '' ) {
+            log(`${i18n$('devtoolsStatusRequestFailed')}\n${message}`);
+        }
+        return undefined;
+    } finally {
+        setButtonBusy(button, false);
+    }
 }
 
 /******************************************************************************/
@@ -178,6 +258,11 @@ function toDNRText(raw) {
 
 dom.on('#console-clear', 'click', ( ) => {
     cmEditor.setValue('');
+    setStatus(
+        i18n$('devtoolsStatusCleared'),
+        i18n$('devtoolsStatusHint'),
+        'success'
+    );
 });
 
 dom.on('#console-fold', 'click', ( ) => {
@@ -193,13 +278,25 @@ dom.on('#console-fold', 'click', ( ) => {
         unfolded.push({ line, depth });
         maxUnfolded = Math.max(maxUnfolded, depth);
     });
-    if ( maxUnfolded === -1 ) { return; }
+    if ( maxUnfolded === -1 ) {
+        setStatus(
+            i18n$('devtoolsStatusNothingToFold'),
+            i18n$('devtoolsStatusHint'),
+            'warning'
+        );
+        return;
+    }
     cmEditor.startOperation();
     for ( const details of unfolded ) {
         if ( details.depth !== maxUnfolded ) { continue; }
         cmEditor.foldCode(details.line, null, 'fold');
     }
     cmEditor.endOperation();
+    setStatus(
+        i18n$('devtoolsStatusFolded'),
+        i18n$('devtoolsStatusLatestResult'),
+        'success'
+    );
 });
 
 dom.on('#console-unfold', 'click', ( ) => {
@@ -215,91 +312,98 @@ dom.on('#console-unfold', 'click', ( ) => {
         folded.push({ line, depth });
         minFolded = Math.min(minFolded, depth);
     });
-    if ( minFolded === Number.MAX_SAFE_INTEGER ) { return; }
+    if ( minFolded === Number.MAX_SAFE_INTEGER ) {
+        setStatus(
+            i18n$('devtoolsStatusNothingToUnfold'),
+            i18n$('devtoolsStatusHint'),
+            'warning'
+        );
+        return;
+    }
     cmEditor.startOperation();
     for ( const details of folded ) {
         if ( details.depth !== minFolded ) { continue; }
         cmEditor.foldCode(details.line, null, 'unfold');
     }
     cmEditor.endOperation();
+    setStatus(
+        i18n$('devtoolsStatusUnfolded'),
+        i18n$('devtoolsStatusLatestResult'),
+        'success'
+    );
 });
 
 dom.on('#snfe-dump', 'click', ev => {
-    const button = ev.target;
-    dom.attr(button, 'disabled', '');
-    vAPI.messaging.send('devTools', {
+    runLoggedAction(buttonFromEvent(ev), {
         what: 'snfeDump',
-    }).then(result => {
-        log(result);
-        dom.attr(button, 'disabled', null);
+        runningKey: 'devtoolsStatusSnfeDumpRunning',
+        doneKey: 'devtoolsStatusSnfeDumpDone',
     });
 });
 
 dom.on('#snfe-todnr', 'click', ev => {
-    const button = ev.target;
-    dom.attr(button, 'disabled', '');
-    vAPI.messaging.send('devTools', {
+    runLoggedAction(buttonFromEvent(ev), {
         what: 'snfeToDNR',
-    }).then(result => {
-        log(toDNRText(result));
-        dom.attr(button, 'disabled', null);
+        runningKey: 'devtoolsStatusSnfeToDnrRunning',
+        doneKey: 'devtoolsStatusSnfeToDnrDone',
+        formatter: result => toDNRText(result),
     });
 });
 
 dom.on('#cfe-dump', 'click', ev => {
-    const button = ev.target;
-    dom.attr(button, 'disabled', '');
-    vAPI.messaging.send('devTools', {
+    runLoggedAction(buttonFromEvent(ev), {
         what: 'cfeDump',
-    }).then(result => {
-        log(result);
-        dom.attr(button, 'disabled', null);
+        runningKey: 'devtoolsStatusCfeDumpRunning',
+        doneKey: 'devtoolsStatusCfeDumpDone',
     });
 });
 
-dom.on('#purge-all-caches', 'click', ( ) => {
-    vAPI.messaging.send('devTools', {
-        what: 'purgeAllCaches'
-    }).then(result => {
-        log(result);
+dom.on('#purge-all-caches', 'click', ev => {
+    runLoggedAction(buttonFromEvent(ev), {
+        what: 'purgeAllCaches',
+        runningKey: 'devtoolsStatusPurgeRunning',
+        doneKey: 'devtoolsStatusPurgeDone',
     });
 });
 
 vAPI.messaging.send('dashboard', {
     what: 'getAppData',
 }).then(appData => {
-    if ( appData.canBenchmark !== true ) { return; }
+    if ( appData.canBenchmark !== true ) {
+        setStatusPill(
+            statusSecondary,
+            i18n$('devtoolsStatusBenchmarksUnavailable'),
+            'muted'
+        );
+        return;
+    }
+    setStatusPill(
+        statusSecondary,
+        i18n$('devtoolsStatusBenchmarksEnabled'),
+        'muted'
+    );
     dom.attr('#snfe-benchmark', 'disabled', null);
     dom.on('#snfe-benchmark', 'click', ev => {
-        const button = ev.target;
-        dom.attr(button, 'disabled', '');
-        vAPI.messaging.send('devTools', {
+        runLoggedAction(buttonFromEvent(ev), {
             what: 'snfeBenchmark',
-        }).then(result => {
-            log(result);
-            dom.attr(button, 'disabled', null);
+            runningKey: 'devtoolsStatusSnfeBenchmarkRunning',
+            doneKey: 'devtoolsStatusSnfeBenchmarkDone',
         });
     });
     dom.attr('#cfe-benchmark', 'disabled', null);
     dom.on('#cfe-benchmark', 'click', ev => {
-        const button = ev.target;
-        dom.attr(button, 'disabled', '');
-        vAPI.messaging.send('devTools', {
+        runLoggedAction(buttonFromEvent(ev), {
             what: 'cfeBenchmark',
-        }).then(result => {
-            log(result);
-            dom.attr(button, 'disabled', null);
+            runningKey: 'devtoolsStatusCfeBenchmarkRunning',
+            doneKey: 'devtoolsStatusCfeBenchmarkDone',
         });
     });
     dom.attr('#sfe-benchmark', 'disabled', null);
     dom.on('#sfe-benchmark', 'click', ev => {
-        const button = ev.target;
-        dom.attr(button, 'disabled', '');
-        vAPI.messaging.send('devTools', {
+        runLoggedAction(buttonFromEvent(ev), {
             what: 'sfeBenchmark',
-        }).then(result => {
-            log(result);
-            dom.attr(button, 'disabled', null);
+            runningKey: 'devtoolsStatusSfeBenchmarkRunning',
+            doneKey: 'devtoolsStatusSfeBenchmarkDone',
         });
     });
 });
@@ -307,17 +411,39 @@ vAPI.messaging.send('dashboard', {
 /******************************************************************************/
 
 async function snfeQuery(lineNo, query) {
+    setStatus(
+        i18n$('devtoolsStatusQueryRunning'),
+        i18n$('devtoolsStatusWorking'),
+        'running'
+    );
     const doc = cmEditor.getDoc();
-    const lineHandle = doc.getLineHandle(lineNo)
-    const result = await vAPI.messaging.send('devTools', {
-        what: 'snfeQuery',
-        query
-    });
-    if ( typeof result !== 'string' ) { return; }
-    cmEditor.startOperation();
-    const nextLineNo = doc.getLineNumber(lineHandle) + 1;
-    doc.replaceRange(`${result}\n`, { line: nextLineNo, ch: 0 });
-    cmEditor.endOperation();
+    const lineHandle = doc.getLineHandle(lineNo);
+    try {
+        const result = await vAPI.messaging.send('devTools', {
+            what: 'snfeQuery',
+            query
+        });
+        if ( typeof result !== 'string' ) { return; }
+        cmEditor.startOperation();
+        const nextLineNo = doc.getLineNumber(lineHandle) + 1;
+        doc.replaceRange(`${result}\n`, { line: nextLineNo, ch: 0 });
+        cmEditor.endOperation();
+        setStatus(
+            i18n$('devtoolsStatusQueryDone'),
+            i18n$('devtoolsStatusLatestResult'),
+            'success'
+        );
+    } catch ( reason ) {
+        const message = describeError(reason);
+        setStatus(
+            i18n$('devtoolsStatusRequestFailed'),
+            i18n$('devtoolsStatusTryAgain'),
+            'warning'
+        );
+        if ( message !== '' ) {
+            log(`${i18n$('devtoolsStatusRequestFailed')}\n${message}`);
+        }
+    }
 }
 
 cmEditor.on('beforeChange', (cm, details) => {

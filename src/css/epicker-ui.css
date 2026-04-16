@@ -202,7 +202,7 @@ html#ublock0-epicker,
 }
 #ublock0-epicker .changeFilter > li > span:nth-of-type(2) {
     font-size: smaller;
-    color: gray;
+    color: var(--ink-3, #6c7086);
 }
 #ublock0-epicker #candidateFilters [data-i18n] {
     font-size: 90%;
@@ -240,21 +240,21 @@ html#ublock0-epicker,
     cursor: not-allowed;
 }
 #ublock0-epicker svg#sea > path:first-child {
-    fill: rgba(0,0,0,0.5);
+    fill: rgba(17,17,27,0.55);
     fill-rule: evenodd;
 }
 #ublock0-epicker svg#sea > path + path {
-    stroke: #F00;
+    stroke: #f38ba8;
     stroke-width: 0.5px;
-    fill: rgba(255,63,63,0.20);
+    fill: rgba(243,139,168,0.18);
 }
 #ublock0-epicker.zap svg#sea > path + path {
-    stroke: #FF0;
+    stroke: #f9e2af;
     stroke-width: 0.5px;
-    fill: rgba(255,255,63,0.20);
+    fill: rgba(249,226,175,0.18);
 }
 #ublock0-epicker.preview svg#sea > path {
-    fill: rgba(0,0,0,0.10);
+    fill: rgba(17,17,27,0.12);
 }
 #ublock0-epicker.preview svg#sea > path + path {
     stroke: none;
@@ -294,4 +294,135 @@ html#ublock0-epicker,
 }
 #ublock0-epicker.minimized #windowbar #minimize svg > rect {
     display: initial;
+}
+
+/*
+ * uBlockForge premium element picker polish
+ */
+#ublock0-epicker aside {
+    backdrop-filter: blur(18px);
+    background:
+        linear-gradient(145deg, rgb(255 255 255 / 0.08), transparent 55%),
+        rgb(var(--surface-0-rgb) / 92%);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: var(--radius-large);
+    box-shadow:
+        0 20px 50px rgb(15 23 42 / 0.35),
+        0 1px 0 rgb(255 255 255 / 0.08);
+    padding: 0.35rem;
+}
+
+#ublock0-epicker #windowbar {
+    align-items: center;
+    border-bottom: 1px solid rgb(255 255 255 / 0.06);
+    margin: 0 0 0.35rem;
+    padding: 0 0 0.2rem;
+}
+
+#ublock0-epicker #windowbar #move {
+    border-radius: 999px;
+    margin-right: 0.35rem;
+    min-height: 1.9rem;
+}
+
+#windowbar #quit,
+#windowbar #minimize {
+    align-items: center;
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 55%),
+        rgb(var(--surface-0-rgb) / 74%);
+    border: 1px solid rgb(255 255 255 / 0.05);
+    border-radius: 999px;
+    box-shadow: none;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    padding: 0;
+}
+
+#windowbar #quit:hover,
+#windowbar #minimize:hover {
+    background-color: rgb(var(--surface-0-rgb) / 94%);
+}
+
+#ublock0-epicker aside > *:not(:first-child) {
+    padding: 0 0.25rem;
+}
+
+#ublock0-epicker #toolbar {
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#ublock0-epicker #toolbar button {
+    flex: 1 1 0;
+    min-height: 2.5rem;
+}
+
+#ublock0-epicker section > div:first-child {
+    background-color: rgb(var(--surface-0-rgb) / 48%);
+    border: 1px solid rgb(255 255 255 / 0.06);
+    border-radius: var(--radius-medium);
+    padding: 0.35rem;
+}
+
+#ublock0-epicker section .codeMirrorContainer {
+    border-radius: calc(var(--radius-medium) - 4px);
+    overflow: hidden;
+    padding: 0;
+}
+
+#ublock0-epicker section > div:first-child + div {
+    color: var(--ink-2);
+    font-size: 0.8rem;
+    margin: 0.45rem 0 0.2rem;
+}
+
+#resultsetCount {
+    background-color: rgb(var(--primary-70) / 0.16);
+    border-radius: 999px;
+    min-width: 2.4rem;
+    padding: 0 0.45rem;
+}
+
+.resultsetModifier > span > span:nth-of-type(1),
+.resultsetModifier > span > span:nth-of-type(2) {
+    background-color: rgb(var(--primary-70));
+}
+
+#ublock0-epicker #candidateFilters {
+    background-color: rgb(var(--surface-0-rgb) / 32%);
+    border: 1px solid rgb(255 255 255 / 0.05);
+    border-radius: var(--radius-medium);
+    margin-top: 0.55rem;
+    padding: 0.4rem 0.25rem;
+}
+
+#ublock0-epicker #candidateFilters .changeFilter li {
+    border-radius: 0.6rem;
+    padding: 0.22rem 0.45rem;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+#ublock0-epicker #candidateFilters .changeFilter li.active {
+    background-color: rgb(var(--primary-70) / 0.14);
+    border: 1px solid rgb(var(--primary-70) / 0.4);
+}
+
+#ublock0-epicker #candidateFilters .changeFilter li:hover {
+    background-color: rgb(var(--surface-0-rgb) / 58%);
+    transform: translateX(1px);
+}
+
+#ublock0-epicker svg#sea > path:first-child {
+    fill: rgb(11 15 24 / 0.58);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #ublock0-epicker #candidateFilters .changeFilter li {
+        transition: none;
+    }
 }

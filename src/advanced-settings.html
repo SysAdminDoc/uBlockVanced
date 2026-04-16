@@ -19,12 +19,42 @@
 
 <body>
 <div class="body">
-    <p><span data-i18n="advancedSettingsWarning"></span> <a class="fa-icon info important" href="https://github.com/gorhill/uBlock/wiki/Advanced-settings" target="_blank">info-circle</a>
-    <p>
-        <button id="advancedSettingsApply" class="preferred" type="button" disabled data-i18n="genericApplyChanges">_<span class="hover"></span></button>&ensp;
+    <header class="editorHero">
+        <div class="editorHeroCopy">
+            <div class="editorEyebrow" translate="no">uBlockVanced</div>
+            <h1 class="editorTitle" data-i18n="advancedSettingsPageName"></h1>
+            <p class="editorLead" data-i18n="advancedSettingsLead"></p>
+        </div>
+        <div id="advancedSettingsStatus" class="editorStatus" role="status" aria-live="polite" aria-atomic="true">
+            <span id="advancedSettingsSaveState" class="statusPill"></span>
+            <span id="advancedSettingsCustomizedState" class="statusPill"></span>
+            <span id="advancedSettingsLockState" class="statusPill"></span>
+        </div>
+    </header>
+    <section class="advancedNotice" aria-labelledby="advancedNoticeTitle">
+        <div class="advancedNoticeHead">
+            <div>
+                <div class="advancedNoticeEyebrow" data-i18n="advancedSettingsRiskEyebrow"></div>
+                <h2 id="advancedNoticeTitle" class="advancedNoticeTitle" data-i18n="advancedSettingsRiskTitle"></h2>
+            </div>
+            <a class="advancedGuideLink" href="https://github.com/gorhill/uBlock/wiki/Advanced-settings" target="_blank" rel="noopener noreferrer" data-i18n-title="genericOpenDocumentation">
+                <span class="fa-icon">info-circle</span>
+                <span data-i18n="advancedSettingsGuideAction"></span>
+            </a>
+        </div>
+        <p class="advancedNoticeLead" data-i18n="advancedSettingsWarning"></p>
+        <p id="advancedSettingsPolicyHint" class="advancedPolicyHint"></p>
+    </section>
+    <div class="actionBar advancedActions">
+        <div class="advancedActionsPrimary">
+            <button id="advancedSettingsApply" class="preferred iconified" type="button" disabled><span class="fa-icon">check</span><span data-i18n="genericApplyChanges">_</span><span class="hover"></span></button>
+            <button id="advancedSettingsRevert" class="iconified" type="button" disabled><span class="fa-icon">undo</span><span data-i18n="genericRevert">_</span><span class="hover"></span></button>
+        </div>
+        <p class="advancedActionsHint" data-i18n="advancedSettingsToolbarHint"></p>
+    </div>
 </div>
 
-<div id="advancedSettings" class="codeMirrorContainer cm-theme-override"></div>
+<div id="advancedSettings" class="codeMirrorContainer cm-theme-override" data-dirty="false"></div>
 
 <script src="lib/codemirror/lib/codemirror.js"></script>
 <script src="lib/codemirror/addon/selection/active-line.js"></script>

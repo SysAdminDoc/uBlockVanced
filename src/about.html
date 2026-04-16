@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock — About</title>
+<title>uBlockVanced — About</title>
 <link rel="stylesheet" type="text/css" href="css/themes/default.css">
 <link rel="stylesheet" type="text/css" href="css/common.css">
 <link rel="stylesheet" type="text/css" href="css/dashboard-common.css">
@@ -14,40 +14,81 @@
 <body>
 
 <div class="body">
-    <div id="aboutNameVer" class="li"></div>
-    <div class="liul">
-        <div class="li">Copyright &copy; Raymond Hill 2014-present</div>
-    </div>
-    <div class="li"><a href="https://github.com/gorhill/uBlock/wiki/Privacy-policy" data-i18n="aboutPrivacyPolicy"></a></div>
-    <div class="li"><a href="https://github.com/gorhill/uBlock/releases" data-i18n="aboutChangelog"></a></div>
-    <div class="li"><a href="https://github.com/gorhill/uBlock" data-i18n="aboutCode"></a></div>
-    <div class="li"><span data-i18n="aboutContributors"></span></div>
-    <div class="liul">
-        <div class="li"><a href="https://github.com/gorhill/uBlock/graphs/contributors" data-i18n="aboutSourceCode"></a></div>
-        <div class="li"><a href="https://crowdin.com/project/ublock" data-i18n="aboutTranslations"></a></div>
-        <div class="li"><a href="https://github.com/uBlockOrigin/uAssets/graphs/contributors" data-i18n="aboutFilterLists"></a></div>
-    </div>
-    <div class="li"><span data-i18n="aboutDependencies"></span></div>
-    <div class="liul">
-        <div class="li"><span><a href="https://codemirror.net/" target="_blank">CodeMirror</a> by <a href="https://github.com/marijnh">Marijn Haverbeke</a></span></div>
-        <div class="li"><span><a href="https://github.com/mathiasbynens/punycode.js" target="_blank">Punycode.js</a> by <a href="https://github.com/mathiasbynens">Mathias Bynens</a></span></div>
-        <div class="li"><span><a href="https://web.archive.org/web/20201013225635/https://github.com/chrismsimpson/Metropolis" target="_blank">Metropolis font family</a> by <a href="https://github.com/chrismsimpson">Chris Simpson</a></span></div>
-        <div class="li"><span><a href="https://github.com/rsms/inter" target="_blank">Inter font family</a> by <a href="https://github.com/rsms">Rasmus Andersson</a></span></div>
-        <div class="li"><span><a href="https://fontawesome.com/" target="_blank">FontAwesome font family</a> by <a href="https://github.com/davegandy">Dave Gandy</a></span></div>
-        <div class="li"><span><a href="https://github.com/Swatinem/diff" target="_blank">An implementation of Myers' diff algorithm</a> by <a href="https://github.com/Swatinem">Arpad Borsos</a></span></div>
-        <div class="li"><span><a href="https://github.com/foo123/RegexAnalyzer" target="_blank">Regular Expression Analyzer</a> by <a href="https://github.com/foo123">Nikos M.</a></span></div>
-        <div class="li"><span><a href="https://github.com/hsluv/hsluv" target="_blank">HSLuv - Human-friendly HSL</a> by <a href="https://github.com/boronine">Alexei Boronine</a></span></div>
-        <div class="li"><span><a href="https://searchfox.org/mozilla-central/rev/d317e93d9a59c9e4c06ada85fbff9f6a1ceaaad1/browser/extensions/webcompat/shims/google-ima.js" target="_blank">google-ima.js</a> by <a href="https://www.mozilla.org/">Mozilla</a></span></div>
-        <div class="li"><span><a href="https://github.com/csstree/csstree" target="_blank">CSSTree</a> by <a href="https://github.com/lahmatiy">Roman Dvornov</a></span></div>
-        <div class="li"><span><a href="https://github.com/beautify-web/js-beautify" target="_blank">js-beautify</a> by <a href="https://github.com/einars">Einar Lielmanis</a>, <a href="https://github.com/bitwiseman">Liam Newman</a>, et al.</span></div>
-        <div class="li"><span><a href="https://flagpedia.net/" target="_blank">Flags of the World</a> by <a href="https://www.davidkrmela.com/">David Krmela</a></span></div>
-    </div>
-    <div class="li"><span data-i18n="aboutCDNs"></span></div>
-    <div class="liul">
-        <div class="li"><span><a href="https://pages.cloudflare.com/" target="_blank">Cloudflare Pages</a>, <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>, <a href="https://www.jsdelivr.com/" target="_blank">jsDelivr</a>, <a href="https://statically.io/" target="_blank">Statically</a></span>
+    <div class="about-hero">
+        <img class="about-icon" src="img/icon_64.png" alt="">
+        <div class="about-copy">
+            <p class="eyebrow">uBlockVanced</p>
+            <div id="aboutNameVer" class="about-title"></div>
+            <p class="about-tagline" data-i18n="extShortDesc"></p>
+            <p class="about-lead" data-i18n="aboutLead"></p>
+            <div class="about-badges">
+                <span id="aboutVersionBadge" class="about-badge"></span>
+                <span class="about-badge" data-i18n="aboutOpenSourceBadge"></span>
+                <span class="about-badge" data-i18n="aboutCommunityBadge"></span>
+            </div>
         </div>
-        <div class="li" data-i18n="aboutCDNsInfo"></div>
     </div>
+
+    <section class="fieldset about-section">
+        <h2 class="fieldset-header" data-i18n="aboutSectionProduct"></h2>
+        <div class="about-link-grid">
+            <a class="about-link-card" href="https://github.com/gorhill/uBlock/wiki/Privacy-policy">
+                <span class="about-link-title" data-i18n="aboutPrivacyPolicy"></span>
+                <span class="about-link-copy" data-i18n="aboutPrivacyLead"></span>
+            </a>
+            <a class="about-link-card" href="https://github.com/gorhill/uBlock/releases">
+                <span class="about-link-title" data-i18n="aboutChangelog"></span>
+                <span class="about-link-copy" data-i18n="aboutChangelogLead"></span>
+            </a>
+            <a class="about-link-card" href="https://github.com/gorhill/uBlock">
+                <span class="about-link-title" data-i18n="aboutCode"></span>
+                <span class="about-link-copy" data-i18n="aboutCodeLead"></span>
+            </a>
+        </div>
+    </section>
+
+    <section class="fieldset about-section">
+        <h2 class="fieldset-header" data-i18n="aboutSectionContributors"></h2>
+        <p class="about-section-copy" data-i18n="aboutContributorsLead"></p>
+        <div class="about-pill-links">
+            <a class="about-pill-link" href="https://github.com/gorhill/uBlock/graphs/contributors" data-i18n="aboutSourceCode"></a>
+            <a class="about-pill-link" href="https://crowdin.com/project/ublock" data-i18n="aboutTranslations"></a>
+            <a class="about-pill-link" href="https://github.com/uBlockOrigin/uAssets/graphs/contributors" data-i18n="aboutFilterLists"></a>
+        </div>
+    </section>
+
+    <section class="fieldset about-section">
+        <h2 class="fieldset-header" data-i18n="aboutSectionDependencies"></h2>
+        <p class="about-section-copy" data-i18n="aboutDependenciesLead"></p>
+        <ul class="about-credit-list">
+            <li><span><a href="https://codemirror.net/">CodeMirror</a> by <a href="https://github.com/marijnh">Marijn Haverbeke</a></span></li>
+            <li><span><a href="https://github.com/mathiasbynens/punycode.js">Punycode.js</a> by <a href="https://github.com/mathiasbynens">Mathias Bynens</a></span></li>
+            <li><span><a href="https://web.archive.org/web/20201013225635/https://github.com/chrismsimpson/Metropolis">Metropolis font family</a> by <a href="https://github.com/chrismsimpson">Chris Simpson</a></span></li>
+            <li><span><a href="https://github.com/rsms/inter">Inter font family</a> by <a href="https://github.com/rsms">Rasmus Andersson</a></span></li>
+            <li><span><a href="https://fontawesome.com/">FontAwesome font family</a> by <a href="https://github.com/davegandy">Dave Gandy</a></span></li>
+            <li><span><a href="https://github.com/Swatinem/diff">An implementation of Myers' diff algorithm</a> by <a href="https://github.com/Swatinem">Arpad Borsos</a></span></li>
+            <li><span><a href="https://github.com/foo123/RegexAnalyzer">Regular Expression Analyzer</a> by <a href="https://github.com/foo123">Nikos M.</a></span></li>
+            <li><span><a href="https://github.com/hsluv/hsluv">HSLuv - Human-friendly HSL</a> by <a href="https://github.com/boronine">Alexei Boronine</a></span></li>
+            <li><span><a href="https://searchfox.org/mozilla-central/rev/d317e93d9a59c9e4c06ada85fbff9f6a1ceaaad1/browser/extensions/webcompat/shims/google-ima.js">google-ima.js</a> by <a href="https://www.mozilla.org/">Mozilla</a></span></li>
+            <li><span><a href="https://github.com/csstree/csstree">CSSTree</a> by <a href="https://github.com/lahmatiy">Roman Dvornov</a></span></li>
+            <li><span><a href="https://github.com/beautify-web/js-beautify">js-beautify</a> by <a href="https://github.com/einars">Einar Lielmanis</a>, <a href="https://github.com/bitwiseman">Liam Newman</a>, et al.</span></li>
+            <li><span><a href="https://flagpedia.net/">Flags of the World</a> by <a href="https://www.davidkrmela.com/">David Krmela</a></span></li>
+        </ul>
+    </section>
+
+    <section class="fieldset about-section">
+        <h2 class="fieldset-header" data-i18n="aboutSectionInfrastructure"></h2>
+        <div class="about-note" data-i18n="aboutCDNs"></div>
+        <div class="about-pill-links about-cdn-links">
+            <a class="about-pill-link" href="https://pages.cloudflare.com/">Cloudflare Pages</a>
+            <a class="about-pill-link" href="https://pages.github.com/">GitHub Pages</a>
+            <a class="about-pill-link" href="https://www.jsdelivr.com/">jsDelivr</a>
+            <a class="about-pill-link" href="https://statically.io/">Statically</a>
+        </div>
+        <p class="about-section-copy" data-i18n="aboutCDNsInfo"></p>
+    </section>
+
+    <p class="about-footer-note" data-i18n="aboutCopyright"></p>
 </div>
 
 <script src="lib/hsluv/hsluv-0.1.0.min.js"></script>

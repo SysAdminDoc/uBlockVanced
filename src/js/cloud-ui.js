@@ -153,6 +153,20 @@ const openOptions = function() {
     input.value = self.cloud.options.deviceName;
     dom.attr(input, 'placeholder', self.cloud.options.defaultDeviceName);
     dom.cl.add('#cloudOptions', 'show');
+    vAPI.defer.once(1).then(( ) => {
+        input.focus();
+        input.select();
+    });
+};
+
+/******************************************************************************/
+
+const closeOptionsPanel = function() {
+    dom.cl.remove('#cloudOptions', 'show');
+    const toggle = qs$('#cloudCog');
+    if ( toggle !== null ) {
+        toggle.focus();
+    }
 };
 
 /******************************************************************************/
@@ -160,13 +174,26 @@ const openOptions = function() {
 const closeOptions = function(ev) {
     const root = qs$('#cloudOptions');
     if ( ev.target !== root ) { return; }
-    dom.cl.remove(root, 'show');
+    closeOptionsPanel();
+};
+
+/******************************************************************************/
+
+const onOptionsKeydown = function(ev) {
+    if ( ev.key === 'Escape' ) {
+        ev.preventDefault();
+        closeOptionsPanel();
+        return;
+    }
+    if ( ev.key !== 'Enter' || ev.target.id !== 'cloudDeviceName' ) { return; }
+    ev.preventDefault();
+    submitOptions();
 };
 
 /******************************************************************************/
 
 const submitOptions = async function() {
-    dom.cl.remove('#cloudOptions', 'show');
+    closeOptionsPanel();
 
     const options = await vAPI.messaging.send('cloudWidget', {
         what: 'cloudSetOptions',
@@ -211,6 +238,7 @@ const onInitialize = function(options) {
         dom.on('#cloudPullAndMerge', 'click', pullAndMergeData);
         dom.on('#cloudCog', 'click', openOptions);
         dom.on('#cloudOptions', 'click', closeOptions);
+        dom.on('#cloudOptions', 'keydown', onOptionsKeydown);
         dom.on('#cloudOptionsSubmit', 'click', ( ) => { submitOptions(); });
 
         fetchCloudData().then(result => {

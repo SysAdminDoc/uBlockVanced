@@ -58,6 +58,7 @@ const renderNumber = value => {
 };
 
 const listStatsTemplate = i18n$('3pListsOfBlockedHostsPerListStats');
+const buttonActivationKeys = new Set([ 'Enter', ' ', 'Spacebar' ]);
 
 const renderLeafStats = (used, total) => {
     if ( isNaN(used) || isNaN(total) ) { return ''; }
@@ -69,6 +70,79 @@ const renderLeafStats = (used, total) => {
 const renderNodeStats = (used, total) => {
     if ( isNaN(used) || isNaN(total) ) { return ''; }
     return `${used.toLocaleString()}/${total.toLocaleString()}`;
+};
+
+const isActivationEvent = ev => {
+    if ( ev.type === 'click' ) { return true; }
+    if ( ev.type !== 'keydown' ) { return false; }
+    if ( buttonActivationKeys.has(ev.key) === false ) { return false; }
+    ev.preventDefault();
+    return true;
+};
+
+const normalizeAccessibleText = text =>
+    text.replace(/\s*\n+\s*/g, ' ').trim();
+
+const setTitleAndAriaLabel = (elem, text) => {
+    if ( elem instanceof Element === false ) { return; }
+    if ( typeof text !== 'string' || text === '' ) { return; }
+    dom.attr(elem, 'title', text);
+    if (
+        /^(?:a|button|input|select|textarea)$/i.test(elem.localName) ||
+        elem.getAttribute('role') === 'button'
+    ) {
+        dom.attr(elem, 'aria-label', normalizeAccessibleText(text));
+    }
+};
+
+const syncExpandableState = expandable => {
+    if ( expandable === null ) { return; }
+    const value = dom.cl.has(expandable, 'expanded') ? 'true' : 'false';
+    let elem = qs$(expandable, ':scope > .listToggle');
+    if ( elem === null ) {
+        elem = qs$(expandable, ':scope > .detailbar > .listToggle');
+    }
+    if ( elem !== null ) {
+        dom.attr(elem, 'aria-expanded', value);
+    }
+    elem = qs$(expandable, ':scope > .detailbar > .listExpander');
+    if ( elem !== null ) {
+        dom.attr(elem, 'role', 'button');
+        dom.attr(elem, 'tabindex', '0');
+        dom.attr(elem, 'aria-expanded', value);
+    }
+    elem = qs$(expandable, ':scope > .detailbar > .nodestats');
+    if ( elem !== null ) {
+        dom.attr(elem, 'aria-expanded', value);
+    }
+};
+
+const syncListEntryControls = listEntry => {
+    if ( listEntry === null ) { return; }
+    syncExpandableState(listEntry);
+    const removeButton = qs$(listEntry, ':scope > .detailbar .remove');
+    if ( removeButton !== null ) {
+        dom.attr(
+            removeButton,
+            'aria-pressed',
+            dom.cl.has(listEntry, 'toRemove') ? 'true' : 'false'
+        );
+    }
+    const cacheButton = qs$(listEntry, ':scope > .detailbar .status.cache');
+    const title = cacheButton !== null ? dom.attr(cacheButton, 'title') : '';
+    if ( cacheButton !== null && title ) {
+        dom.attr(cacheButton, 'aria-label', normalizeAccessibleText(title));
+    }
+};
+
+const syncListControls = (root = qs$('#lists')) => {
+    if ( root === null ) { return; }
+    for ( const expandable of qsa$(root, '.expandable') ) {
+        syncExpandableState(expandable);
+    }
+    for ( const listEntry of qsa$(root, '.listEntry') ) {
+        syncListEntryControls(listEntry);
+    }
 };
 
 const i18nGroupName = name => {
@@ -118,7 +192,7 @@ const renderFilterLists = ( ) => {
         if ( listDetails.supportName ) {
             elem = qs$(listEntry, ':scope > .detailbar a.support');
             dom.attr(elem, 'href', listDetails.supportURL || '#');
-            dom.attr(elem, 'title', listDetails.supportName);
+            setTitleAndAriaLabel(elem, listDetails.supportName);
         }
         if ( listDetails.external ) {
             dom.cl.add(listEntry, 'external');
@@ -152,16 +226,23 @@ const renderFilterLists = ( ) => {
             if ( asset.cached && asset.writeTime !== 0 ) {
                 title += '\n' + lastUpdateString;
             }
-            dom.attr(qs$(listEntry, ':scope > .detailbar .status.obsolete'), 'title', title);
+            setTitleAndAriaLabel(
+                qs$(listEntry, ':scope > .detailbar .status.obsolete'),
+                title
+            );
         }
         if ( asset.cached === true ) {
             dom.cl.add(listEntry, 'cached');
-            dom.attr(qs$(listEntry, ':scope > .detailbar .status.cache'), 'title', lastUpdateString);
+            setTitleAndAriaLabel(
+                qs$(listEntry, ':scope > .detailbar .status.cache'),
+                lastUpdateString
+            );
             const timeSinceLastUpdate = Date.now() - asset.writeTime;
             dom.cl.toggle(listEntry, 'recent', timeSinceLastUpdate < recentlyUpdated);
         } else {
             dom.cl.remove(listEntry, 'cached');
         }
+        syncListEntryControls(listEntry);
     };
 
     const createListEntry = (listDetails, depth) => {
@@ -293,6 +374,7 @@ const renderFilterLists = ( ) => {
         dom.cl.toggle(dom.body, 'updating', listsetDetails.isUpdating);
 
         renderWidgets();
+        syncListControls();
     };
 
     return vAPI.messaging.send('dashboard', {
@@ -325,11 +407,12 @@ const updateAssetStatus = details => {
     dom.cl.toggle(listEntry, 'obsolete', !details.cached);
     dom.cl.toggle(listEntry, 'cached', !!details.cached);
     if ( details.cached ) {
-        dom.attr(qs$(listEntry, '.status.cache'), 'title',
+        setTitleAndAriaLabel(qs$(listEntry, '.status.cache'),
             lastUpdateTemplateString.replace('{{ago}}', i18n.renderElapsedTimeToString(Date.now()))
         );
         dom.cl.add(listEntry, 'recent');
     }
+    syncListEntryControls(listEntry);
     updateAncestorListNodes(listEntry, ancestor => {
         updateListNode(ancestor);
     });
@@ -460,9 +543,15 @@ const updateListNode = listNode => {
     );
     const firstLeaf = qs$(listNode, '.listEntry[data-role="leaf"]');
     if ( firstLeaf !== null ) {
-        dom.attr(qs$(listNode, ':scope > .detailbar a.support'), 'href',
-            dom.attr(qs$(firstLeaf, ':scope > .detailbar a.support'), 'href') || '#'
+        const supportLink = qs$(listNode, ':scope > .detailbar a.support');
+        const supportLinkFirst = qs$(firstLeaf, ':scope > .detailbar a.support');
+        dom.attr(supportLink, 'href',
+            dom.attr(supportLinkFirst, 'href') || '#'
         );
+        const supportTitle = dom.attr(supportLinkFirst, 'title');
+        if ( supportTitle ) {
+            setTitleAndAriaLabel(supportLink, supportTitle);
+        }
         dom.attr(qs$(listNode, ':scope > .detailbar a.mustread'), 'href',
             dom.attr(qs$(firstLeaf, ':scope > .detailbar a.mustread'), 'href') || '#'
         );
@@ -481,6 +570,7 @@ const updateListNode = listNode => {
     if ( qs$(listNode, '.listEntry.stickied') !== null ) {
         dom.cl.add(listNode, 'stickied');
     }
+    syncListEntryControls(listNode);
 };
 
 const updateAncestorListNodes = (listEntry, fn) => {
@@ -506,6 +596,7 @@ const onRemoveExternalList = ev => {
     const listEntry = ev.target.closest('[data-key]');
     if ( listEntry === null ) { return; }
     dom.cl.toggle(listEntry, 'toRemove');
+    syncListEntryControls(listEntry);
     renderWidgets();
 };
 
@@ -542,9 +633,10 @@ const onPurgeClicked = ev => {
     if ( qs$(liEntry, 'input[type="checkbox"]').checked ) {
         renderWidgets();
     }
+    syncListEntryControls(liEntry);
 };
 
-dom.on('#lists', 'click', 'span.cache', onPurgeClicked);
+dom.on('#lists', 'click', '.status.cache', onPurgeClicked);
 
 /******************************************************************************/
 
@@ -573,6 +665,7 @@ const selectFilterLists = async ( ) => {
             }
         }
         dom.cl.remove(textarea.closest('.expandable'), 'expanded');
+        syncExpandableState(textarea.closest('.expandable'));
         textarea.value = '';
         return after.join('\n');
     })();
@@ -653,8 +746,8 @@ dom.on('#buttonUpdate', 'click', ( ) => { buttonUpdateHandler(); });
 
 /******************************************************************************/
 
-const userSettingCheckboxChanged = ( ) => {
-    const target = event.target;
+const userSettingCheckboxChanged = ev => {
+    const target = ev.target;
     vAPI.messaging.send('dashboard', {
         what: 'userSettings',
         name: target.id,
@@ -736,6 +829,7 @@ const applyListExpansion = listkeys => {
         expandedListSet.add(which);
         dom.cl.add(`#lists [data-key="${which}"]`, 'expanded');
     });
+    syncListControls();
 };
 
 const toggleListExpansion = which => {
@@ -771,13 +865,15 @@ const toggleListExpansion = which => {
     }
     vAPI.localStorage.setItem('expandedListSet', Array.from(expandedListSet));
     vAPI.localStorage.removeItem('hideUnusedFilterLists');
+    syncListControls();
 };
 
-dom.on('#listsOfBlockedHostsPrompt', 'click', ( ) => {
+dom.on('#listsOfBlockedHostsToggle', 'click', ( ) => {
     toggleListExpansion('*');
 });
 
-dom.on('#lists', 'click', '.listExpander', ev => {
+const onListExpanderActivated = ev => {
+    if ( isActivationEvent(ev) === false ) { return; }
     const expandable = ev.target.closest('.expandable');
     if ( expandable === null ) { return; }
     const which = expandable.dataset.key;
@@ -790,9 +886,12 @@ dom.on('#lists', 'click', '.listExpander', ev => {
         }
     }
     ev.preventDefault();
-});
+};
 
-dom.on('#lists', 'click', '[data-parent="root"] > .detailbar .listname', ev => {
+dom.on('#lists', 'click', '.listExpander', onListExpanderActivated);
+dom.on('#lists', 'keydown', '.listExpander', onListExpanderActivated);
+
+dom.on('#lists', 'click', '[data-parent="root"] > .detailbar .listToggle', ev => {
     const listEntry = ev.target.closest('.listEntry');
     if ( listEntry === null ) { return; }
     const listkey = listEntry.dataset.key;
@@ -801,10 +900,11 @@ dom.on('#lists', 'click', '[data-parent="root"] > .detailbar .listname', ev => {
     ev.preventDefault();
 });
 
-dom.on('#lists', 'click', '[data-role="import"] > .detailbar .listname', ev => {
+dom.on('#lists', 'click', '[data-role="import"] > .detailbar .listToggle', ev => {
     const expandable = ev.target.closest('.listEntry');
     if ( expandable === null ) { return; }
     dom.cl.toggle(expandable, 'expanded');
+    syncExpandableState(expandable);
     ev.preventDefault();
 });
 
@@ -875,7 +975,9 @@ self.cloud.onPull = function fromCloudData(data, append) {
         lines.push(...selectedSet);
         if ( lines.length !== 0 ) { lines.push(''); }
         textarea.value = lines.join('\n');
-        dom.cl.toggle('#lists .listEntry[data-role="import"]', 'expanded', textarea.value !== '');
+        const importEntry = qs$('#lists .listEntry[data-role="import"]');
+        dom.cl.toggle(importEntry, 'expanded', textarea.value !== '');
+        syncExpandableState(importEntry);
     }
 
     renderWidgets();

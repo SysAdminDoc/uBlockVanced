@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark" />
-<title>uBlock — Dynamic filtering rules</title>
+<title>uBlockVanced - Dynamic filtering rules</title>
 <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
 <link rel="stylesheet" href="lib/codemirror/addon/merge/merge.css">
 
@@ -21,7 +21,9 @@
 
 <div class="body">
     <div id="cloudWidget" class="hide" data-cloud-entry="myRulesPane"></div>
-    <p class="vverbose"><span data-i18n="rulesHint"></span></p>
+    <div class="rulesIntro">
+        <p class="vverbose"><span data-i18n="rulesHint"></span></p>
+    </div>
     <div id="diff">
         <div class="tools">
             <div class="ruleActions">
@@ -39,7 +41,9 @@
     </div>
 </div>
 <div id="ruleFilter">
-    <span><span class="fa-icon">filter</span>&nbsp;<input type="search" size="16"></span>&emsp;<span data-i18n="rulesSort"></span>&nbsp;<select><option value="0" selected data-i18n="rulesSortByType"><option value="1" data-i18n="rulesSortBySource"><option value="2" data-i18n="rulesSortByDestination"></select>&emsp;<span id="diffCollapse" class="fa-icon">double-angle-up</span>
+    <label class="ruleFilterSearch"><span class="fa-icon">filter</span><input type="search" size="16"></label>
+    <label class="ruleFilterSort"><span data-i18n="rulesSort"></span><select><option value="0" selected data-i18n="rulesSortByType"><option value="1" data-i18n="rulesSortBySource"><option value="2" data-i18n="rulesSortByDestination"></select></label>
+    <button id="diffCollapse" class="fa-icon" type="button" aria-label="Collapse unchanged rules" aria-pressed="false">double-angle-up</button>
 </div>
 <div class="codeMirrorContainer codeMirrorMergeContainer cm-theme-override"></div>
 

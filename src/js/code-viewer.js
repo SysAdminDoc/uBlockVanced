@@ -257,6 +257,18 @@ async function start() {
         setURL(ev.target.value);
     });
 
+    dom.on('#header input[type="url"]', 'keydown', ev => {
+        if ( ev.key === 'Enter' ) {
+            ev.preventDefault();
+            setURL(ev.target.value);
+            return;
+        }
+        if ( ev.key !== 'Escape' ) { return; }
+        ev.preventDefault();
+        setInputURL(currentURL);
+        ev.target.select();
+    });
+
     dom.on('#reloadURL', 'click', ( ) => {
         const input = qs$('#header input[type="url"]');
         const url = input.value;

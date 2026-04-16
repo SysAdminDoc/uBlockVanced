@@ -78,3 +78,207 @@ body[dir="rtl"] .CodeMirror-merge-pane-rightmost {
 :root.mobile #diff .tools {
     overflow: auto;
     }
+
+/*
+ * uBlockForge premium dynamic rules polish
+ */
+body {
+    background:
+        radial-gradient(circle at top left, rgb(var(--primary-70) / 0.14), transparent 24rem),
+        var(--surface-2);
+}
+
+.body {
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: var(--default-page-max-width);
+    padding: 1.5rem 1.25rem 0;
+    width: 100%;
+}
+
+.rulesIntro {
+    background:
+        linear-gradient(145deg, rgb(255 255 255 / 0.08), transparent 55%),
+        var(--surface-raised);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    box-shadow: var(--panel-shadow);
+    margin-bottom: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.rulesIntro .vverbose {
+    color: var(--ink-2);
+    line-height: 1.7;
+    margin: 0;
+}
+
+#diff {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 42%),
+        var(--surface-raised-strong);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    box-shadow: var(--panel-shadow);
+    overflow: hidden;
+    padding: 1.1rem 1.1rem 1rem;
+}
+
+#diff .tools {
+    display: flex;
+    gap: 1rem;
+}
+
+#diff .tools > * {
+    margin-bottom: 0;
+}
+
+#diff .ruleActions {
+    background-color: rgb(var(--surface-0-rgb) / 42%);
+    border: 1px solid rgb(255 255 255 / 0.04);
+    border-radius: var(--radius-medium);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+#diff .ruleActions .fieldset-header {
+    color: var(--ink-1);
+    margin: 0 0 0.1rem;
+    text-align: left;
+    width: 100%;
+}
+
+#diff .ruleActions button {
+    flex: 1 1 11rem;
+    justify-content: center;
+    min-height: 2.8rem;
+}
+
+#ruleFilter {
+    backdrop-filter: blur(18px);
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 60%),
+        rgb(var(--surface-0-rgb) / 84%);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-large);
+    box-shadow: var(--panel-shadow);
+    gap: 1rem;
+    justify-content: space-between;
+    margin: 1rem auto 0;
+    max-width: calc(var(--default-page-max-width) - 2.5rem);
+    padding: 0.85rem 1rem;
+    position: sticky;
+    top: 1rem;
+    z-index: 5;
+}
+
+#ruleFilter .ruleFilterSearch,
+#ruleFilter .ruleFilterSort {
+    align-items: center;
+    color: var(--ink-2);
+    display: inline-flex;
+    gap: 0.75rem;
+}
+
+#ruleFilter .ruleFilterSearch {
+    flex: 1 1 18rem;
+}
+
+#ruleFilter .ruleFilterSearch > .fa-icon {
+    color: rgb(var(--primary-70));
+        fill: rgb(var(--primary-70));
+    font-size: 1rem;
+}
+
+#ruleFilter .ruleFilterSearch input {
+    flex: 1 1 auto;
+    min-width: 13rem;
+}
+
+#ruleFilter .ruleFilterSort select {
+    min-width: 12rem;
+}
+
+#ruleFilter #diffCollapse {
+    align-items: center;
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 50%),
+        rgb(var(--surface-0-rgb) / 72%);
+    border: 1px solid var(--border-2);
+    border-radius: 999px;
+    box-shadow: none;
+    color: var(--ink-2);
+        fill: var(--ink-2);
+    display: inline-flex;
+    font-size: 1.1rem;
+    justify-content: center;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: 0;
+}
+
+#ruleFilter #diffCollapse:hover {
+    color: var(--ink-1);
+        fill: var(--ink-1);
+}
+
+.codeMirrorContainer {
+    box-sizing: border-box;
+    margin: 1rem auto 1.25rem;
+    max-width: var(--default-page-max-width);
+    min-width: 0;
+    width: calc(100% - 2.5rem);
+}
+
+.CodeMirror-merge,
+.CodeMirror-merge-pane,
+.CodeMirror-merge .CodeMirror {
+    border-radius: var(--radius-large);
+}
+
+.CodeMirror-merge {
+    border: 1px solid var(--border-1);
+    box-shadow: var(--panel-shadow);
+    overflow: hidden;
+}
+
+.CodeMirror-merge-gap {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 60%),
+        rgb(var(--surface-0-rgb) / 72%);
+}
+
+body.editing .CodeMirror-merge-editor .CodeMirror,
+.codeMirrorContainer .CodeMirror {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 45%),
+        var(--surface-raised-strong);
+}
+
+@media (max-width: 900px) {
+    .body {
+        padding-inline: 0.85rem;
+    }
+
+    #diff .tools {
+        flex-direction: column;
+    }
+
+    #ruleFilter {
+        align-items: stretch;
+        border-radius: var(--radius-medium);
+        max-width: calc(100% - 1.7rem);
+        top: 0.75rem;
+    }
+
+    #ruleFilter .ruleFilterSearch,
+    #ruleFilter .ruleFilterSort {
+        width: 100%;
+    }
+
+    .codeMirrorContainer {
+        width: calc(100% - 1.7rem);
+    }
+}

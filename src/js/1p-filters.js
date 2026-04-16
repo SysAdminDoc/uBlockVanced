@@ -93,6 +93,16 @@ let originalState = {
     filters: '',
 };
 
+function setStatusPill(target, message, tone) {
+    const node = qs$(target);
+    if ( node === null ) { return; }
+    node.textContent = message;
+    node.className = 'statusPill';
+    if ( tone ) {
+        dom.cl.add(node, tone);
+    }
+}
+
 function getCurrentState() {
     const enabled = qs$('#enableMyFilters input').checked;
     return {
@@ -121,12 +131,46 @@ function setEditorText(text) {
 
 /******************************************************************************/
 
+function syncEditorState(changed) {
+    const enabled = qs$('#enableMyFilters input').checked;
+    const trustedInput = qs$('#trustMyFilters input');
+    const exportButton = qs$('#exportUserFiltersToFile');
+    const hasContent = getEditorText().trim() !== '';
+
+    trustedInput.disabled = enabled === false;
+    dom.cl.toggle('#trustMyFilters', 'is-disabled', enabled === false);
+    exportButton.disabled = hasContent === false;
+
+    setStatusPill(
+        '#userFiltersSaveState',
+        i18n$(changed ? '1pEditorStatusUnsaved' : '1pEditorStatusSaved'),
+        changed ? 'is-warning' : 'is-success'
+    );
+    setStatusPill(
+        '#userFiltersEnabledState',
+        i18n$(enabled ? '1pEditorStateEnabled' : '1pEditorStateDisabled'),
+        enabled ? '' : 'is-muted'
+    );
+    setStatusPill(
+        '#userFiltersTrustState',
+        i18n$(
+            enabled && trustedInput.checked
+                ? '1pEditorTrustEnabled'
+                : '1pEditorTrustStandard'
+        ),
+        enabled && trustedInput.checked ? 'is-accent' : 'is-muted'
+    );
+}
+
+/******************************************************************************/
+
 function userFiltersChanged(details = {}) {
     const changed = typeof details.changed === 'boolean'
         ? details.changed
         : self.hasUnsavedData();
     qs$('#userFiltersApply').disabled = !changed;
     qs$('#userFiltersRevert').disabled = !changed;
+    syncEditorState(changed);
     const enabled = qs$('#enableMyFilters input').checked;
     const trustedbefore = cmEditor.getOption('trustedSource');
     const trustedAfter = enabled && qs$('#trustMyFilters input').checked;
@@ -298,6 +342,7 @@ function setCloudData(data, append) {
         data = uBlockDashboard.mergeNewLines(getEditorText(), data);
     }
     cmEditor.setValue(data);
+    userFiltersChanged();
 }
 
 self.cloud.onPush = getCloudData;

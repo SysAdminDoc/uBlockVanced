@@ -269,6 +269,17 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
 
 /******************************************************************************/
 
+function revealSupportDiagnostics() {
+    const button = qs$('#showSupportInfo');
+    if ( button === null ) { return; }
+    dom.attr(button, 'aria-expanded', 'true');
+    dom.cl.add(button, 'hidden');
+    dom.cl.add('#supportDiagnostics', 'e');
+    cmEditor.refresh();
+}
+
+/******************************************************************************/
+
 (async ( ) => {
     await showSupportData();
 
@@ -307,10 +318,8 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
         });
 
         dom.on('#showSupportInfo', 'click', ev => {
-            const button = ev.target.closest('#showSupportInfo');
-            dom.cl.add(button, 'hidden');
-            dom.cl.add('.a.b.c.d', 'e');
-            cmEditor.refresh();
+            revealSupportDiagnostics();
+            ev.preventDefault();
         });
     }
 

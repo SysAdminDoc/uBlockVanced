@@ -16,12 +16,37 @@
 </head>
 <body class="loading">
 
-<section id="subscribe" class="hide notice">
-    <span class="logo"><img data-i18n-title="extName" src="img/ublock.svg" alt="logo"></span>
-    <span id="subscribePrompt"><span></span><a></a></span>
-    <span class="fa-icon">spinner</span>
-    <button id="subscribeButton" type="button" data-i18n="subscribeButton">_<span class="hover"></span></button>
-</section>
+<main class="viewerShell">
+    <section class="viewerHero">
+        <div class="heroCopy">
+            <p class="eyebrow">uBlockVanced</p>
+            <h1 id="assetHeading"></h1>
+            <p class="lead" data-i18n="assetViewerLead"></p>
+            <p id="assetMeta" class="assetMeta"></p>
+        </div>
+        <div id="assetStatus" class="statusCluster" role="status" aria-live="polite" aria-atomic="true">
+            <span id="assetStatusPrimary" class="statusPill" data-tone="running" data-i18n="assetViewerStatusLoading"></span>
+            <span id="assetTrustState" class="statusPill"></span>
+            <span id="assetLineCount" class="statusPill"></span>
+            <a id="assetSourceLink" class="sourceLink hide" target="_blank" rel="noopener noreferrer" data-i18n="assetViewerOpenSource" href="#"></a>
+        </div>
+    </section>
+
+    <section id="subscribe" class="hide notice" aria-live="polite">
+        <span class="logo"><img data-i18n-title="extName" src="img/ublock.svg" alt=""></span>
+        <div class="subscribeCopy">
+            <p class="subscribeEyebrow" data-i18n="assetViewerSubscribeEyebrow"></p>
+            <p id="subscribeTitle" class="subscribeTitle"></p>
+            <p class="subscribeHint" data-i18n="assetViewerSubscribeHint"></p>
+            <a id="subscribeTarget" class="subscribeTarget" target="_blank" rel="noopener noreferrer"></a>
+        </div>
+        <div class="subscribeActions">
+            <span id="subscribeState" class="statusPill" data-tone="warning" data-i18n="assetViewerSubscribePending"></span>
+            <span class="fa-icon" aria-hidden="true">spinner</span>
+            <button id="subscribeButton" type="button" data-i18n="subscribeButton">_<span class="hover"></span></button>
+        </div>
+    </section>
+</main>
 
 <div id="content" class="codeMirrorContainer codeMirrorBreakAll cm-theme-override"></div>
 

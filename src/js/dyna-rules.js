@@ -493,6 +493,11 @@ const onPresentationChanged = (( ) => {
     });
     dom.on('#ruleFilter #diffCollapse', 'click', ev => {
         presentationState.isCollapsed = dom.cl.toggle(ev.target, 'active');
+        dom.attr(
+            ev.target,
+            'aria-pressed',
+            presentationState.isCollapsed ? 'true' : 'false'
+        );
         savePresentationState();
         onPresentationChanged(true);
     });
@@ -668,6 +673,11 @@ vAPI.localStorage.getItemAsync('dynaRulesPresentationState').then(details => {
     if ( typeof details.isCollapsed === 'boolean' ) {
         presentationState.isCollapsed = details.isCollapsed;
         dom.cl.toggle('#ruleFilter #diffCollapse', 'active', details.isCollapsed);
+        dom.attr(
+            '#ruleFilter #diffCollapse',
+            'aria-pressed',
+            details.isCollapsed ? 'true' : 'false'
+        );
     }
     if ( typeof details.filter === 'string' ) {
         presentationState.filter = details.filter;

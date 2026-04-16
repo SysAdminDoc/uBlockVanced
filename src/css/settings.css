@@ -7,6 +7,9 @@ body {
     font-size: var(--font-size-smaller);
     opacity: var(--medium-em);
     }
+.settings-note {
+    margin: 0;
+}
 
 /* surface/ink */
 #themeMood {
@@ -72,3 +75,96 @@ body.advancedUser [href="advanced-settings.html"] {
 :root.mobile #localData > div:last-of-type > button {
     min-width: unset;
     }
+
+/*
+ * uBlockForge premium polish
+ */
+body {
+    padding-bottom: 2rem;
+}
+
+.settings-overview {
+    overflow: hidden;
+    position: relative;
+}
+
+.settings-overview::after {
+    background:
+        radial-gradient(circle at top right, rgb(var(--primary-70) / 0.18), transparent 32%),
+        radial-gradient(circle at bottom left, rgb(var(--green-50) / 0.12), transparent 28%);
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.settings-overview > * {
+    position: relative;
+    z-index: 1;
+}
+
+.settings-overview-copy {
+    color: var(--ink-2);
+    margin-top: calc(var(--default-gap-xsmall) * -1);
+    max-width: 72ch;
+    opacity: 1;
+    padding-bottom: var(--default-gap-small);
+}
+
+.fieldset > .li + .li,
+.fieldset > div > .li + .li {
+    border-top: 1px solid var(--border-1);
+}
+
+.fieldset label {
+    align-items: flex-start;
+    width: 100%;
+}
+
+[data-setting-name="uiTheme"] {
+    min-width: 9rem;
+}
+
+input[type="color"][data-setting-name="uiAccentCustom0"] {
+    background: none;
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-small);
+    box-shadow: var(--panel-shadow);
+    height: 2.75rem;
+    padding: 0.2rem;
+    width: 4rem;
+}
+
+input[type="number"][data-setting-name="largeMediaSize"] {
+    min-width: 5.5rem;
+}
+
+#localData {
+    display: grid;
+    gap: var(--default-gap);
+}
+
+#localData .localDataActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap-small);
+}
+
+#localData .localDataActions > button {
+    margin: 0;
+    min-width: 220px;
+}
+
+#reset {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 40%),
+        rgb(243 139 168 / 0.1);
+    color: var(--info3-ink);
+}
+
+@media (max-width: 640px) {
+    #localData .localDataActions > button {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}

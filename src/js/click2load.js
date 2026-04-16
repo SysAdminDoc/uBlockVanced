@@ -40,9 +40,7 @@ frameURLElem.children[1].title = frameURL;
 
 document.body.setAttribute('title', actualURL);
 
-document.body.addEventListener('click', ev => {
-    if ( ev.isTrusted === false ) { return; }
-    if ( ev.target.closest('#frameURL') !== null ) { return; }
+const activate = ( ) => {
     vAPI.messaging.send('default', {
         what: 'clickToLoad',
         frameURL,
@@ -50,6 +48,20 @@ document.body.addEventListener('click', ev => {
         if ( ok !== true ) { return; }
         self.location.replace(frameURL);
     });
+};
+
+document.body.addEventListener('click', ev => {
+    if ( ev.isTrusted === false ) { return; }
+    if ( ev.target.closest('#frameURL') !== null ) { return; }
+    activate();
+});
+
+document.body.addEventListener('keydown', ev => {
+    if ( ev.isTrusted === false ) { return; }
+    if ( ev.target.closest('#frameURL') !== null ) { return; }
+    if ( ev.key !== 'Enter' && ev.key !== ' ' ) { return; }
+    ev.preventDefault();
+    activate();
 });
 
 /******************************************************************************/

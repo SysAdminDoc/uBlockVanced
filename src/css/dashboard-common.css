@@ -53,3 +53,63 @@ input[type="number"] {
 :root.mobile body {
     min-height: 600px;
     }
+
+/*
+ * uBlockForge premium dashboard shell
+ */
+body > div.body {
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: var(--default-page-max-width);
+    padding: clamp(18px, 2vw, 28px);
+    width: 100%;
+}
+
+h2,
+h3 {
+    color: var(--ink-2);
+    font-family: var(--font-family-display);
+    letter-spacing: 0.02em;
+}
+
+h2 {
+    font-size: clamp(1.15rem, 1rem + 0.45vw, 1.45rem);
+}
+
+h3 {
+    font-size: 1.05rem;
+}
+
+.body > p,
+.body > ul {
+    max-width: 74ch;
+}
+
+.body > hr {
+    margin: var(--default-gap-large) 0;
+}
+
+.fa-icon.info {
+    align-items: center;
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: 999px;
+    display: inline-flex;
+    justify-content: center;
+    padding: 0.3rem;
+}
+
+.fa-icon.info:hover {
+    background: var(--field-surface-hover);
+    transform: translateY(-1px);
+}
+
+input[type="number"] {
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    body > div.body {
+        padding: 14px 12px 28px;
+    }
+}

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Element Probe</title>
+<link rel="stylesheet" href="css/element-probe-panel.css">
+</head>
+<body>
+
+<div class="shell">
+<div class="panel-header">
+    <div class="panel-brand">
+        <div class="brand-mark" aria-hidden="true">EP</div>
+        <div class="panel-brand-copy">
+            <p class="panel-eyebrow">uBlockVanced DevTools</p>
+            <div class="heading-row">
+                <h1>Element Probe</h1>
+                <span class="version">v0.2.0</span>
+            </div>
+            <p class="panel-subtitle">Generate resilient selectors and cosmetic filters for shadow DOM, dynamic class names, live chat overlays, and other stubborn page elements.</p>
+        </div>
+    </div>
+    <div class="panel-status-group">
+        <div class="status-indicator" aria-live="polite">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Ready</span>
+        </div>
+        <p class="selection-summary" id="selectionSummary">No element selected yet.</p>
+    </div>
+</div>
+
+<div class="panel-body">
+    <!-- Inspect Controls -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">Inspection</span>
+                <span class="section-subtitle">Start from the current DevTools selection or pick directly on the page.</span>
+            </div>
+        </div>
+        <div class="section-body">
+            <div class="inspect-controls">
+                <button class="btn primary" id="btnInspectSelected">Inspect selection</button>
+                <button class="btn" id="btnInspectPoint">Pick on page</button>
+                <button class="btn" id="btnScanShadow">Scan shadow DOM</button>
+                <button class="btn" id="btnScanIframes">Scan iframes</button>
+            </div>
+            <div class="control-row">
+                <div class="frame-field">
+                    <label class="field-label" for="frameTarget">Frame target</label>
+                    <select id="frameTarget" class="control-select">
+                        <option value="">Top document</option>
+                    </select>
+                    <button class="btn-mini" id="btnRefreshFrames" title="Refresh iframe list">Refresh</button>
+                </div>
+                <label class="preview-toggle" for="chkLivePreview">
+                    <input type="checkbox" id="chkLivePreview" checked>
+                    <span>Live highlight on hover</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Element Details -->
+    <div class="section" id="elementSection" style="display:none;">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">Element details</span>
+                <span class="section-subtitle">Quick context for the currently inspected node.</span>
+            </div>
+            <span id="shadowBadge" class="shadow-badge" style="display:none;">SHADOW DOM</span>
+        </div>
+        <div class="section-body">
+            <div class="element-info" id="elementInfo">
+                <span class="label">Tag</span><span class="value tag" id="elTag">--</span>
+                <span class="label">ID</span><span class="value id" id="elId">--</span>
+                <span class="label">Classes</span><span class="value classes" id="elClasses">--</span>
+                <span class="label">Attributes</span><span class="value" id="elAttrs">--</span>
+                <span class="label">Text</span><span class="value text-content" id="elText">--</span>
+                <span class="label">Dimensions</span><span class="value" id="elDims">--</span>
+                <span class="label">Visibility</span><span class="value" id="elVisibility">--</span>
+                <span class="label">Position</span><span class="value" id="elPosition">--</span>
+                <span class="label">Computed</span><span class="value" id="elComputed">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generated Selectors -->
+    <div class="section" id="selectorSection" style="display:none;">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">CSS selectors</span>
+                <span class="section-subtitle">Choose the most stable selector before generating a cosmetic filter.</span>
+            </div>
+            <span id="selectorCount" class="section-meta">0 selectors</span>
+        </div>
+        <div class="section-body">
+            <div class="selector-list" id="selectorList"></div>
+        </div>
+    </div>
+
+    <!-- Procedural Cosmetic Filters -->
+    <div class="section" id="proceduralSection" style="display:none;">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">Procedural filters</span>
+                <span class="section-subtitle">Use these when standard selectors are not expressive enough.</span>
+            </div>
+            <span id="proceduralCount" class="section-meta">0 filters</span>
+        </div>
+        <div class="section-body">
+            <div class="selector-list" id="proceduralList"></div>
+        </div>
+    </div>
+
+    <!-- Filter Output -->
+    <div class="section" id="filterSection" style="display:none;">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">Filter output</span>
+                <span class="section-subtitle">Preview or save the final rule to your user filters.</span>
+            </div>
+        </div>
+        <div class="section-body">
+            <div class="filter-output">
+                <textarea id="filterOutput" placeholder="Select a selector or procedural filter above to build a filter..." spellcheck="false"></textarea>
+            </div>
+            <div class="filter-actions">
+                <button class="btn success" id="btnApplyFilter">Save filter</button>
+                <button class="btn" id="btnCopyFilter">Copy</button>
+                <button class="btn" id="btnTestFilter">Preview</button>
+                <button class="btn danger" id="btnRemoveFilter">Clear preview</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter History -->
+    <div class="section" id="historySection" style="display:none;">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">Filter history</span>
+                <span class="section-subtitle">Quickly copy, undo, or re-apply recent rules.</span>
+            </div>
+            <span style="display:flex;align-items:center;gap:8px;">
+                <span id="historyCount" class="section-meta">0 filters</span>
+                <button class="btn-mini danger" id="btnClearHistory">Clear</button>
+            </span>
+        </div>
+        <div class="section-body" style="padding:0;">
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state">
+        <div class="icon">&#9881;</div>
+        <p>Select an element in the Elements panel, then use <strong>Inspect selection</strong> to analyze it.</p>
+        <p class="hint">You can also use <strong>Pick on page</strong> to hover and click elements directly in the inspected tab.</p>
+        <p class="hint">Element Probe is built for hard targets: shadow DOM, obfuscated classes, live chat overlays, and dynamic UI that the standard picker struggles to reach.</p>
+    </div>
+
+    <!-- Log -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-heading">
+                <span class="section-title">Activity log</span>
+                <span class="section-subtitle">Recent actions and results from this panel.</span>
+            </div>
+            <button class="btn-mini" id="btnClearLog">Clear</button>
+        </div>
+        <div class="section-body">
+            <div id="log"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="js/element-probe-panel.js"></script>
+</body>
+</html>
