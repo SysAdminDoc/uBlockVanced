@@ -23,10 +23,10 @@
             <div id="hostname"><span></span>&shy;<span>&nbsp;</span></div>
             <div id="stickyTools" role="toolbar" aria-label="Primary page controls">
                 <div class="rulesetTools">
-                    <span id="saveRules" class="fa-icon" role="button" tabindex="0" data-i18n-title="popupTipSaveRules" aria-label="data-title">lock</span>
-                    <span id="revertRules" class="fa-icon" role="button" tabindex="0" data-i18n-title="popupTipRevertRules" aria-label="data-title">eraser</span>
+                    <span id="saveRules" class="fa-icon" role="button" tabindex="0" data-i18n-title="popupTipSaveRules" aria-label="Save rules">lock</span>
+                    <span id="revertRules" class="fa-icon" role="button" tabindex="0" data-i18n-title="popupTipRevertRules" aria-label="Revert rules">eraser</span>
                 </div>
-                <div id="switch" role="button" aria-label aria-pressed="false" tabindex="0" title>
+                <div id="switch" role="button" aria-label="Toggle filtering" aria-pressed="false" tabindex="0" title>
                     <span class="fa-icon"><!--
                         Power button taken from Font Awesome v4.7.0 by Dave Gandy.
                         Unlike other FA icons, the power button is inlined here so
@@ -47,11 +47,11 @@
             </div>
         </div>
         <div id="extraTools" class="toolRibbon" role="toolbar" aria-label="Per-site controls" data-more="d">
-            <span id="no-popups" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-popups<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoPopups_v2"></span></span>
-            <span id="no-large-media" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">film<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoLargeMedia_v2"></span></span>
-            <span id="no-cosmetic-filtering" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">eye-slash<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoCosmeticFiltering_v2"></span></span>
-            <span id="no-remote-fonts" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-readermode-text-size<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoRemoteFonts_v2"></span></span>
-            <span id="no-scripting" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">code<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoScripting_v2"></span></span>
+            <span id="no-popups" class="hnSwitch tool enabled" role="button" aria-label="Block popups" aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-popups<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoPopups_v2"></span></span>
+            <span id="no-large-media" class="hnSwitch tool enabled" role="button" aria-label="Block large media" aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">film<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoLargeMedia_v2"></span></span>
+            <span id="no-cosmetic-filtering" class="hnSwitch tool enabled" role="button" aria-label="Block cosmetic filtering" aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">eye-slash<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoCosmeticFiltering_v2"></span></span>
+            <span id="no-remote-fonts" class="hnSwitch tool enabled" role="button" aria-label="Block remote fonts" aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-readermode-text-size<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoRemoteFonts_v2"></span></span>
+            <span id="no-scripting" class="hnSwitch tool enabled" role="button" aria-label="Block scripting" aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">code<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoScripting_v2"></span></span>
         </div>
         <hr data-more="a">
         <div id="basicStats" data-more="a">
@@ -66,9 +66,9 @@
             </div>
         </div>
         <div id="basicTools" class="toolRibbon" role="toolbar" aria-label="Quick tools" data-more="c">
-            <span id="gotoZap" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipZapper" aria-label="data-title">bolt<span class="caption" data-i18n="popupTipZapper"></span></span>
-            <span id="gotoPick" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipPicker" aria-label="data-title">eye-dropper<span class="caption" data-i18n="popupTipPicker"></span></span>
-            <span id="gotoReport" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipReport" aria-label="data-title">comment-alt<span class="caption" data-i18n="popupTipReport"></span></span>
+            <span id="gotoZap" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipZapper" aria-label="Element zapper">bolt<span class="caption" data-i18n="popupTipZapper"></span></span>
+            <span id="gotoPick" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipPicker" aria-label="Element picker">eye-dropper<span class="caption" data-i18n="popupTipPicker"></span></span>
+            <span id="gotoReport" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipReport" aria-label="Report an issue">comment-alt<span class="caption" data-i18n="popupTipReport"></span></span>
             <a href="logger-ui.html#_" class="fa-icon tool enabled" target="uBOLogger" tabindex="0" data-i18n-title="popupTipLog">list-alt<span class="caption" data-i18n="popupTipLog"></span></a>
             <a href="dashboard.html" class="fa-icon tool enabled" target="uBODashboard" tabindex="0" data-i18n-title="popupTipDashboard">cogs<span class="caption" data-i18n="popupTipDashboard"></span></a>
         </div>

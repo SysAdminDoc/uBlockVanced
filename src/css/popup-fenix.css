@@ -20,8 +20,12 @@
     font-size: var(--font-size);
     line-height: 20px;
     }
+:root body {
+    transition: opacity 120ms ease-out;
+    }
 :root body.loading {
     opacity: 0;
+    transition: none;
     }
 a {
     color: var(--ink-1);
@@ -235,9 +239,9 @@ body.needSave #revertRules {
 
 #unprocessedRequestWarning {
     align-items: center;
-    background-color: #fc0;
-    color: rgb(var(--ink-80));
-        stroke: rgb(var(--ink-80));
+    background-color: var(--warning-surface);
+    color: var(--ink-1);
+        stroke: var(--ink-1);
     display: none;
     font-size: var(--font-size-smaller);
     padding: var(--popup-gap-thin);
@@ -343,7 +347,7 @@ body.needSave #revertRules {
     flex-direction: column;
     }
 #firewall > section .filterExpressions div {
-    border-bottom: 1px dotted #ddd;
+    border-bottom: 1px dotted var(--border-2);
     padding: 0.25em;
     }
 #firewall > section .filterExpressions div:last-of-type {
