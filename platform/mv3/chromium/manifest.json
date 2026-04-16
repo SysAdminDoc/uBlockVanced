@@ -1,17 +1,18 @@
 {
   "action": {
     "default_icon": {
-      "16": "img/icon_16.png",
-      "32": "img/icon_32.png",
-      "64": "img/icon_64.png"
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
     },
     "default_popup": "popup.html"
   },
-  "author": "Raymond Hill",
+  "author": "SysAdminDoc (forked from Raymond Hill)",
   "background": {
-      "service_worker": "/js/background.js",
-      "type": "module"
-   },
+    "service_worker": "/js/background.js",
+    "type": "module"
+  },
   "commands": {
     "enter-zapper-mode": {
       "description": "__MSG_zapperTipEnter__"
@@ -21,8 +22,7 @@
     }
   },
   "declarative_net_request": {
-    "rule_resources": [
-    ]
+    "rule_resources": []
   },
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
@@ -31,10 +31,10 @@
   ],
   "incognito": "split",
   "icons": {
-    "16": "img/icon_16.png",
-    "32": "img/icon_32.png",
-    "64": "img/icon_64.png",
-    "128": "img/icon_128.png"
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   },
   "manifest_version": 3,
   "minimum_chrome_version": "122.0",
@@ -46,11 +46,11 @@
     "scripting",
     "storage"
   ],
-  "short_name": "uBO Lite",
+  "short_name": "uBlockVanced Lite",
   "storage": {
     "managed_schema": "managed_storage.json"
   },
-  "version": "1.0",
+  "version": "0.2.0",
   "web_accessible_resources": [
     {
       "resources": [

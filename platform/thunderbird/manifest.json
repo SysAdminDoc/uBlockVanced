@@ -1,21 +1,23 @@
 {
   "browser_specific_settings": {
     "gecko": {
-      "id": "uBlock0@raymondhill.net",
+      "id": "uBlockVanced@sysadmindoc.dev",
       "strict_min_version": "91.0"
     }
   },
-  "author": "Raymond Hill & contributors",
+  "author": "SysAdminDoc (forked from Raymond Hill)",
   "background": {
     "page": "background.html"
   },
   "browser_action": {
     "browser_style": false,
     "default_icon": {
-      "16": "img/icon_16.png",
-      "32": "img/icon_32.png"
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
     },
-    "default_title": "uBlock Origin",
+    "default_title": "uBlockVanced",
     "default_popup": "popup-fenix.html"
   },
   "content_scripts": [
@@ -65,12 +67,13 @@
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
   "icons": {
-    "16": "img/ublock.svg",
-    "48": "img/ublock.svg",
-    "96": "img/ublock.svg"
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   },
   "manifest_version": 2,
-  "name": "uBlock Origin",
+  "name": "uBlockVanced",
   "options_ui": {
     "page": "dashboard.html",
     "browser_style": false,
@@ -86,8 +89,8 @@
     "webRequestBlocking",
     "<all_urls>"
   ],
-  "short_name": "uBlock₀",
-  "version": "1.9.15.101",
+  "short_name": "uBlockVanced",
+  "version": "0.2.0",
   "web_accessible_resources": [
     "/web_accessible_resources/*"
   ]

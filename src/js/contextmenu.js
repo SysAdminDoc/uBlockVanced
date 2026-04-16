@@ -137,20 +137,41 @@ const onViewSource = function(details, tab) {
 const onElementProbe = function(details, tab) {
     if ( tab === undefined ) { return; }
     if ( /^https?:\/\//.test(tab.url) === false ) { return; }
-    // Inject a content script that selects the right-clicked element for
-    // inspection in Element Probe's DevTools panel.
-    // The element is stored on the page so $0 can reference it when the
-    // user switches to the Element Probe panel.
+    // Store the last right-clicked element for inspection in the Element
+    // Probe DevTools panel. A content-level contextmenu listener captures
+    // the target, then this handler tells the page to expose it via
+    // window.__ubp_target__ so $0 can reference it in the panel.
     const frameId = details.frameId || 0;
     vAPI.tabs.executeScript(tab.id, {
         frameId,
         code: `(function(){
-            var el = document.elementFromPoint(
-                ${details.clientX || 0}, ${details.clientY || 0}
-            );
-            if (!el) return;
+            var el = document.querySelector('[data-ubp-ctx-target]');
+            if ( !el ) {
+                el = document.body;
+            }
+            el.removeAttribute('data-ubp-ctx-target');
             window.__ubp_target__ = el;
-            inspect(el);
+            if ( typeof inspect === 'function' ) { inspect(el); }
+        })()`,
+        runAt: 'document_start',
+    }).catch(() => {});
+};
+
+// Inject a lightweight listener that marks the right-clicked element so
+// the context-menu handler above can retrieve it.
+const ensureProbeListener = function(tabId, frameId) {
+    vAPI.tabs.executeScript(tabId, {
+        frameId,
+        code: `(function(){
+            if ( window.__ubp_ctx_installed__ ) return;
+            window.__ubp_ctx_installed__ = true;
+            document.addEventListener('contextmenu', function(ev) {
+                var prev = document.querySelector('[data-ubp-ctx-target]');
+                if ( prev ) prev.removeAttribute('data-ubp-ctx-target');
+                if ( ev.target && ev.target.setAttribute ) {
+                    ev.target.setAttribute('data-ubp-ctx-target', '');
+                }
+            }, true);
         })()`,
         runAt: 'document_start',
     }).catch(() => {});
@@ -276,6 +297,7 @@ const update = function(tabId = undefined) {
     }
     if ( (newBits & ELEMENT_PROBE_BIT) !== 0 ) {
         usedEntries.push(menuEntries.elementProbe);
+        if ( tabId ) { ensureProbeListener(tabId, 0); }
     }
     vAPI.contextMenu.setEntries(usedEntries, onEntryClicked);
 };
