@@ -48,13 +48,6 @@ body.notReady {
 .tabButton:focus {
     outline: 0;
     }
-/* 
- * TODO: support keyboard-driven navigation
- * 
-.tabButton:not(:active):focus {
-    background-color: var(--dashboard-tab-focus-surface);
-    }
- */
 .tabButton.selected {
     background-color: var(--dashboard-tab-active-surface);
     border-bottom: 3px solid var(--dashboard-tab-active-ink);
@@ -118,12 +111,6 @@ body.noDashboard #dashboard-nav {
 :root.mobile #dashboard-nav .logo {
     display: none;
     }
-
-/* Scrollbar styling */
-:root.dark ::-webkit-scrollbar { width: 6px; }
-:root.dark ::-webkit-scrollbar-track { background: rgb(24 24 37); }
-:root.dark ::-webkit-scrollbar-thumb { background: rgb(69 71 90); border-radius: 3px; }
-:root.dark ::-webkit-scrollbar-thumb:hover { background: rgb(108 112 134); }
 
 /*
  * uBlockForge premium dashboard shell

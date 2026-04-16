@@ -1,6 +1,5 @@
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    to { transform: rotate(360deg); }
     }
 body {
     margin-bottom: 6rem;
@@ -16,7 +15,7 @@ body {
     }
 #buttonUpdate.active .fa-icon svg,
 body.working #buttonUpdate:not(.disabled) .fa-icon svg {
-    animation: spin 1s linear infinite;
+    animation: spin 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     transform-origin: 50%;
     }
 
@@ -75,14 +74,19 @@ body.working #actions button {
         transform var(--transition-fast);
     }
 #lists .listEntry > .detailbar .listExpander[role="button"]:hover {
-    background: var(--surface-2);
+    background: var(--field-surface-hover);
+    color: var(--ink-1);
+        fill: var(--ink-1);
     }
 #lists .rootstats > .listToggle {
     width: 100%;
     }
 
+#lists .fa-icon {
+    transition: transform var(--transition-fast), color var(--transition-fast), fill var(--transition-fast);
+    }
 #lists .fa-icon:hover {
-    transform: scale(1.25);
+    transform: scale(1.2);
     }
 
 #lists .rootstats.expanded .listExpander svg {
@@ -150,9 +154,14 @@ body.working #actions button {
     min-height: 0;
     padding: 0.2rem 0.45rem;
     touch-action: manipulation;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        fill var(--transition-fast);
     }
-#lists .nodestats:hover {
-    background: var(--surface-2);
+#lists .nodestats:hover,
+#lists .nodestats:focus-visible {
+    background: var(--field-surface-hover);
     color: var(--ink-1);
         fill: var(--ink-1);
     }
@@ -291,10 +300,9 @@ body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconb
 #lists .listEntry > .detailbar .listExpander[role="button"]:focus-visible,
 #lists .listEntry > .detailbar .nodestats:focus-visible,
 #lists a.fa-icon:focus-visible,
-#lists .iconbar button.fa-icon:focus-visible,
-#lists .searchfield input:focus-visible {
-    outline: 2px solid var(--button-preferred-surface);
-    outline-offset: 2px;
+#lists .iconbar button.fa-icon:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: none;
     }
 
 /*

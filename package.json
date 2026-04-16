@@ -1,7 +1,7 @@
 {
-  "name": "uBlock",
-  "version": "1.0.0",
-  "description": "npm dev tools",
+  "name": "ublockvanced",
+  "version": "0.2.4",
+  "description": "uBlock Origin fork with Catppuccin Mocha dark theme and Element Probe DevTools panel (dev tooling).",
   "type": "module",
   "scripts": {
     "lint": "eslint --no-warn-ignored --ignore-pattern \"**/lib/\" --ignore-pattern \"**/npm/\" -- \"./src/js/*.js\" \"./src/js/**/*.js\" \"./**/*.json\" \"./platform/**/*.js\"",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gorhill/uBlock.git"
+    "url": "git+https://github.com/SysAdminDoc/uBlockVanced.git"
   },
-  "author": "Raymond Hill",
-  "license": "GPLv3",
+  "author": "SysAdminDoc (forked from Raymond Hill)",
+  "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/gorhill/uBlock/issues"
+    "url": "https://github.com/SysAdminDoc/uBlockVanced/issues"
   },
-  "homepage": "https://github.com/gorhill/uBlock#readme",
+  "homepage": "https://github.com/SysAdminDoc/uBlockVanced#readme",
   "engines": {
     "node": ">=22",
     "npm": ">=11"

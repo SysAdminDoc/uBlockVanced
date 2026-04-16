@@ -153,8 +153,8 @@
 }
 
 #cloudInfo {
-    background-color: rgb(var(--surface-0-rgb) / 46%);
-    border: 1px solid rgb(255 255 255 / 0.05);
+    background-color: var(--field-surface);
+    border: 1px solid var(--border-1);
     border-radius: var(--radius-medium);
     line-height: 1.45;
     margin: 0;
@@ -163,8 +163,9 @@
 }
 
 #cloudError {
-    background-color: rgb(var(--red-40) / 0.12);
+    background-color: var(--danger-surface);
     border-radius: 0 0 var(--radius-large) var(--radius-large);
+    color: var(--info3-ink);
     line-height: 1.5;
     margin: 0;
     padding: 0 1rem 0.8rem;

@@ -243,8 +243,8 @@
     --dashboard-happy-green: rgb(var(--green-65));
 
     /* popup panel */
-    --popup-cell-cname-ink: #0054d7; /* h260 S:100 Luv:40 */;
-    --popup-cell-label-mixed-surface: #c29100; /* TODO: fix */
+    --popup-cell-cname-ink: #0054d7; /* h260 S:100 Luv:40 */
+    --popup-cell-label-mixed-surface: rgb(var(--yellow-60)); /* mixed allow+block */
     --popup-icon-x-ink: rgb(var(--red-60));
     --popup-power-ink-rgb: var(--primary-50);
 
@@ -361,7 +361,7 @@
 
     /* popup panel */
     --popup-cell-cname-ink: #89b4fa; /* Blue */
-    --popup-cell-label-mixed-surface: #f9e2af; /* Yellow */
+    --popup-cell-label-mixed-surface: rgb(249 226 175); /* Catppuccin Yellow */
     --popup-icon-x-ink: rgb(243 139 168); /* Red */
     --popup-power-ink-rgb: 137 180 250; /* Blue */
 
@@ -484,6 +484,9 @@
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(var(--primary-80) / 0.26), transparent 34%),
         radial-gradient(circle at top right, rgb(var(--violet-20) / 0.22), transparent 30%);
+    --scrollbar-track: rgb(var(--gray-90) / 0.7);
+    --scrollbar-thumb: rgb(var(--gray-70) / 0.6);
+    --scrollbar-thumb-hover: rgb(var(--primary-50) / 0.7);
 }
 
 :root.dark {
@@ -508,6 +511,9 @@
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(137 180 250 / 0.16), transparent 36%),
         radial-gradient(circle at top right, rgb(203 166 247 / 0.14), transparent 30%);
+    --scrollbar-track: rgb(17 17 27 / 0.5);
+    --scrollbar-thumb: rgb(88 91 112 / 0.72);
+    --scrollbar-thumb-hover: rgb(137 180 250 / 0.9);
 }
 
 /*
@@ -632,7 +638,7 @@
     --popup-cell-allow-own-surface-rgb: 151 113   0; /* h:58.5 S:100 Luv:50 */
     --popup-cell-block-own-surface-rgb:   0 120 216; /* h:252  S:100 Luv:50 */
     --popup-cell-noop-own-surface-rgb:  119 119 119; /* h:0    S:0   Luv:50 */
-    --popup-cell-label-mixed-surface: #ff6a00;  /* TODO: fix */
+    --popup-cell-label-mixed-surface: rgb(255 176 88);  /* colorBlind: amber for mixed rule */
     --logger-noop-surface: rgb(96 96 96 / 0.1);
     --logger-noop-em-surface: rgb(96 96 96 / 0.2);
     --logger-noop-solid: rgb(96 96 96);

@@ -24,6 +24,7 @@ body {
 
 /*
  * uBlockForge premium polish
+ * (shared .editorHero / .statusPill system lives in dashboard-common.css)
  */
 body {
     padding-bottom: 1rem;
@@ -35,77 +36,6 @@ body {
     max-width: var(--default-page-max-width);
     padding: clamp(16px, 2vw, 24px);
     width: 100%;
-}
-
-.editorHero {
-    align-items: end;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--default-gap);
-    justify-content: space-between;
-    margin: 0 0 var(--default-gap);
-}
-
-.editorEyebrow {
-    color: var(--ink-0);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.35rem;
-    opacity: var(--high-em);
-    text-transform: uppercase;
-}
-
-.editorTitle {
-    font-family: var(--dashboard-title-font, "Metropolis", var(--font-family));
-    font-size: clamp(1.5rem, 1.15rem + 1vw, 2.1rem);
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    margin: 0;
-    text-wrap: balance;
-}
-
-.editorLead {
-    color: var(--ink-2);
-    font-size: var(--font-size-smaller);
-    margin: 0.55rem 0 0;
-    max-width: 66ch;
-}
-
-.editorStatus {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--default-gap-xsmall);
-    justify-content: flex-end;
-}
-
-.statusPill {
-    background: var(--surface-raised);
-    border: 1px solid var(--border-1);
-    border-radius: 999px;
-    color: var(--ink-1);
-    display: inline-flex;
-    font-size: 0.8rem;
-    font-weight: 600;
-    gap: 0.35rem;
-    padding: 0.38rem 0.8rem;
-    white-space: nowrap;
-}
-
-.statusPill.is-warning {
-    background: rgb(var(--yellow-40) / 0.12);
-    border-color: rgb(var(--yellow-40) / 0.22);
-}
-
-.statusPill.is-success {
-    background: rgb(var(--green-50) / 0.12);
-    border-color: rgb(var(--green-50) / 0.2);
-}
-
-.statusPill.is-muted {
-    background: var(--surface-2);
-    color: var(--ink-2);
 }
 
 .actionBar.whitelistActions {
