@@ -3,122 +3,64 @@ html {
         height: 100svh;
     overflow: hidden;
     width: 100vw;
-    }
+}
+
 body {
     display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: stretch;
     overflow: hidden;
-    overflow-y: auto;
     width: 100%;
-    }
+}
+
 .body {
     box-sizing: border-box;
     flex-shrink: 0;
     margin: 0 auto;
     max-width: var(--default-page-max-width);
-    padding: clamp(16px, 2vw, 24px);
+    padding: clamp(14px, 1.5vw, 20px);
     width: 100%;
-    }
+}
+
+.advancedSettingsWorkbench {
+    display: grid;
+    gap: 0.45rem;
+    padding-bottom: 0.55rem;
+}
+
 .codeMirrorContainer {
+    align-self: center;
+    display: flex;
     flex-grow: 1;
-    }
+    min-height: 0;
+    width: min(calc(100% - 24px), var(--default-page-max-width));
+}
+
 #advancedSettings {
     background: var(--surface-raised-strong);
     border: 1px solid var(--border-1);
     border-radius: var(--radius-large);
     box-shadow: var(--panel-shadow);
-    margin: 0 clamp(12px, 2vw, 28px) clamp(16px, 2vw, 28px);
+    margin: 0 auto 12px;
     min-height: 12em;
     overflow: hidden;
     text-align: left;
     transition:
         border-color var(--transition-fast),
-        box-shadow var(--transition-fast),
-        transform var(--transition-fast);
-    }
+        box-shadow var(--transition-fast);
+}
+
 #advancedSettings[data-dirty="true"] {
     border-color: rgb(var(--yellow-40) / 0.26);
     box-shadow:
         0 0 0 1px rgb(var(--yellow-40) / 0.18),
         var(--panel-shadow);
-    }
+}
+
 .CodeMirror-wrap pre {
     word-break: break-all;
-    }
-
-/* .editorHero / .editorEyebrow / .editorTitle / .editorLead / .editorStatus
- * and .statusPill.* variants are defined in dashboard-common.css */
-.advancedNoticeEyebrow {
-    color: var(--ink-0);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.35rem;
-    opacity: var(--high-em);
-    text-transform: uppercase;
-    }
-
-.advancedNotice {
-    background:
-        linear-gradient(135deg, rgb(var(--yellow-40) / 0.12), transparent 58%),
-        var(--surface-raised-strong);
-    border: 1px solid rgb(var(--yellow-40) / 0.2);
-    border-radius: var(--radius-large);
-    box-shadow: var(--panel-shadow);
-    margin-bottom: var(--default-gap);
-    padding: 1rem 1.1rem;
-    }
-.advancedNoticeHead {
-    align-items: start;
-    display: flex;
-    gap: var(--default-gap);
-    justify-content: space-between;
-    }
-.advancedNoticeTitle {
-    font-size: 1.05rem;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    margin: 0;
-    }
-.advancedGuideLink {
-    align-items: center;
-    background: var(--warning-surface);
-    border: 1px solid var(--warning-border);
-    border-radius: 999px;
-    color: var(--ink-1);
-    display: inline-flex;
-    flex-shrink: 0;
-    font-size: var(--font-size-smaller);
-    font-weight: 600;
-    gap: 0.5rem;
-    min-height: 36px;
-    padding: 0 0.85rem;
-    text-decoration: none;
-    transition:
-        transform var(--transition-fast),
-        border-color var(--transition-fast),
-        background-color var(--transition-fast);
-    }
-.advancedGuideLink:hover {
-    background: rgb(var(--yellow-40) / 0.14);
-    border-color: rgb(var(--yellow-40) / 0.3);
-    transform: translateY(-1px);
-    }
-.advancedGuideLink:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-    }
-.advancedNoticeLead {
-    color: var(--ink-1);
-    margin: 0.85rem 0 0;
-    }
-.advancedPolicyHint {
-    color: var(--ink-2);
-    font-size: var(--font-size-smaller);
-    margin: 0.55rem 0 0;
-    }
+}
 
 .actionBar.advancedActions {
     align-items: center;
@@ -130,55 +72,97 @@ body {
     box-shadow: var(--panel-shadow);
     display: flex;
     flex-wrap: wrap;
-    gap: var(--default-gap-small);
+    gap: 0.45rem 0.6rem;
     justify-content: space-between;
-    margin: 0 0 var(--default-gap);
-    padding: 0.9rem;
+    margin: 0;
+    padding: 0.52rem 0.58rem;
     position: sticky;
     top: 0;
     z-index: 5;
-    }
+}
+
 .advancedActionsPrimary {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: var(--default-gap-small);
-    }
-.advancedActionsHint {
-    color: var(--ink-2);
+    gap: 0.4rem;
+}
+
+.advancedActions button {
+    min-height: 34px;
+    padding-inline: 0.9rem;
+}
+
+.advancedActions .editorStatus {
+    gap: 0.35rem;
+    margin-left: auto;
+}
+
+.advancedActions .statusPill {
+    font-size: 0.72rem;
+    padding: 0.28rem 0.62rem;
+}
+
+.advancedMetaBar {
+    align-items: center;
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-medium);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.42rem 0.7rem;
+    padding: 0.45rem 0.72rem;
+}
+
+.advancedNoticeLead,
+.advancedPolicyHint {
+    margin: 0;
+}
+
+.advancedNoticeLead {
+    color: var(--ink-1);
     flex: 1 1 18rem;
     font-size: var(--font-size-smaller);
-    margin: 0;
-    text-align: end;
-    }
+}
+
+.advancedPolicyHint {
+    color: var(--ink-2);
+    font-size: var(--font-size-smaller);
+}
+
 #advancedSettingsApply[data-busy="true"] {
     opacity: 0.9;
-    }
+}
 
-@media (max-width: 700px) {
-    .editorHero {
-        align-items: stretch;
-        }
-    .editorStatus {
-        justify-content: flex-start;
-        }
-    .advancedNoticeHead,
-    .actionBar.advancedActions {
-        align-items: stretch;
-        flex-direction: column;
-        }
-    .advancedGuideLink {
-        justify-content: center;
-        }
-    .advancedActionsHint {
-        text-align: start;
-        }
+@media (max-width: 820px) {
+    .advancedActions .editorStatus {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 
 @media (max-width: 640px) {
     .body {
         padding: 12px;
-        }
-    #advancedSettings {
-        margin-inline: 12px;
-        }
+    }
+
+    .advancedSettingsWorkbench {
+        gap: 0.4rem;
+        padding-bottom: 0.45rem;
+    }
+
+    .actionBar.advancedActions {
+        padding: 0.5rem;
+    }
+
+    .advancedActions button {
+        padding-inline: 0.82rem;
+    }
+
+    .advancedMetaBar {
+        align-items: flex-start;
+    }
+
+    .codeMirrorContainer {
+        width: calc(100% - 24px);
+    }
 }

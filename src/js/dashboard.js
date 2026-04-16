@@ -92,9 +92,6 @@ function loadDashboardPanel(pane, first) {
         iframe.title = tabButton.textContent.trim() || 'Dashboard content';
         iframe.contentWindow.location.replace(pane);
         if ( pane !== 'no-dashboard.html' ) {
-            iframe.addEventListener('load', ( ) => {
-                qs$('.wikilink').href = iframe.contentWindow.wikilink || '';
-            }, { once: true });
             vAPI.localStorage.setItem('dashboardLastVisitedPane', pane);
         }
     };
