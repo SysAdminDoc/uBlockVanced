@@ -90,7 +90,7 @@
     "<all_urls>"
   ],
   "short_name": "uBlockVanced",
-  "version": "0.2.0",
+  "version": "0.2.6",
   "web_accessible_resources": [
     "/web_accessible_resources/*"
   ]
