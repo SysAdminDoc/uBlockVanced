@@ -202,7 +202,7 @@ html#ublock0-epicker,
 }
 #ublock0-epicker .changeFilter > li > span:nth-of-type(2) {
     font-size: smaller;
-    color: var(--ink-3, #6c7086);
+    color: var(--ink-3);
 }
 #ublock0-epicker #candidateFilters [data-i18n] {
     font-size: 90%;

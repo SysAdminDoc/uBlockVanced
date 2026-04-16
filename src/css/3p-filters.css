@@ -276,7 +276,7 @@ body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconb
     visibility: visible;
     }
 #lists .listEntry[data-role="import"] textarea {
-    border: 1px solid var(--border-2, #45475a);
+    border: 1px solid var(--border-2);
     box-sizing: border-box;
     display: block;
     font-size: smaller;

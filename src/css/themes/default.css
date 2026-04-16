@@ -592,6 +592,12 @@
     :root {
         --native-control-opacity: 1;
         --button-border-size: 1px;
+        --focus-ring: 0 0 0 3px rgb(var(--primary-70) / 54%);
+        --border-1: rgb(var(--ink-rgb) / 38%);
+    }
+    :root.dark {
+        --focus-ring: 0 0 0 3px rgb(137 180 250 / 58%);
+        --border-1: rgb(205 214 244 / 28%);
     }
 }
 
