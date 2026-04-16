@@ -151,11 +151,16 @@ const onMessage = function(request, sender, callback) {
 
     case 'createUserFilter':
         µb.createUserFilters(request);
-        break;
+        callback();
+        return;
 
     case 'removeUserFilter':
-        µb.removeUserFilter(request);
-        break;
+        µb.removeUserFilter(request).then(() => {
+            callback();
+        }, ( ) => {
+            callback();
+        });
+        return;
 
     case 'getAppData':
         response = {

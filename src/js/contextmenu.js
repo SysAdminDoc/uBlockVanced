@@ -154,7 +154,7 @@ const onElementProbe = function(details, tab) {
             if ( typeof inspect === 'function' ) { inspect(el); }
         })()`,
         runAt: 'document_start',
-    }).catch(() => {});
+    }).catch(( ) => { /* tab may have closed or navigated */ });
 };
 
 // Inject a lightweight listener that marks the right-clicked element so
@@ -174,7 +174,7 @@ const ensureProbeListener = function(tabId, frameId) {
             }, true);
         })()`,
         runAt: 'document_start',
-    }).catch(() => {});
+    }).catch(( ) => { /* tab may have closed or navigated */ });
 };
 
 /******************************************************************************/

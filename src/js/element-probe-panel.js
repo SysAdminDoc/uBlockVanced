@@ -447,6 +447,7 @@ function persistFilter(filter) {
         what: 'createUserFilter',
         autoComment: true,
         filters: filter,
+        docURL: currentPageUrl || undefined,
     }, (response) => {
         if (chrome.runtime.lastError) {
             log('Could not persist to filter list (copy and add manually)', 'info');
@@ -1145,7 +1146,7 @@ async function inspectSelected() {
         setStatus('Element inspected', 'active');
         log(`Inspected <${data.tag}> - ${data.selectors.length} selectors, ${data.proceduralFilters.length} procedural filters`, 'success');
     } catch (err) {
-        log('Inspection failed: ' + (err.message || err.value || JSON.stringify(err)), 'error');
+        log('Inspection failed: ' + (err.message || String(err)), 'error');
         setStatus('Error', 'error');
     } finally {
         setBusy('btnInspectSelected', false);
@@ -1585,6 +1586,7 @@ async function scanFrames() {
 `, ''); // force top frame
         const frames = JSON.parse(raw);
         const select = $('frameTarget');
+        if ( !select ) { return frames; }
         const prevValue = select.value;
 
         // Clear all but top-frame option
@@ -1645,6 +1647,33 @@ $('btnRefreshFrames').addEventListener('click', async () => {
     const frames = await scanFrames();
     log('Found ' + frames.length + ' iframe(s)', frames.length > 0 ? 'success' : 'info');
 });
+
+// Handle page navigation — reset panel state
+if ( chrome.devtools.inspectedWindow.onNavigated ) {
+    chrome.devtools.inspectedWindow.onNavigated.addListener(() => {
+        lastInspectedData = null;
+        currentSelectors = [];
+        selectedSelectorIndex = -1;
+        currentFrameUrl = '';
+        isHighlighting = false;
+        $('emptyState').style.display = '';
+        $('elementSection').style.display = 'none';
+        $('selectorSection').style.display = 'none';
+        $('proceduralSection').style.display = 'none';
+        $('filterSection').style.display = 'none';
+        $('filterOutput').value = '';
+        const select = $('frameTarget');
+        if (select) {
+            while (select.options.length > 1) select.remove(1);
+            select.value = '';
+        }
+        setStatus('Page navigated', 'idle');
+        setSelectionSummary('No element selected yet.');
+        syncFilterActions();
+        log('Page navigated — state reset', 'info');
+        scanFrames();
+    });
+}
 
 // Initialize
 loadHistory();
