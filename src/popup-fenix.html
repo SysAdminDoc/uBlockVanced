@@ -17,11 +17,14 @@
 <div id="panes">
     <div id="main">
         <div id="sticky">
+            <div id="pageContext">
+                <span id="pageTitle" dir="auto"></span>
+            </div>
             <div id="hostname"><span></span>&shy;<span>&nbsp;</span></div>
-            <div id="stickyTools">
+            <div id="stickyTools" role="toolbar" aria-label="Primary page controls">
                 <div class="rulesetTools">
-                    <span id="saveRules" class="fa-icon" data-i18n-title="popupTipSaveRules">lock</span>
-                    <span id="revertRules" class="fa-icon" data-i18n-title="popupTipRevertRules">eraser</span>
+                    <span id="saveRules" class="fa-icon" role="button" tabindex="0" data-i18n-title="popupTipSaveRules" aria-label="data-title">lock</span>
+                    <span id="revertRules" class="fa-icon" role="button" tabindex="0" data-i18n-title="popupTipRevertRules" aria-label="data-title">eraser</span>
                 </div>
                 <div id="switch" role="button" aria-label aria-pressed="false" tabindex="0" title>
                     <span class="fa-icon"><!--
@@ -39,11 +42,11 @@
                  --></span>
                 </div>
                 <div class="rulesetTools">
-                    <span id="refresh" class="fa-icon">refresh</span>
+                    <span id="refresh" class="fa-icon" role="button" tabindex="0" aria-label="Reload the current page" title="Reload the current page">refresh</span>
                 </div>
             </div>
         </div>
-        <div id="extraTools" class="toolRibbon" data-more="d">
+        <div id="extraTools" class="toolRibbon" role="toolbar" aria-label="Per-site controls" data-more="d">
             <span id="no-popups" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">ph-popups<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoPopups_v2"></span></span>
             <span id="no-large-media" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">film<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoLargeMedia_v2"></span></span>
             <span id="no-cosmetic-filtering" class="hnSwitch tool enabled" role="button" aria-label aria-pressed="false" tabindex="0" title><span class="fa-icon fa-icon-badged">eye-slash<svg class="nope" viewBox="0 0 20 20"><path d="M1,1 19,19M1,19 19,1" /></svg></span><span class="caption" data-i18n="popupNoCosmeticFiltering_v2"></span></span>
@@ -52,14 +55,20 @@
         </div>
         <hr data-more="a">
         <div id="basicStats" data-more="a">
-            <span data-i18n="popupBlockedOnThisPage_v2">_</span><span>_</span>
-            <span data-i18n="popupDomainsConnected_v2">_</span><span>_</span>
-            <span data-i18n="popupBlockedSinceInstall_v2" data-more="b">_</span><span data-more="b">_</span>
+            <div class="statCard statCardPrimary" data-stat="page">
+                <span data-i18n="popupBlockedOnThisPage_v2">_</span><span>_</span>
+            </div>
+            <div class="statCard" data-stat="domains">
+                <span data-i18n="popupDomainsConnected_v2">_</span><span>_</span>
+            </div>
+            <div class="statCard" data-stat="global" data-more="b">
+                <span data-i18n="popupBlockedSinceInstall_v2">_</span><span>_</span>
+            </div>
         </div>
-        <div id="basicTools" class="toolRibbon" data-more="c">
-            <span id="gotoZap" class="fa-icon tool enabled needPick" data-i18n-title="popupTipZapper">bolt<span class="caption" data-i18n="popupTipZapper"></span></span>
-            <span id="gotoPick" class="fa-icon tool enabled needPick" data-i18n-title="popupTipPicker">eye-dropper<span class="caption" data-i18n="popupTipPicker"></span></span>
-            <span id="gotoReport" class="fa-icon tool enabled needPick" data-i18n-title="popupTipReport">comment-alt<span class="caption" data-i18n="popupTipReport"></span></span>
+        <div id="basicTools" class="toolRibbon" role="toolbar" aria-label="Quick tools" data-more="c">
+            <span id="gotoZap" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipZapper" aria-label="data-title">bolt<span class="caption" data-i18n="popupTipZapper"></span></span>
+            <span id="gotoPick" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipPicker" aria-label="data-title">eye-dropper<span class="caption" data-i18n="popupTipPicker"></span></span>
+            <span id="gotoReport" class="fa-icon tool enabled needPick" role="button" tabindex="0" data-i18n-title="popupTipReport" aria-label="data-title">comment-alt<span class="caption" data-i18n="popupTipReport"></span></span>
             <a href="logger-ui.html#_" class="fa-icon tool enabled" target="uBOLogger" tabindex="0" data-i18n-title="popupTipLog">list-alt<span class="caption" data-i18n="popupTipLog"></span></a>
             <a href="dashboard.html" class="fa-icon tool enabled" target="uBODashboard" tabindex="0" data-i18n-title="popupTipDashboard">cogs<span class="caption" data-i18n="popupTipDashboard"></span></a>
         </div>
@@ -71,18 +80,18 @@
             <span data-i18n="popupVersion"></span><span id="version"></span>
         </div>
         <hr data-more="g">
-        <div id="moreOrLess" class="">
-            <span id="moreButton">
+        <div id="moreOrLess" class="" role="group" aria-label="Popup detail level">
+            <span id="moreButton" role="button" tabindex="0">
                 <span data-i18n="popupMoreButton_v2"></span>&emsp;<span class="fa-icon">angle-up</span>
             </span>
-            <span id="lessButton">
+            <span id="lessButton" role="button" tabindex="0">
                 <span class="fa-icon">angle-up</span>&emsp;<span data-i18n="popupLessButton_v2"></span>
             </span>
         </div>
     </div>
     <div id="firewall" data-more="e">
-        <section><span class="fa-icon">filter</span><div class="filterExpressions"><div><span data-i18n="loggerRowFiltererBuiltinNot" data-expr="not">_</span><span data-i18n="loggerRowFiltererBuiltinBlocked" data-expr="blocked">_</span><span data-i18n="loggerRowFiltererBuiltinAllowed" data-expr="allowed">_</span></div><div><span data-i18n="loggerRowFiltererBuiltinNot" data-expr="not">_</span><span data-expr="script" data-i18n="popup3pScriptFilter">_</span><span data-expr="frame" data-i18n="popup3pFrameFilter">_</span></div></div></section>
-        <div data-des="*" data-type="*"><span data-i18n="popupAnyRulePrompt">_</span><span data-src="/" data-i18n-title="popupTipGlobalRules"> </span><span data-src="." data-i18n-title="popupTipLocalRules"> </span></div>
+        <section><span class="fa-icon">filter</span><div class="filterExpressions"><div><span data-i18n="loggerRowFiltererBuiltinNot" data-expr="not" role="button" tabindex="0">_</span><span data-i18n="loggerRowFiltererBuiltinBlocked" data-expr="blocked" role="button" tabindex="0">_</span><span data-i18n="loggerRowFiltererBuiltinAllowed" data-expr="allowed" role="button" tabindex="0">_</span></div><div><span data-i18n="loggerRowFiltererBuiltinNot" data-expr="not" role="button" tabindex="0">_</span><span data-expr="script" data-i18n="popup3pScriptFilter" role="button" tabindex="0">_</span><span data-expr="frame" data-i18n="popup3pFrameFilter" role="button" tabindex="0">_</span></div></div></section>
+        <div data-des="*" data-type="*"><span data-i18n="popupAnyRulePrompt" role="button" tabindex="0" aria-controls="firewall" aria-expanded="false">_</span><span data-src="/" data-i18n-title="popupTipGlobalRules"> </span><span data-src="." data-i18n-title="popupTipLocalRules"> </span></div>
         <div data-des="*" data-type="image"><span data-i18n="popupImageRulePrompt"></span><span data-src="/"> </span><span data-src="."> </span></div>
         <div data-des="*" data-type="3p"><span data-i18n="popup3pAnyRulePrompt"></span><span data-src="/"> </span><span data-src="."> </span></div>
         <div data-des="*" data-type="inline-script"><span data-i18n="popupInlineScriptRulePrompt"></span><span data-src="/"> </span><span data-src="."> </span></div>

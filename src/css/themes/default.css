@@ -414,11 +414,13 @@
  */
 :root {
     --font-family-display: Metropolis, Inter, sans-serif;
-    --radius-small: 8px;
-    --radius-medium: 14px;
-    --radius-large: 22px;
+    --radius-small: 10px;
+    --radius-medium: 16px;
+    --radius-large: 24px;
+    --radius-xlarge: 30px;
     --transition-fast: 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
     --transition-normal: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    --surface-raised-soft: rgb(var(--surface-0-rgb) / 56%);
     --surface-raised: rgb(var(--surface-0-rgb) / 72%);
     --surface-raised-strong: rgb(var(--surface-0-rgb) / 88%);
     --surface-muted: rgb(var(--surface-0-rgb) / 60%);
@@ -428,15 +430,28 @@
     --field-border: var(--border-2);
     --field-placeholder: var(--ink-4);
     --focus-ring: 0 0 0 3px rgb(var(--primary-70) / 28%);
+    --field-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.05),
+        0 0 0 1px rgb(255 255 255 / 0.02);
     --panel-shadow:
         0 1px 0 rgb(255 255 255 / 0.05),
         0 18px 44px rgb(17 17 27 / 0.12);
+    --panel-shadow-strong:
+        0 1px 0 rgb(255 255 255 / 0.06),
+        0 22px 54px rgb(17 17 27 / 0.16);
+    --success-surface: rgb(var(--green-50) / 0.12);
+    --success-border: rgb(var(--green-50) / 0.24);
+    --warning-surface: rgb(var(--yellow-40) / 0.14);
+    --warning-border: rgb(var(--yellow-40) / 0.24);
+    --danger-surface: rgb(var(--red-40) / 0.12);
+    --danger-border: rgb(var(--red-40) / 0.24);
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(var(--primary-70) / 0.14), transparent 34%),
         radial-gradient(circle at top right, rgb(var(--violet-40) / 0.12), transparent 28%);
 }
 
 :root.light {
+    --surface-raised-soft: rgb(255 255 255 / 68%);
     --surface-raised: rgb(255 255 255 / 80%);
     --surface-raised-strong: rgb(255 255 255 / 94%);
     --surface-muted: rgb(255 255 255 / 66%);
@@ -444,15 +459,22 @@
     --field-surface-hover: rgb(255 255 255 / 96%);
     --field-surface-active: rgb(255 255 255);
     --field-border: rgb(var(--gray-80));
+    --field-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.86),
+        0 0 0 1px rgb(17 17 27 / 0.02);
     --panel-shadow:
         0 1px 0 rgb(255 255 255 / 0.8),
         0 18px 44px rgb(17 17 27 / 0.08);
+    --panel-shadow-strong:
+        0 1px 0 rgb(255 255 255 / 0.86),
+        0 24px 58px rgb(17 17 27 / 0.12);
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(var(--primary-80) / 0.26), transparent 34%),
         radial-gradient(circle at top right, rgb(var(--violet-20) / 0.22), transparent 30%);
 }
 
 :root.dark {
+    --surface-raised-soft: rgb(17 17 27 / 62%);
     --surface-raised: rgb(24 24 37 / 82%);
     --surface-raised-strong: rgb(17 17 27 / 92%);
     --surface-muted: rgb(17 17 27 / 72%);
@@ -461,9 +483,15 @@
     --field-surface-active: rgb(34 34 56);
     --field-border: rgb(88 91 112);
     --focus-ring: 0 0 0 3px rgb(137 180 250 / 32%);
+    --field-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.04),
+        0 0 0 1px rgb(255 255 255 / 0.02);
     --panel-shadow:
         0 1px 0 rgb(255 255 255 / 0.04),
         0 22px 52px rgb(0 0 0 / 0.32);
+    --panel-shadow-strong:
+        0 1px 0 rgb(255 255 255 / 0.05),
+        0 28px 64px rgb(0 0 0 / 0.4);
     --page-accent-glow:
         radial-gradient(circle at top left, rgb(137 180 250 / 0.16), transparent 36%),
         radial-gradient(circle at top right, rgb(203 166 247 / 0.14), transparent 30%);
@@ -497,11 +525,11 @@
     --button-ink: var(--ink-1);
     --button-surface: rgb(var(--button-surface-rgb));
     --button-border-size: 0;
-    --button-border-radius: 5px;
+    --button-border-radius: var(--radius-small);
     --button-preferred-ink: var(--accent-ink-1);
     --button-preferred-surface: var(--accent-surface-1);
     --button-disabled-surface: var(--surface-3);
-    --button-disabled-filter: opacity(50%);
+    --button-disabled-filter: saturate(70%) opacity(55%);
 
     --checkbox-size: calc(var(--font-size) + 2px);
     --checkbox-ink: var(--ink-3);
@@ -539,11 +567,11 @@
     --popup-cell-block-own-surface: rgb(var(--popup-cell-block-own-surface-rgb));
     --popup-cell-block-surface: rgb(var(--popup-cell-block-surface-rgb));
     --popup-power-ink: rgb(var(--popup-power-ink-rgb));
-    --popup-toolbar-surface: rgb(var(--primary-80) / 15%);
-    --popup-toolbar-surface-hover: rgb(var(--primary-80) / 30%);
+    --popup-toolbar-surface: rgb(var(--primary-80) / 12%);
+    --popup-toolbar-surface-hover: rgb(var(--primary-80) / 22%);
     --popup-ruleset-tool-ink: var(--ink-1);
-    --popup-ruleset-tool-surface: rgb(var(--primary-80) / 15%);
-    --popup-ruleset-tool-surface-hover: rgb(var(--primary-80) / 20%);
+    --popup-ruleset-tool-surface: rgb(var(--primary-80) / 12%);
+    --popup-ruleset-tool-surface-hover: rgb(var(--primary-80) / 22%);
     --popup-ruleset-tool-shadow: transparent;
 }
 

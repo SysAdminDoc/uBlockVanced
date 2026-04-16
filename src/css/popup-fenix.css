@@ -212,7 +212,7 @@ body.needSave #revertRules {
     }
 
 #basicTools .needPick:not(.canPick) {
-    visibility: hidden;
+    visibility: visible;
     }
 
 #extraTools .fa-icon {
@@ -653,12 +653,12 @@ body.godMode #actionSelector > #dynaAllow {
     }
 
 /* configurable UI elements */
-:root:not(.mobile) .toolRibbon .caption,
 :root.mobile body.no-tooltips .toolRibbon .caption,
 :root.mobile body[data-ui~="-captions"] .toolRibbon .caption {
     display: none;
     }
 :root.mobile .toolRibbon .caption,
+:root:not(.mobile) .toolRibbon .caption,
 :root:not(.mobile) body[data-ui~="+captions"] .toolRibbon .caption {
     display: inherit;
     }
@@ -830,7 +830,7 @@ body:not([data-more*="e"]) [data-more="e"] {
 #main {
     background: var(--surface-raised-strong);
     border: 1px solid var(--border-1);
-    border-radius: 24px;
+    border-radius: var(--radius-xlarge);
     box-shadow: var(--panel-shadow);
     margin: 12px 12px 12px 0;
     overflow: hidden;
@@ -849,17 +849,55 @@ body:not([data-more*="e"]) [data-more="e"] {
     padding: 12px 14px 0;
 }
 
+body.off #main,
+body.off #firewall {
+    border-color: var(--danger-border);
+}
+
+body.off #sticky {
+    background:
+        radial-gradient(circle at top right, rgb(var(--red-40) / 0.2), transparent 42%),
+        linear-gradient(180deg, rgb(24 24 37 / 0.92), rgb(30 30 46 / 0.88));
+    border-bottom-color: rgb(var(--red-40) / 0.18);
+}
+
+#pageContext {
+    margin: 0 0 12px;
+}
+
+#pageTitle {
+    color: var(--ink-1);
+    display: -webkit-box;
+    font-family: var(--font-family-display);
+    font-size: 0.94rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-wrap: pretty;
+}
+
+body.off #pageTitle {
+    color: rgb(252 228 234 / 0.94);
+}
+
 #hostname {
     align-items: center;
     background: rgb(var(--surface-0-rgb) / 0.2);
     border: 1px solid rgb(var(--primary-70) / 0.16);
-    border-radius: 16px;
+    border-radius: 18px;
     display: flex;
     gap: 0.15rem;
     justify-content: space-between;
     margin: 0;
     padding: 0.7rem 0.9rem;
     text-align: left;
+}
+
+body.off #hostname {
+    border-color: rgb(var(--red-40) / 0.18);
 }
 
 #hostname > span:first-child {
@@ -894,6 +932,35 @@ body:not([data-more*="e"]) [data-more="e"] {
     min-height: 4rem;
 }
 
+body.needSave #saveRules,
+body.needSave #revertRules,
+body.needReload #refresh {
+    box-shadow:
+        0 0 0 1px rgb(255 255 255 / 0.04),
+        0 16px 30px rgb(0 0 0 / 0.16);
+}
+
+body.needSave #saveRules {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 54%),
+        var(--success-surface);
+    border-color: var(--success-border);
+}
+
+body.needSave #revertRules {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 54%),
+        var(--warning-surface);
+    border-color: var(--warning-border);
+}
+
+body.needReload #refresh {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 54%),
+        var(--danger-surface);
+    border-color: var(--danger-border);
+}
+
 #switch {
     align-items: center;
     background:
@@ -922,6 +989,9 @@ body.off #switch {
     background:
         linear-gradient(180deg, rgb(17 17 27 / 0.76), rgb(24 24 37 / 0.7));
     border-color: rgb(243 139 168 / 0.22);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.04),
+        0 16px 28px rgb(243 139 168 / 0.08);
 }
 
 #basicStats {
@@ -929,43 +999,102 @@ body.off #switch {
     border: 1px solid var(--border-1);
     border-radius: 18px;
     column-gap: 10px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin: 14px;
     padding: 14px;
-    row-gap: 4px;
+    row-gap: 10px;
 }
 
-#basicStats > span {
+#basicStats .statCard {
+    background:
+        linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 62%),
+        rgb(var(--surface-0-rgb) / 0.38);
+    border: 1px solid rgb(var(--primary-70) / 0.08);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 88px;
+    overflow: hidden;
+    padding: 0.95rem 0.95rem 0.9rem;
+    position: relative;
+}
+
+#basicStats .statCard::after {
+    background:
+        linear-gradient(90deg, rgb(var(--primary-70) / 0.72), rgb(var(--secondary-60) / 0.62));
+    border-radius: 999px;
+    bottom: 0;
+    content: '';
+    height: 4px;
+    left: 0;
+    position: absolute;
+    width: var(--stat-fill, 0%);
+}
+
+#basicStats .statCardPrimary {
+    background:
+        radial-gradient(circle at top right, rgb(var(--primary-70) / 0.14), transparent 48%),
+        linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 58%),
+        rgb(var(--surface-0-rgb) / 0.42);
+    grid-column: 1 / -1;
+    min-height: 110px;
+}
+
+#basicStats .statCard[data-tone="soft"]::after {
+    opacity: 0.42;
+}
+
+#basicStats .statCard[data-tone="mid"]::after {
+    opacity: 0.78;
+}
+
+#basicStats .statCard[data-tone="strong"]::after {
+    opacity: 1;
+}
+
+#basicStats .statCard > span {
     justify-self: start;
     margin: 0;
     white-space: normal;
 }
 
-#basicStats > span:nth-child(1) { grid-column: 1; grid-row: 1; }
-#basicStats > span:nth-child(2) { grid-column: 1; grid-row: 2; }
-#basicStats > span:nth-child(3) { grid-column: 2; grid-row: 1; }
-#basicStats > span:nth-child(4) { grid-column: 2; grid-row: 2; }
-#basicStats > span:nth-child(5) { grid-column: 3; grid-row: 1; }
-#basicStats > span:nth-child(6) { grid-column: 3; grid-row: 2; }
-
-#basicStats > [data-i18n] {
+#basicStats .statCard > [data-i18n] {
     color: var(--ink-3);
     font-size: 0.74rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
-#basicStats > [data-i18n] + span {
+#basicStats .statCard > [data-i18n] + span {
     font-family: var(--font-family-display);
     font-size: 1.02rem;
     font-weight: 600;
+}
+
+body:not([data-more*="b"]) #basicStats .statCard[data-stat="domains"] {
+    grid-column: 1 / -1;
+}
+
+body:not([data-more*="b"]) #basicStats .statCard[data-more="b"] {
+    display: none;
+}
+
+#basicStats .statCardPrimary > [data-i18n] + span {
+    font-size: 1.28rem;
+}
+
+body.off #basicStats .statCard,
+body.off .toolRibbon .tool,
+body.off #moreOrLess > span {
+    border-color: rgb(var(--red-40) / 0.14);
 }
 
 #extraTools,
 #basicTools {
     background: transparent;
     gap: 10px;
+    grid-auto-rows: 1fr;
     padding: 0 14px 14px;
 }
 
@@ -1008,8 +1137,25 @@ body.off #switch {
 
 .toolRibbon .tool .caption {
     color: var(--ink-3);
-    font: 10px/1.3 var(--font-family);
+    display: -webkit-box;
+    font: 11px/1.35 var(--font-family);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     margin-top: 8px;
+    overflow: hidden;
+    text-align: center;
+}
+
+#basicTools .tool.isDisabled {
+    color: var(--ink-4);
+    filter: saturate(0.55);
+    opacity: 0.48;
+    pointer-events: none;
+    transform: none;
+}
+
+#basicTools .tool.isDisabled .caption {
+    color: var(--ink-4);
 }
 
 #extraTools > span.on {
@@ -1017,6 +1163,27 @@ body.off #switch {
         linear-gradient(180deg, rgb(var(--primary-70) / 0.14), transparent 50%),
         var(--field-surface-active);
     border-color: rgb(var(--primary-70) / 0.3);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.04),
+        0 10px 24px rgb(var(--primary-70) / 0.12);
+}
+
+#extraTools > span.on .fa-icon {
+    color: rgb(var(--primary-70));
+        fill: rgb(var(--primary-70));
+}
+
+#extraTools > span.on .caption {
+    color: var(--ink-1);
+}
+
+#extraTools .fa-icon-badge {
+    box-shadow: 0 0 0 2px rgb(var(--surface-0-rgb) / 0.9);
+}
+
+#extraTools > span.on .fa-icon-badge {
+    background: rgb(var(--primary-70));
+    color: var(--surface-1);
 }
 
 #unprocessedRequestWarning {
@@ -1025,6 +1192,24 @@ body.off #switch {
     border-radius: 16px;
     margin: 0 14px 14px;
     padding: 0.75rem 0.9rem;
+}
+
+#unprocessedRequestWarning > .dismiss {
+    align-items: center;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    margin-inline-start: auto;
+    padding: 0.25rem;
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+#unprocessedRequestWarning > .dismiss:hover {
+    background: rgb(0 0 0 / 0.08);
+    transform: scale(1.04);
 }
 
 #moreOrLess {
@@ -1047,10 +1232,31 @@ body.off #switch {
     text-align: center;
 }
 
+#moreOrLess > span:hover,
+#moreOrLess > span:focus-visible {
+    background: var(--field-surface-hover);
+    border-color: rgb(var(--primary-70) / 0.26);
+    box-shadow: var(--focus-ring);
+}
+
+#moreButton.disabled,
+#lessButton.disabled {
+    opacity: 0.42;
+    visibility: visible;
+}
+
+#moreOrLess > span.disabled {
+    background: var(--field-surface);
+    border-color: var(--border-1);
+    box-shadow: none;
+    cursor: default;
+    transform: none;
+}
+
 #firewall {
     background: var(--surface-raised-strong);
     border: 1px solid var(--border-1);
-    border-radius: 24px;
+    border-radius: var(--radius-xlarge);
     box-shadow: var(--panel-shadow);
     margin: 12px 12px 12px 0;
     max-height: 640px;
@@ -1060,6 +1266,18 @@ body.off #switch {
 
 :root.portrait #firewall {
     margin: 0 12px 12px;
+}
+
+:root.portrait #basicStats {
+    grid-template-columns: 1fr;
+}
+
+:root.portrait #basicStats .statCard {
+    grid-column: auto;
+}
+
+:root.portrait body[data-more*="b"] #basicStats .statCard[data-more="b"] {
+    display: flex;
 }
 
 #firewall > section {
@@ -1085,6 +1303,11 @@ body.off #switch {
     overflow: hidden;
 }
 
+#firewall > section:focus-within .filterExpressions {
+    display: flex;
+    flex-direction: column;
+}
+
 #firewall > section .filterExpressions div {
     border-bottom: 1px solid var(--border-1);
     padding: 0.35rem;
@@ -1093,7 +1316,21 @@ body.off #switch {
 #firewall > section .filterExpressions span {
     border: 1px solid transparent;
     border-radius: 999px;
+    cursor: pointer;
     padding: 0.45rem 0.6rem;
+}
+
+#firewall > section .filterExpressions span.on {
+    background: rgb(var(--primary-70) / 0.16);
+    border-color: rgb(var(--primary-70) / 0.28);
+    color: var(--ink-1);
+}
+
+#firewall > section .filterExpressions span:focus-visible {
+    background: var(--field-surface-hover);
+    border-color: rgb(var(--primary-70) / 0.28);
+    box-shadow: var(--focus-ring);
+    outline: none;
 }
 
 #firewall > div {
@@ -1105,11 +1342,59 @@ body.off #switch {
 #actionSelector > #dynaCounts {
     background-color: var(--field-surface);
     border: 1px solid transparent;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+#firewall > div[data-des="*"] > span:first-of-type,
+#firewall > div.isRootContext > span:first-of-type {
+    background:
+        linear-gradient(180deg, rgb(var(--primary-70) / 0.08), transparent 60%),
+        var(--field-surface);
+    border-color: rgb(var(--primary-70) / 0.18);
 }
 
 #firewall > div > span:first-of-type {
     border-radius: 14px 0 0 14px;
     padding-left: 16px;
+}
+
+#firewall > div.isDomain > span:first-of-type {
+    font-weight: 600;
+}
+
+#firewall > div.isSubdomain > span:first-of-type {
+    padding-left: 22px;
+}
+
+#firewall > div.expandException > span:first-of-type {
+    background:
+        linear-gradient(180deg, rgb(var(--primary-70) / 0.12), transparent 55%),
+        var(--field-surface);
+}
+
+#firewall > div.isDomain.hasSubdomains > span:first-of-type {
+    cursor: pointer;
+}
+
+#firewall > div.isDomain.hasSubdomains > span:first-of-type:focus-visible,
+#firewall > div[data-des="*"] > span:first-of-type:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: none;
+    position: relative;
+    z-index: 1;
+}
+
+#firewall > div.isDomain.hasSubdomains > span:first-of-type > span::before {
+    content: '\25B8\00A0';
+    opacity: 0.78;
+}
+
+#firewall.expanded > div.isDomain.hasSubdomains:not(.expandException) > span:first-of-type > span::before,
+#firewall:not(.expanded) > div.isDomain.hasSubdomains.expandException > span:first-of-type > span::before {
+    content: '\25BE\00A0';
 }
 
 #firewall > div > span:last-of-type {
@@ -1120,22 +1405,63 @@ body.advancedUser #firewall > div > span[data-src]:hover {
     border-color: rgb(var(--primary-70) / 0.3);
 }
 
+body.advancedUser #firewall > div > span[data-src]:focus-visible {
+    border-color: rgb(var(--primary-70) / 0.3);
+    box-shadow: var(--focus-ring);
+    outline: none;
+    z-index: 1;
+}
+
+body.advancedUser #firewall > div > span[data-src] {
+    font-variant-numeric: tabular-nums;
+}
+
 #firewall > div:hover > span {
     background-color: var(--field-surface-hover);
 }
 
+#firewall > div > span:first-of-type > sub {
+    color: var(--ink-4);
+    line-height: 1.3;
+}
+
+#actionSelector {
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+#actionSelector > span {
+    transition: filter var(--transition-fast), opacity var(--transition-fast);
+}
+
+#actionSelector > #dynaCounts {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+}
+
+body.advancedUser #firewall > div > span.ownRule,
+#firewall > div > span.ownRule {
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 0.08),
+        0 8px 18px rgb(0 0 0 / 0.08);
+}
+
+#switch:focus-visible,
+.rulesetTools [role="button"]:focus-visible,
+.toolRibbon [role="button"]:focus-visible,
+.toolRibbon a:focus-visible {
+    box-shadow: var(--focus-ring);
+    outline: none;
+}
+
 @media (max-width: 720px) {
     #basicStats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-rows: repeat(3, auto);
+        grid-template-columns: 1fr;
     }
 
-    #basicStats > span:nth-child(1) { grid-column: 1; grid-row: 1; }
-    #basicStats > span:nth-child(2) { grid-column: 1; grid-row: 2; }
-    #basicStats > span:nth-child(3) { grid-column: 2; grid-row: 1; }
-    #basicStats > span:nth-child(4) { grid-column: 2; grid-row: 2; }
-    #basicStats > span:nth-child(5) { grid-column: 1 / -1; grid-row: 3; }
-    #basicStats > span:nth-child(6) { grid-column: 1 / -1; grid-row: 4; }
+    #basicStats .statCard {
+        grid-column: auto;
+    }
 
     #extraTools,
     #basicTools {
