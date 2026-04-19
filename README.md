@@ -1,12 +1,4 @@
-<!-- codex-branding:start -->
-<p align="center"><img src="icon.png" width="128" alt="u Block Vanced"></p>
 
-<p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-preview-58A6FF?style=for-the-badge">
-  <img alt="License" src="https://img.shields.io/badge/license-GPL--3.0-4ade80?style=for-the-badge">
-  <img alt="Platform" src="https://img.shields.io/badge/platform-Chrome%20Extension-58A6FF?style=for-the-badge">
-</p>
-<!-- codex-branding:end -->
 
 <p align="center">
   <img src="src/img/icon_128.png" alt="uBlockVanced" width="80">
@@ -23,7 +15,11 @@
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7" alt="Catppuccin Mocha">
   <img src="https://img.shields.io/badge/License-GPLv3-green" alt="GPLv3">
 </p>
-
+<p align="center">
+<img width="2931" height="1216" alt="2026-04-19 13_44_21-OpenCut and 5 more tabs - File Explorer" src="https://github.com/user-attachments/assets/2f90e569-98fc-44e1-b6c6-e410bb3dd5d5" />
+<img width="589" height="463" alt="2026-04-19 13_43_32-OpenCut and 5 more tabs - File Explorer" src="https://github.com/user-attachments/assets/474ec598-d6f6-402f-a940-f1f0de7c0acb" />
+<img width="961" height="669" alt="2026-04-19 13_43_46-OpenCut and 5 more tabs - File Explorer" src="https://github.com/user-attachments/assets/400fdf32-05d6-4e33-beea-aebfd87a314e" />
+</p>
 ---
 
 ## What's Different
