@@ -18,3 +18,7 @@ CLAUDE.md
 /src/is-webrtc-supported.html
 /src/managed_storage.json
 /src/manifest.json
+
+# Markdown files local-only (except README)
+*.md
+!README.md
