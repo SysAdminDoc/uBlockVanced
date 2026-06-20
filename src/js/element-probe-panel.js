@@ -242,6 +242,8 @@ function setBusy(buttonId, busy, busyText) {
     button.textContent = busy ? busyText : button.dataset.label;
 }
 
+let matchCountTimer = null;
+
 function syncFilterActions() {
     const output = $('filterOutput');
     const value = output ? output.value.trim() : '';
@@ -254,6 +256,54 @@ function syncFilterActions() {
     $('btnRemoveFilter').disabled = !isHighlighting;
     updateFilterHint();
     updateWorkflowSummary();
+    updateMatchCount(value, isProcedural);
+}
+
+function updateMatchCount(filterValue, isProcedural) {
+    if (matchCountTimer !== null) { clearTimeout(matchCountTimer); }
+    const badge = $('filterMatchCount');
+    if (!badge) { return; }
+
+    if (!filterValue) {
+        badge.textContent = '';
+        badge.removeAttribute('data-state');
+        return;
+    }
+
+    matchCountTimer = setTimeout(async () => {
+        if (panelClosed) { return; }
+        const match = filterValue.match(/##(.+)$/);
+        if (!match) { badge.textContent = ''; return; }
+        const selector = match[1];
+
+        try {
+            let count;
+            if (!isProcedural) {
+                const code = `(function(){ try { return document.querySelectorAll(${JSON.stringify(selector)}).length; } catch(e) { return -1; } })()`;
+                count = await evalInPage(code);
+            } else {
+                count = null;
+            }
+            if (panelClosed) { return; }
+
+            if (count === null) {
+                badge.textContent = 'procedural';
+                badge.removeAttribute('data-state');
+            } else if (count === -1) {
+                badge.textContent = 'invalid';
+                badge.dataset.state = 'error';
+            } else if (count === 0) {
+                badge.textContent = '0 matches';
+                badge.dataset.state = 'zero';
+            } else {
+                badge.textContent = count + ' match' + (count !== 1 ? 'es' : '');
+                badge.dataset.state = 'match';
+            }
+        } catch(_) {
+            badge.textContent = '';
+            badge.removeAttribute('data-state');
+        }
+    }, 250);
 }
 
 function setHighlighting(state) {

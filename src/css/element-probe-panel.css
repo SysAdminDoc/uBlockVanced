@@ -612,6 +612,41 @@ input:focus-visible {
     width: 100%;
 }
 
+.filter-output {
+    position: relative;
+}
+
+.filter-match-count {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    bottom: 10px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    pointer-events: none;
+    position: absolute;
+    right: 10px;
+}
+
+.filter-match-count:empty {
+    display: none;
+}
+
+.filter-match-count[data-state="match"] {
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+}
+
+.filter-match-count[data-state="zero"] {
+    color: var(--accent-warn);
+}
+
+.filter-match-count[data-state="error"] {
+    color: var(--accent-red);
+}
+
 .filter-hint {
     align-items: center;
     background: rgb(255 255 255 / 0.03);
