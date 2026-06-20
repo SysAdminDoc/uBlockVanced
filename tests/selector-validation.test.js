@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 // Extracted from element-probe-panel.js isProcedural regex
-const PROCEDURAL_RE = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/;
+const PROCEDURAL_RE = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/;
 
 describe('isProcedural detection', () => {
     it('detects :has-text()', () => {
@@ -31,6 +31,14 @@ describe('isProcedural detection', () => {
 
     it('detects :remove()', () => {
         assert.ok(PROCEDURAL_RE.test('div.banner:remove()'));
+    });
+
+    it('detects :watch-attr()', () => {
+        assert.ok(PROCEDURAL_RE.test('div:watch-attr(data-state)'));
+    });
+
+    it('detects :others()', () => {
+        assert.ok(PROCEDURAL_RE.test('div.main:others()'));
     });
 
     it('detects :not(:has-text())', () => {

@@ -135,7 +135,7 @@ const updateFilterHint = () => {
     if (!section || !output) { return; }
     const value = output.value.trim();
     const hasValue = value !== '';
-    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/i.test(value);
+    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
 
     let badge = 'Selection required';
     let text = 'Choose a selector or procedural filter to build a rule.';
@@ -170,7 +170,7 @@ const updateFilterHint = () => {
 const updateWorkflowSummary = () => {
     const frameCount = Math.max(($('frameTarget')?.options.length || 1) - 1, 0);
     const hasFilterValue = $('filterOutput')?.value.trim() !== '';
-    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/.test($('filterOutput')?.value || '');
+    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test($('filterOutput')?.value || '');
 
     setText('overviewTargetValue', currentFrameUrl ? 'Focused iframe' : 'Top document');
     setText(
@@ -248,7 +248,7 @@ function syncFilterActions() {
     const output = $('filterOutput');
     const value = output ? output.value.trim() : '';
     const hasValue = value !== '';
-    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/i.test(value);
+    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
 
     $('btnApplyFilter').disabled = !hasValue;
     $('btnCopyFilter').disabled = !hasValue;
@@ -1109,6 +1109,40 @@ const INSPECT_SCRIPT = `
         }
     }
 
+    // :watch-attr() - re-evaluate when attributes change (SPA recycling)
+    var dynamicAttrs = [];
+    if (el.attributes) {
+        for (var wi = 0; wi < el.attributes.length; wi++) {
+            var wa = el.attributes[wi];
+            if (wa.name === 'class' || wa.name === 'style' || wa.name === 'id') continue;
+            if (wa.name.startsWith('data-') || wa.name === 'aria-hidden' || wa.name === 'hidden') {
+                dynamicAttrs.push(wa.name);
+            }
+        }
+    }
+    if (dynamicAttrs.length > 0 && result.selectors.length > 0) {
+        var watchBase = result.selectors[0].selector;
+        result.proceduralFilters.push({
+            type: 'watch-attr',
+            label: ':watch-attr()',
+            filter: watchBase + ':watch-attr(' + dynamicAttrs.join(',') + ')',
+            description: 'Re-evaluate when ' + dynamicAttrs.join(', ') + ' change (for SPAs)'
+        });
+    }
+
+    // :others() - select everything NOT matching (experimental)
+    if (result.selectors.length > 0) {
+        var othersSel = result.selectors[0];
+        if (othersSel.matches > 0 && othersSel.matches <= 5) {
+            result.proceduralFilters.push({
+                type: 'others',
+                label: ':others()',
+                filter: othersSel.selector + ':others()',
+                description: 'Hide everything EXCEPT elements matching ' + othersSel.selector
+            });
+        }
+    }
+
     // YouTube-specific procedural filters
     if (location.hostname.includes('youtube.com')) {
         // Banner in live chat - these change class names but keep tag structure
@@ -1835,7 +1869,7 @@ $('btnApplyFilter').addEventListener('click', async () => {
     const rawSelector = match[1];
 
     // Check if this is a procedural filter (contains :has-text, :upward, :matches-path, etc.)
-    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/.test(rawSelector);
+    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test(rawSelector);
 
     // Pre-flight validation for standard CSS filters only. Catches typos
     // (unbalanced brackets, stray punctuation, unknown pseudo-classes)
@@ -1910,7 +1944,7 @@ $('btnTestFilter').addEventListener('click', async () => {
     }
 
     const selector = match[1];
-    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/.test(selector);
+    const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
 
     if (isProcedural) {
         if (/:remove\(\)/.test(selector)) {

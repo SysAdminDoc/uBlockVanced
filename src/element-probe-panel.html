@@ -185,6 +185,8 @@
                 <tr><td><code>:min-text-length()</code></td><td><code>p:min-text-length(20)</code></td><td>Only match if text is at least N chars</td></tr>
                 <tr><td><code>:remove()</code></td><td><code>div.banner:remove()</code></td><td>Remove from DOM instead of hiding</td></tr>
                 <tr><td><code>:xpath()</code></td><td><code>:xpath(//div[@class])</code></td><td>XPath expression selector</td></tr>
+                <tr><td><code>:watch-attr()</code></td><td><code>div:watch-attr(data-state)</code></td><td>Re-evaluate when attributes change (SPAs)</td></tr>
+                <tr><td><code>:others()</code></td><td><code>div.main:others()</code></td><td>Hide everything EXCEPT matched elements</td></tr>
                 <tr><td><code>:not()</code></td><td><code>div:not(:has-text(Keep))</code></td><td>Negate any procedural operator</td></tr>
             </table>
             <p class="help-note">Procedural filters must be site-scoped (e.g. <code>example.com##</code>). Generic procedural rules are discarded by uBO.</p>
