@@ -159,6 +159,30 @@
         </div>
     </div>
 
+    <!-- Syntax Help -->
+    <details class="section help-section" id="helpSection">
+        <summary class="section-header help-toggle">
+            <span class="section-title">Filter syntax reference</span>
+        </summary>
+        <div class="section-body help-body">
+            <table class="help-table">
+                <tr><th>Operator</th><th>Usage</th><th>Description</th></tr>
+                <tr><td><code>##</code></td><td><code>example.com##div.ad</code></td><td>Hide elements matching CSS selector</td></tr>
+                <tr><td><code>#@#</code></td><td><code>example.com#@#div.ad</code></td><td>Exception — unblock a hiding rule</td></tr>
+                <tr><td><code>:has-text()</code></td><td><code>div:has-text(Subscribe)</code></td><td>Match by text content (literal or /regex/)</td></tr>
+                <tr><td><code>:upward()</code></td><td><code>span:upward(2)</code></td><td>Walk up N ancestors, or <code>:upward(.card)</code> to find by selector</td></tr>
+                <tr><td><code>:matches-path()</code></td><td><code>div:matches-path(/video/)</code></td><td>Only apply on specific URL paths</td></tr>
+                <tr><td><code>:matches-attr()</code></td><td><code>div:matches-attr("data-ad")</code></td><td>Match by attribute name or name=value</td></tr>
+                <tr><td><code>:matches-css()</code></td><td><code>div:matches-css(position: fixed)</code></td><td>Match by computed CSS property value</td></tr>
+                <tr><td><code>:min-text-length()</code></td><td><code>p:min-text-length(20)</code></td><td>Only match if text is at least N chars</td></tr>
+                <tr><td><code>:remove()</code></td><td><code>div.banner:remove()</code></td><td>Remove from DOM instead of hiding</td></tr>
+                <tr><td><code>:xpath()</code></td><td><code>:xpath(//div[@class])</code></td><td>XPath expression selector</td></tr>
+                <tr><td><code>:not()</code></td><td><code>div:not(:has-text(Keep))</code></td><td>Negate any procedural operator</td></tr>
+            </table>
+            <p class="help-note">Procedural filters must be site-scoped (e.g. <code>example.com##</code>). Generic procedural rules are discarded by uBO.</p>
+        </div>
+    </details>
+
     <!-- Filter History -->
     <div class="section" id="historySection" style="display:none;">
         <div class="section-header">

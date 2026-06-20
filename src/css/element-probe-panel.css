@@ -647,6 +647,71 @@ input:focus-visible {
     color: var(--accent-red);
 }
 
+.help-section {
+    margin-top: 8px;
+}
+
+.help-toggle {
+    cursor: pointer;
+    list-style: none;
+    padding: 0.6rem 0.9rem;
+    user-select: none;
+}
+
+.help-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.help-toggle .section-title::before {
+    content: '\25b6';
+    display: inline-block;
+    font-size: 10px;
+    margin-right: 6px;
+    transition: transform 150ms ease;
+}
+
+details[open] > .help-toggle .section-title::before {
+    transform: rotate(90deg);
+}
+
+.help-body {
+    padding: 0.5rem 0.9rem 0.9rem;
+}
+
+.help-table {
+    border-collapse: collapse;
+    font-size: 12px;
+    width: 100%;
+}
+
+.help-table th {
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+.help-table td {
+    border-bottom: 1px solid rgb(255 255 255 / 0.03);
+    padding: 5px 8px;
+}
+
+.help-table code {
+    background: var(--surface-muted);
+    border-radius: 4px;
+    color: var(--accent-green);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 1px 4px;
+}
+
+.help-note {
+    color: var(--text-faint);
+    font-size: 11px;
+    margin-top: 10px;
+}
+
 .filter-hint {
     align-items: center;
     background: rgb(255 255 255 / 0.03);
