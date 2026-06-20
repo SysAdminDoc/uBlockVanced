@@ -528,6 +528,7 @@ const INSPECT_SCRIPT = `
         computed: '',
         inShadowDOM: false,
         shadowHost: '',
+        shadowClosed: false,
         selectors: [],
         proceduralFilters: [],
         textContent: '',
@@ -786,13 +787,51 @@ const INSPECT_SCRIPT = `
         }
     }
 
-    // 8. Shadow DOM piercing selector
+    // 8. Shadow DOM selectors
     if (result.inShadowDOM && result.shadowHost) {
-        var shadowPierce = result.shadowHost + ' /deep/ ' + result.tag;
-        if (classified.stable.length > 0) {
-            shadowPierce = result.shadowHost + ' /deep/ ' + result.tag + '.' + classified.stable[0];
+        // Determine if the shadow root is open (pierceable) or closed
+        var shadowNode = el;
+        var shadowRoot = null;
+        while (shadowNode) {
+            if (shadowNode instanceof ShadowRoot) { shadowRoot = shadowNode; break; }
+            shadowNode = shadowNode.parentNode;
         }
-        result.selectors.push({ type: 'pierce', label: 'Shadow', selector: shadowPierce, matches: -1 });
+        var isOpen = shadowRoot && shadowRoot.host && shadowRoot.host.shadowRoot === shadowRoot;
+
+        if (isOpen) {
+            // Open shadow root: uBO's content scripts can walk into it via
+            // element.shadowRoot recursion. Generate the inner selector
+            // relative to the shadow host so the user knows the path.
+            var innerSel = result.tag;
+            if (classified.stable.length > 0) {
+                innerSel += '.' + escCSS(classified.stable[0]);
+            }
+            result.selectors.push({
+                type: 'pierce',
+                label: 'Shadow (open)',
+                selector: innerSel,
+                matches: -1
+            });
+            // Also offer the host selector itself for hiding the entire component
+            var hostCount = countMatches(result.shadowHost);
+            result.selectors.push({
+                type: 'pierce',
+                label: 'Shadow host',
+                selector: result.shadowHost,
+                matches: hostCount
+            });
+        } else {
+            // Closed shadow root: not pierceable by content scripts.
+            // The only viable strategy is to target the host element.
+            var hostCount = countMatches(result.shadowHost);
+            result.selectors.push({
+                type: 'pierce',
+                label: 'Shadow (closed)',
+                selector: result.shadowHost,
+                matches: hostCount
+            });
+            result.shadowClosed = true;
+        }
     }
 
     // ---- Procedural Cosmetic Filter Generation ----
@@ -1256,7 +1295,13 @@ function displayElementInfo(data) {
     if (shadowBadge) {
         if (data.inShadowDOM) {
             shadowBadge.style.display = '';
-            shadowBadge.title = 'Host: ' + (data.shadowHost || 'unknown');
+            if (data.shadowClosed) {
+                shadowBadge.textContent = 'Closed Shadow DOM';
+                shadowBadge.title = 'Host: ' + (data.shadowHost || 'unknown') + ' — closed root, only the host element can be targeted';
+            } else {
+                shadowBadge.textContent = 'Shadow DOM';
+                shadowBadge.title = 'Host: ' + (data.shadowHost || 'unknown');
+            }
         } else {
             shadowBadge.style.display = 'none';
         }

@@ -6,6 +6,13 @@ node_modules/
 /tmp/
 .DS_Store
 CLAUDE.md
+AGENTS.md
+ROADMAP.md
+RESEARCH.md
+Roadmap_Blocked.md
+LOGO_PROMPTS.md
+MANIFESTO.md
+REMOVED.md
 
 # Build artifacts copied into src/ by tools/copy-common-files.sh
 /src/js/vapi.js
