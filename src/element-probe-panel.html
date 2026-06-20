@@ -150,6 +150,14 @@
                 <span class="filter-hint-badge" id="filterHintBadge">Selection required</span>
                 <span class="filter-hint-text" id="filterHintText">Choose a selector or procedural filter to build a rule.</span>
             </div>
+            <div class="filter-type-row">
+                <label class="filter-type-label" for="filterType">Rule type</label>
+                <select id="filterType" class="filter-type-select">
+                    <option value="##">Block (##)</option>
+                    <option value="#@#">Exception (#@#)</option>
+                    <option value="##-remove">Block + :remove()</option>
+                </select>
+            </div>
             <div class="filter-actions">
                 <button type="button" class="btn success" id="btnApplyFilter">Save filter</button>
                 <button type="button" class="btn" id="btnCopyFilter">Copy</button>

@@ -1712,7 +1712,13 @@ function selectSelector(idx) {
 
 function generateFilter(sel) {
     const hostname = currentHostname || '*';
-    return hostname + '##' + sel.selector;
+    const typeSelect = $('filterType');
+    const filterType = typeSelect ? typeSelect.value : '##';
+
+    if (filterType === '##-remove') {
+        return hostname + '##' + sel.selector + ':remove()';
+    }
+    return hostname + filterType + sel.selector;
 }
 
 /******************************************************************************/
@@ -2136,5 +2142,13 @@ setSelectionSummary('No element selected yet.');
 syncFilterActions();
 
 $('filterOutput').addEventListener('input', syncFilterActions);
+
+$('filterType').addEventListener('change', () => {
+    if (selectedSelectorIndex >= 0 && currentSelectors[selectedSelectorIndex]) {
+        const filter = generateFilter(currentSelectors[selectedSelectorIndex]);
+        $('filterOutput').value = filter;
+    }
+    syncFilterActions();
+});
 
 })();
