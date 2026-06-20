@@ -2,158 +2,164 @@
 
 ## Executive Summary
 
-uBlockVanced is a well-polished MV2 uBlock Origin fork differentiated by its DevTools-integrated Element Probe panel for procedural cosmetic filter authoring, Catppuccin Mocha theme, and YouTube-specific selector generation. The codebase is clean with no TODOs, thorough error handling, and a consistent design token system. However, three critical issues demand immediate attention:
+uBlockVanced is the only actively maintained uBlock Origin fork adding new features. Its DevTools-integrated Element Probe panel — with 12 procedural operators, live preview, compatibility badges, timer freezing, and a "Test (5s)" temporary filter button — has no equivalent in any competitor. The codebase is clean (30 unit tests, CI lint, consistent design tokens, no unresolved TODOs in fork code).
 
-1. **Chrome MV2 dies June 30, 2026 (Chrome 150)** — 10 days away. The extension's primary platform disappears. Firefox must become the primary target immediately.
-2. **Element Probe is Chromium-only** — The Firefox manifest lacks `devtools_page`, so the fork's core differentiator doesn't work on the platform where MV2 survives.
-3. **Element Probe covers only 4 of 12+ upstream procedural operators** — Missing `:xpath()`, `:matches-css()`, `:matches-attr()`, `:matches-prop()`, `:min-text-length()`, `:watch-attr()`, `:others()`, `:remove()`, `:closest()`.
+**The strategic landscape has shifted**: Chrome MV2 died in August 2025 (Chrome 139). The extension no longer functions on Chrome. Firefox (indefinite MV2 support) is the only viable primary platform. gorhill is building a full MV3 uBO (not just uBOL) using the `userScripts` API for scriptlet injection — competing on MV3 would mean competing directly with upstream on their strongest ground.
 
-Top priorities in order:
-1. Add `devtools_page` to Firefox manifest (P0 bug — 1 line fix)
-2. Firefox-first distribution strategy (AMO listing, Firefox Android build)
-3. Expand procedural operator coverage in Element Probe
-4. Add sender-origin validation on message handlers (security gap)
-5. Replace deprecated `/deep/` shadow DOM combinator
-6. Add live procedural filter preview (no tool does this — major differentiator)
-7. MV3 migration plan for Chrome users who remain
-8. Test infrastructure for fork-specific code
-9. i18n for Element Probe panel UI
-10. Filter management improvements (per-rule toggle, diff-on-update, conflict detection)
+The fork's best path: **become the best filter authoring tool on Firefox MV2**, where upstream is feature-complete but under-tooled.
+
+Top priorities:
+1. **Infrastructure**: add tests to CI, fix Makefile fork references (gorhill → SysAdminDoc)
+2. **Operator parity**: `:style()` generation, `:matches-path()` generation, `:matches-prop()` generation
+3. **Accessibility**: `forced-colors` media query (zero rules exist; `prefers-reduced-motion` and `prefers-contrast` are covered)
+4. **Security**: Trusted Types compatibility for cosmetic injection on Google/YouTube
+5. **Filter authoring**: exception filters (`#@#`), multi-domain scoping, auto-strip `www.` prefix
+6. **UX wins**: replace picker state polling with messages, resizable logger columns
 
 ## Product Map
 
-- **Core workflows**: Ad/tracker blocking (inherited from uBO) → Element inspection via DevTools panel → Procedural filter generation → Filter persistence with undo history → Live CSS preview
-- **User personas**: Power users writing custom cosmetic filters, filter list authors testing rules, privacy-focused users who need to block dynamic/obfuscated elements (YouTube chat, SPA-rendered ads, Shadow DOM content)
-- **Platforms**: Chromium (MV2, dying June 30 2026), Firefox (MV2, indefinite support), Opera, Thunderbird. MV3 scaffolding exists but Element Probe not ported.
-- **Key integrations**: uBO's filter engine (cosmeticFilteringEngine, staticNetFilteringEngine), chrome.devtools.inspectedWindow.eval(), chrome.storage.local for filter history, uAssets filter lists
+- **Core workflows**: Ad/tracker blocking (inherited from uBO) → element inspection via DevTools panel → procedural filter generation → filter persistence with undo history → live CSS/procedural preview → temporary filter testing
+- **User personas**: Power users writing custom cosmetic filters; filter list authors testing rules; privacy-focused users blocking dynamic/obfuscated elements (YouTube chat, SPA ads, Shadow DOM)
+- **Platforms**: Firefox MV2 (primary, indefinite support), Edge (MV2 status TBD), Opera (MV2), Thunderbird. MV3 scaffolding exists for Chromium/Firefox/Safari but Element Probe not ported. Chrome MV2 is dead (since Aug 2025).
+- **Key integrations**: uBO's filter engine (cosmeticFilteringEngine, staticNetFilteringEngine), `chrome.devtools.inspectedWindow.eval()`, `chrome.storage.local` for filter history, uAssets filter lists
+- **Distribution**: GitHub releases only. Firefox AMO listing blocked on credentials (in Roadmap_Blocked.md). No Chrome Web Store path exists (MV2 listings delisted).
 
 ## Competitive Landscape
 
-### uBlock Origin (upstream)
-- Latest stable v1.71.0 (May 2026). Recent work: new scriptlets (`freeze-element-property`, `prevent-navigation`), JSONPath RFC 9535 conformance, `top=` and `requestheader` filter options. Fully functional on Firefox (indefinite MV2) and Brave (hardcoded MV2 support).
-- **Learn from**: Procedural operator breadth (16+ operators including action operators `:remove()`, `:style()`, `:remove-attr()`, `:remove-class()`), dual-slider element picker UX (depth + specificity), `SelectorCacheEntry` architecture, snapshot-based test suite.
-- **Avoid**: Scope creep into upstream's domain — differentiate on tooling and filter authoring UX, not blocking efficacy.
+### uBlock Origin (upstream) — v1.71.0, May 2026
+Actively maintained for Firefox MV2 and building a full MV3 version. Recent additions: `freeze-element-property`/`prevent-navigation` scriptlets, `requestheader`/`top=` filter options, JSONPath RFC 9535 conformance, `edit-object-on-[getter|setter]` scriptlets. 16+ procedural operators including action operators (`:remove()`, `:style()`, `:remove-attr()`, `:remove-class()`). ~10.9M Firefox users.
+- **Learn from**: Full procedural operator set (`:style()`, `:matches-css-before/after()`, `:matches-media()` are in upstream but not in Element Probe), `SelectorCacheEntry` architecture, dual-slider element picker depth/specificity UI.
+- **Avoid**: Scope creep into upstream's domain. Differentiate on tooling and filter authoring UX.
 
-### uBlock Origin Lite (MV3)
-- Official MV3 successor. ~30-40% blocking effectiveness loss per gorhill. Cannot block YouTube ads due to DNR limitations. No dynamic filtering, no real-time logger, no scriptlet injection, weak anti-adblock bypass.
-- **Learn from**: Layered permissions model (basic/optimal/complete), pre-service-worker static rule loading, DNR rule compilation pipeline.
-- **Avoid**: Trying to match full uBO on MV3 — the platform constraints make it impossible. Position uBlockVanced MV2 as the "full power" option on Firefox.
+### AdGuard Browser Extension — v5.4.3.1, May 2026
+Ships MV2 and MV3 simultaneously. v5.3 doubled startup speed with native `:has()` CSS delegation. Custom filters update independently in MV3 since v5.4.1. Has AGLint (filter linter), VS Code syntax extension, DeadDomainsLinter, and ExtendedCss library with `:matches-property()` (JS property chains) and `:empty-trimmed`.
+- **Learn from**: AGLint for CI filter validation, `{ debug: true; }` CSS pseudo-property for filter debugging, independent custom filter updates in MV3.
+- **Avoid**: Commercial feature-gating. Keep everything open.
 
-### AdGuard Browser Extension
-- Fully migrated to MV3 (v5.2+). Re-enabled custom filters via Chrome's User Scripts API. v5.3 doubled startup speed. Extended CSS via ExtendedCss library includes `:empty-trimmed`, `{ debug: true; }`, `$$` HTML filtering. DevTools assistant is point-and-click (select → adjust size → confirm), not a DevTools panel — simpler but less precise than Element Probe.
-- **Learn from**: VS Code extension for filter syntax (AGLint linting, TMLanguage grammar), `{ remove: true; }` / `{ debug: true; }` CSS pseudo-properties, "Quick Fixes" dynamic rule system for MV3.
-- **Avoid**: Commercial feature-gating model. Keep everything open.
-
-### Ghostery
-- Open-source, account-free (Oct 2025), natively MV3. Uses TrackerDB (database-driven tracker identification) rather than pure filter-list execution. Never-Consent auto-rejects GDPR banners. Distraction Eraser persistently hides elements with cross-visit memory.
-- **Learn from**: Compatibility matrix (ground-truth operator support across uBO/ABP/AdGuard/Brave). Never-Consent pattern for cookie banner automation. Distraction Eraser's persistent element hiding concept.
+### Ghostery — v10.5.48, June 2026
+MV3-native, open-source, account-free. TrackerDB (database-driven tracker identification), Never-Consent (auto-reject cookie popups via `@duckduckgo/autoconsent`), "Distractions" feature (hide YouTube Shorts, Reels, social share widgets, Google Sign-In popups), GPC signal. Adblocker engine has published compatibility matrix across uBO/ABP/AdGuard/Brave.
+- **Learn from**: "Distractions" as a differentiation category beyond pure ad-blocking. Never-Consent auto-dismiss pattern. GPC signal support.
 - **Avoid**: Their engine is a rewrite, not a fork — different architecture constraints.
 
-### Brave Built-in Adblocker
-- adblock-rust engine with procedural cosmetic filtering (since v1.73), CNAME uncloaking by default, and 75% memory reduction (Jan 2026 overhaul). `CosmeticFilterCache` uses flat multimaps for efficient hostname lookups. No user-facing filter authoring UI — Brave Shields is toggle-based only.
-- **Learn from**: CNAME uncloaking via Firefox `dns.resolve()` API, memory-efficient `CosmeticFilterCache` architecture, two-phase cosmetic filtering (URL-specific at load, generic on discovery).
-- **Avoid**: Building native code — the extension model doesn't support it well.
+### Brave Shields / adblock-rust — v0.12.5
+Rust-based engine with procedural cosmetic filtering (9 operators + 4 action types), FlatBuffers serialization, CNAME uncloaking at browser level. January 2026 overhaul: 75% memory reduction, `CosmeticFilterCache` flat multimaps. Recent focus: double-hashing elimination, domain parsing speedup, allocation reduction.
+- **Learn from**: Memory-efficient `CosmeticFilterCache` architecture, two-phase cosmetic filtering.
+- **Avoid**: Building native code or competing on engine performance.
+
+### Selector Generation Libraries
+`antonmedv/finder` (1,486 stars): shortest unique CSS selectors, 1.5KB. `fczbkk/css-selector-generator` (596 stars): Shadow DOM support built-in, configurable selector priority, `ignoreGeneratedClassNames`. Both are reference implementations for selector robustness algorithms — Element Probe's `classifyClasses()` heuristic parallels css-selector-generator's class filtering approach.
 
 ### Notable Gap
-- No significant maintained uBO forks with new features exist on GitHub. uBlockVanced is the first feature-adding fork in a largely empty space. No existing tool combines DevTools-level DOM inspection with procedural cosmetic filter generation.
+No other actively maintained uBO fork adds new features. The only visible fork ("youblock" — Material You reskin of uBOL, 1 star) is superficial. uBlockVanced occupies an uncontested niche.
 
 ## Security, Privacy, and Reliability
 
-### Bugs Found
-- **Firefox manifest missing `devtools_page`** (`platform/firefox/manifest.json`) — Element Probe doesn't load on Firefox at all. Same gap in Opera and Thunderbird manifests.
-- **Deprecated `/deep/` combinator** (`src/js/element-probe-panel.js:791`) — Shadow DOM piercing selector uses `/deep/` which was removed from Chrome years ago. Generates non-functional selectors.
-- **No sender-origin validation** on `createUserFilter` and `removeUserFilter` message handlers (`src/js/messaging.js:152-166`). Per OWASP browser extension security guidelines, all message handlers should validate `sender.id === chrome.runtime.id` and check `sender.url` starts with the extension's origin.
-- **Polling loop for picker state** (`src/js/element-probe-panel.js:1429-1442`) — Uses `setInterval(300ms)` to poll `window.__ubp_picker_active__` instead of message passing. Wastes resources and has a 300ms detection delay.
+### Fixed Since Last Research (verified)
+- Firefox manifest now has `devtools_page` — Element Probe works on Firefox ✓
+- Deprecated `/deep/` Shadow DOM combinator removed from codebase ✓
+- PEM signing key is gitignored and not tracked ✓
 
-### Missing Guardrails
-- No CSP on the Element Probe panel HTML (inherits extension default, which is safe for MV2 but won't survive MV3 migration).
-- Filter history stored in plaintext `chrome.storage.local` — acceptable for filter text but worth noting if the scope expands to include user annotations.
-- `evalInPage()` passes user-selected selectors through `JSON.stringify()` before injection, which prevents basic injection, but the broad use of `chrome.devtools.inspectedWindow.eval()` remains a large attack surface if the panel is ever exposed to untrusted input.
+### Remaining Gaps
+- **No sender-origin validation** on `createUserFilter` and `removeUserFilter` message handlers (`src/js/messaging.js`). Chrome's `runtime.onMessage` only accepts messages from extension scripts (implicit isolation), but `web_accessible_resources` could theoretically send messages. Defense-in-depth recommendation: validate `sender.id === chrome.runtime.id`. Severity: low (MV2 messaging is well-isolated).
+- **Trusted Types enforcement** on Google/YouTube properties. Sites using `require-trusted-types-for 'script'` CSP may reject cosmetic filter injection that uses `innerHTML`-style DOM manipulation. uBO's content scripts may need adaptation for pages enforcing Trusted Types. Severity: medium (affects primary use case sites).
+- **Picker state polling** (`src/js/element-probe-panel.js`) uses `setInterval(300ms)` to poll `window.__ubp_picker_active__` instead of message passing. Wastes resources with 300ms detection delay. Severity: low (performance, not security).
+- **`chrome.devtools.inspectedWindow.eval()` attack surface** — Chrome explicitly warns this is "powerful when used in the right context and dangerous when used inappropriately." The inspected page can affect returned data. Element Probe sanitizes via `JSON.stringify()` before injection and uses `JSON.parse()` for returned data, which is adequate. The `useContentScriptContext: true` option cannot replace this because the INSPECT_SCRIPT depends on `$0` (the DevTools-selected element reference), which is only available in page context.
+- **No `forced-colors` media query rules** in any CSS file. `prefers-reduced-motion` is handled (3 files: `common.css`, `element-probe-panel.css`, `epicker-ui.css`) and `prefers-contrast: more` has one rule in `themes/default.css`, but `forced-colors: active` has zero rules. Users with Windows High Contrast mode enabled will see a broken UI.
 
 ### Recovery and Rollback
-- Filter history with undo exists and works correctly (tested in v0.2.5 hardening pass).
-- No backup/restore for Element Probe settings or history separate from the main uBO backup.
-- No crash recovery — if the DevTools panel closes during a filter save, the `panelClosed` flag prevents UI updates but the filter may or may not have been written.
+- Filter history with undo works correctly (hardened in v0.2.5).
+- No backup/restore for Element Probe settings separate from main uBO backup.
+- No crash recovery during filter save (panelClosed flag prevents UI updates but filter state may be inconsistent).
 
 ## Architecture Assessment
 
+### Strengths
+- Element Probe is the fork's unique value. 2324 lines, 12 procedural operators, live preview, compatibility badges, timer freezing, "Test (5s)" temporary filters — no competitor has this.
+- Design token system (`src/css/themes/default.css`) is thorough: radius scale, surface layers, focus rings, colorblind variants, scrollbar tokens.
+- Build is simple (bash scripts + Makefile, no bundler) — easy to understand and modify.
+- Zero runtime npm dependencies. Everything vendored or self-contained.
+
 ### Module Improvements Needed
-- `element-probe-panel.js` (1822 lines) is a single IIFE containing all panel logic — inspection scripts, UI rendering, event handlers, history management, picker, frame targeting. Should be split into modules: `inspect.js`, `ui.js`, `history.js`, `picker.js`, `frame-targeting.js`.
-- The INSPECT_SCRIPT is a 400-line string template that runs in the page context. It generates all selectors and procedural filters inline. Adding new operators requires modifying this monolithic string. Should be refactored into a composable pipeline.
-- `generateFilter()` is trivially simple (`hostname + '##' + selector`) — no support for exception filters (`#@#`), action operators (`:remove()`), or domain-scoped rules (`domain1,domain2##`).
+- `element-probe-panel.js` (2324 lines) is still a single IIFE containing all panel logic. Already on roadmap as P2 modularization item.
+- INSPECT_SCRIPT is a ~400-line string template running in page context. Each operator is an inline function within this string. The recent operator additions (12 commits today) show this is workable but fragile — adding `:style()` or `:matches-css-before/after()` means modifying this monolithic template.
+- `generateFilter()` is trivially simple (`hostname + '##' + selector`). No support for exception filters (`#@#`), action operators with arguments (`:style(opacity: 0)`), or multi-domain scoping (`domain1,domain2##`).
 
-### Refactor Candidates
-- `src/js/element-probe-panel.js:608-630` — `classifyClasses()` regex heuristic for stable vs. dynamic class detection. 11 regex patterns hardcoded in the page-context script. Should be a configurable/extensible classifier.
-- `src/js/element-probe-panel.js:266-278` — `evalInPage()` wrapper. Should support `useContentScriptContext: true` option for safer DOM reads (per Chrome DevTools API best practices).
-- `src/js/contextmenu.js:165-187` — `ensureProbeListener()` injects a raw code string via `vAPI.tabs.executeScript`. Uses MV2-only API that won't survive MV3 migration.
+### Build Infrastructure Issues
+- **Makefile publish targets** still reference `gorhill` and `uBlock` in 8 places (lines 105-165). These would deploy to the wrong GitHub repo if ever triggered.
+- **CI runs lint but not tests**. The 30 test cases in `tests/` are never executed in CI. `npm test` exists but isn't in the workflow.
+- **Upstream SNFE tests** exist at `platform/npm/tests/` but are not integrated into the fork's CI either.
 
-### Test Gaps
-- **Zero tests for fork-specific code.** `package.json` test script is `echo "Error: no test specified" && exit 1`. The npm test suite (`platform/npm/tests/`) only covers upstream SNFE tests.
-- No test for the INSPECT_SCRIPT output format.
-- No test for `classifyClasses()` regex patterns against known CSS-in-JS class name formats.
-- No test for `persistFilter()`/`undoFilter()` round-trip.
-- No test for `isValidCssSelector()` edge cases.
-- No CI lint job in the GitHub workflow — only build + release.
+### Test Coverage
+- Fork-specific: `tests/classify-classes.test.js` (12 cases), `tests/selector-validation.test.js` (18 cases). Uses Node.js built-in test runner.
+- Upstream npm: `platform/npm/tests/snfe.js`, `leaks.js`, `wasm.js`.
+- Manual test pages: `docs/tests/` with HTML fixtures for cosmetic/procedural/scriptlet filters.
+- **Gaps**: no tests for `persistFilter()`/`undoFilter()` round-trip, `generateFilter()` output, `isValidCssSelector()` edge cases, message handlers, or context menu integration.
+- **Upstream uBO has zero tests** (`package.json` test script is `echo "Error: no test specified"`). Any test infrastructure in the fork is a differentiation.
 
 ### Documentation Gaps
-- No user-facing documentation for Element Probe beyond README installation steps.
-- No filter syntax reference or help panel within Element Probe itself.
-- No contributing guide specific to the fork (CONTRIBUTING.md points to upstream).
-- Upstream changelog entries (v1.54.0–1.70.0) included verbatim in CHANGELOG.md without noting which are relevant to the fork.
+- No user-facing documentation for Element Probe beyond README installation steps (syntax help panel added today partially addresses this).
+- CONTRIBUTING.md points to upstream.
+- Upstream changelog entries included verbatim in CHANGELOG.md.
 
 ## Rejected Ideas
 
 | Idea | Reason | Source |
 |------|--------|--------|
-| Auto-sync across devices | Privacy concern + complexity exceeds fork scope; uBO declined for 10 years | Reddit r/uBlockOrigin, multiple threads |
-| ASN/GeoIP-based blocking | Requires external database dependency, maintenance burden, niche use case | GitHub Discussions |
-| Built-in ad-detection ML model | Model size, training data requirements, false positive risk — not viable for a lightweight extension | General ML-in-extensions research |
-| Rewrite filter engine in Rust/WASM | Massive scope, diverges from upstream, Brave already did this (adblock-rust) | Competitive analysis |
-| Port to Safari MV3 | Safari lacks `devtools_page` API entirely — Element Probe cannot exist on Safari | Browser API research |
-| Chrome Web Store publication | Chrome MV2 extensions can no longer be published to CWS; MV3 variant would lose Element Probe's `eval()` capabilities | Chrome MV2 deprecation timeline |
-| `:closest()` procedural operator | uBO upstream explicitly declined this; implementing it would create filter syntax divergence that breaks cross-engine compatibility | GitHub Issue #2190 |
+| Build MV3 variant to compete with upstream | gorhill is building full MV3 uBO with `userScripts` API. Competing on MV3 means competing with upstream on their strongest ground. Fork's value is MV2 tooling on Firefox. | gorhill/uBlock master branch, 60+ `[mv3]` commits Feb-Jun 2026 |
+| Auto-sync filters across devices | Privacy concern + complexity exceeds fork scope; uBO declined for 10+ years | Reddit r/uBlockOrigin |
+| ASN/GeoIP-based blocking | External database dependency, maintenance burden, niche use case | GitHub discussions |
+| Built-in ad-detection ML model | Model size, training data, false positive risk — not viable for lightweight extension | General ML-in-extensions research |
+| Rewrite filter engine in Rust/WASM | Massive scope, diverges from upstream. Brave already did this (adblock-rust). | Competitive analysis |
+| Port to Safari MV3 | Safari lacks `devtools_page` API entirely. Element Probe cannot exist on Safari. | Browser API research |
+| Chrome Web Store publication | Chrome MV2 extensions delisted. MV3 variant would lose Element Probe's `eval()` capabilities. | Chrome MV2 deprecation timeline |
+| `:closest()` procedural operator | uBO upstream explicitly declined; implementing creates filter syntax divergence breaking cross-engine compatibility | uBlock-issues #2190 |
+| Replace selector generation with external library | `finder`/`css-selector-generator` generate generic unique selectors; Element Probe generates ad-blocking-specific procedural filters using `$0` in page context — fundamentally different goal | Architecture analysis |
+| CNAME uncloaking in extension | Already handled by upstream uBO on Firefox via `dns` permission. Fork inherits this. | gorhill/uBlock wiki |
 
 ## Sources
 
 **Browser Platform**
-- https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest
-- https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3
 - https://developer.chrome.com/docs/extensions/develop/migrate/mv2-deprecation-timeline
-- https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/filterResponseData
-- https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/
+- https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest
+- https://developer.chrome.com/docs/extensions/reference/api/userScripts
 - https://developer.chrome.com/docs/extensions/reference/api/devtools/inspectedWindow
-- https://developer.mozilla.org/en-US/docs/Web/CSS/content-visibility
+- https://developer.chrome.com/docs/extensions/develop/concepts/messaging
 - https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API
+- https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
+- https://developer.mozilla.org/en-US/docs/Web/CSS/content-visibility
+- https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/
+- https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/developer-guide/manifest-v3
 
 **Competitors & Ecosystem**
-- https://github.com/gorhill/uBlock (upstream, v1.71.0)
-- https://github.com/uBlockOrigin/uBOL-home (MV3 variant)
-- https://github.com/AdguardTeam/AdguardBrowserExtension
-- https://github.com/AdguardTeam/ExtendedCss (extended CSS library)
-- https://github.com/AdguardTeam/VscodeAdblockSyntax (VS Code filter syntax)
-- https://github.com/ghostery/adblocker (engine + compatibility matrix)
-- https://github.com/brave/adblock-rust (Rust adblocker)
-- https://github.com/fczbkk/css-selector-generator (selector generation algorithms)
-
-**Community Signal**
-- https://github.com/uBlockOrigin/uBlock-issues/issues/2190 (`:closest()` request)
-- https://github.com/uBlockOrigin/uBlock-issues/issues/803 (Shadow DOM cosmetic filters)
-- https://github.com/uBlockOrigin/uBlock-issues/issues/2297 (eBay Shadow DOM)
-- https://github.com/uBlockOrigin/uBlock-issues/discussions/3322 (YouTube Trusted Types)
-- https://github.com/gorhill/uBlock/issues/2072 (screen reader accessibility)
-
-**Security**
-- https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html
-
-**Filter Syntax & Tooling**
-- https://github.com/gorhill/uBlock/wiki/Static-filter-syntax
+- https://github.com/gorhill/uBlock
 - https://github.com/gorhill/uBlock/wiki/Procedural-cosmetic-filters
-- https://github.com/gorhill/uBlock/wiki/Element-picker
-- https://tueksta.github.io/adblock-filter-analyzer/ (filter validator)
-- https://hub.filterlists.com/t/useful-tools-for-maintaining-filter-lists/18
+- https://github.com/uBlockOrigin/uBOL-home
+- https://github.com/AdguardTeam/AdguardBrowserExtension
+- https://github.com/AdguardTeam/ExtendedCss
+- https://github.com/ghostery/ghostery-extension
+- https://github.com/ghostery/adblocker
+- https://github.com/brave/adblock-rust
+- https://github.com/duckduckgo/autoconsent
+
+**Tooling**
+- https://github.com/AdguardTeam/AGLint
+- https://github.com/AdguardTeam/DeadDomainsLinter
+- https://github.com/AdguardTeam/VscodeAdblockSyntax
+- https://github.com/antonmedv/finder
+- https://github.com/fczbkk/css-selector-generator
+
+**Community & Issues**
+- https://github.com/uBlockOrigin/uBlock-issues/issues
+- https://github.com/ghostery/trackerdb
+
+**Testing & Accessibility**
+- https://playwright.dev/docs/chrome-extensions
+- https://github.com/acvetkov/sinon-chrome
+- https://extensionworkshop.com/documentation/develop/build-an-accessible-extension/
+- https://www.w3.org/WAI/ARIA/apg/patterns/
 
 ## Open Questions
 
-1. **Is Firefox AMO listing planned?** The extension ID (`uBlockVanced@sysadmindoc.dev`) is declared in the Firefox manifest, suggesting AMO publication is intended but hasn't happened. This is the most impactful distribution decision given Chrome MV2's death.
-2. **What is the upstream rebase strategy post-MV2?** Upstream uBO is shifting focus to MV3 (uBOL). If upstream MV2 receives only security fixes, the fork must decide: track upstream MV2 maintenance branch, or selectively cherry-pick from MV3 work?
-3. **Should Element Probe target the MV3 variant?** MV3's `chrome.devtools.inspectedWindow.eval()` is still available, but service worker lifecycle and `chrome.scripting` migration would require significant rework of the context menu integration and filter persistence flow.
+1. **Firefox AMO listing** — the single most impactful distribution decision given Chrome's death. Extension ID (`uBlockVanced@sysadmindoc.dev`) is declared in the Firefox manifest. Blocked on AMO developer account credentials.
+2. **Upstream sync strategy** — gorhill's `master` branch now has extensive MV3 code mixed with MV2 fixes. Cherry-picking MV2-only fixes without pulling MV3 architecture requires a disciplined rebase strategy. The fork has only 35 commits on top of upstream — the delta is manageable now but will grow.
+3. **Firefox Android positioning** — DevTools panels do not work on Firefox Android. Should Element Probe degrade gracefully (show a "not available on mobile" message) or should the Firefox Android build omit it entirely? The core ad-blocking functionality works fine on Android — only the fork-specific tooling is affected.

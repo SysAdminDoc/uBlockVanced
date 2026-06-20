@@ -5,10 +5,6 @@ uBlockForge (v0.2.6, branded "uBlockVanced" in-repo) is an MV2 uBlock Origin for
 ## Planned Features
 
 ### Element Probe
-- `:xpath()` procedural operator support in addition to the existing uBO procedurals
-- Shadow-root-piercing selectors generated automatically when the picked element sits behind a closed shadow root (report unreachable instead of producing a silent no-match)
-- "Test filter" button that temporarily applies the draft filter for 5s and auto-reverts
-- Obfuscation detection ML: tiny on-device classifier to score class names as stable vs. generated (current heuristic is regex-based)
 - Generated-filter collision detection — warn when the new rule is a superset/subset of an existing user filter
 
 ### Filter management
@@ -18,20 +14,13 @@ uBlockForge (v0.2.6, branded "uBlockVanced" in-repo) is an MV2 uBlock Origin for
 - Auto-disable filters that match zero elements for 30 days (stale filter cleanup)
 - Import from AdGuard / ABP / uBlock-Origin-Lite cosmetic syntax with a compatibility note for procedurals that can't cross over
 
-### Upstream rebase
-- Track upstream uBO's MV2 branch weekly; upstream is shifting to MV3 (uBlock Lite), fork strategy must account for that
-- Publish the divergence as a quilt-style patch series so each change rebases cleanly
-- CI build that runs against last-known-good upstream nightly
-
 ### Theme
 - Theme palette object (Catppuccin Latte/Frappe/Macchiato/Mocha swappable)
-- Respect system `prefers-color-scheme`
 - Theme-aware logger colors (currently partially themed)
 
 ### Safety
 - CSP-compatible mode for sites that reject inline-injected filters
 - SRI for any external resources the Probe loads (none today, but future plugin paths)
-- Sender-origin validation on every message handler
 
 ## Competitive Research
 
@@ -63,16 +52,9 @@ uBlockForge (v0.2.6, branded "uBlockVanced" in-repo) is an MV2 uBlock Origin for
 - https://github.com/hoblin/x-ad-banhammer — advertiser-auto-block userscript, interesting complement filter flow
 
 ### Features to Borrow
-- `:matches-attr()`, `:matches-css()`, `:matches-prop()` operators from upstream uBO procedural set — uBO wiki procedural-cosmetic-filters
-- `:watch-attr(...)` re-evaluation on attribute change (not just DOM mutation) for SPA-heavy sites like X/YouTube — uBO 1.40+
-- `:others()` experimental operator (select everything *not* matching) — uBO wiki, useful for "hide sidebar except X" recipes
-- `:min-text-length(n)` to filter only non-trivial text matches and avoid false positives on empty wrappers — uBO procedural syntax
-- `:remove()` action operator for DOM removal vs visibility hiding (stops layout-shift flicker) — uBO + AdGuard `{ remove: true; }` equivalence
 - Scriptlet injection (`+js(...)`) pipeline for page-world patches, with a vetted scriptlet library — NanoFilters + uBO scriptlets folder
-- Live element count in the filter input field as operators change — uBO element picker pattern
 - Depth/specificity dual-slider in the generated-filter modal — uBO element picker UI
 - Hostname auto-prefix guard (discard generic procedural filters at parse time) — uBO engine invariant
-- Compatibility-matrix badge in-panel that warns when a user-authored filter uses operators unsupported in MV3/Ghostery/Brave — inspired by ghostery/adblocker wiki
 
 ### Patterns & Architectures Worth Studying
 - Static filter AST → compiled procedural pipeline in uBO's `cosmeticFilteringEngine.js` (build once, run many)
@@ -112,88 +94,60 @@ uBlockForge (v0.2.6, branded "uBlockVanced" in-repo) is an MV2 uBlock Origin for
 
 ## Research-Driven Additions
 
-### P0 — Critical (blocks core functionality or security)
+### P0 — Critical (infrastructure, must-fix)
 
-- [ ] P0 — Add `devtools_page` to Firefox manifest
-  Why: Element Probe (the fork's core differentiator) doesn't load on Firefox at all — the `devtools_page` key is only in `platform/chromium/manifest.json`. Chrome MV2 dies June 30 2026; Firefox is the only platform where MV2 survives indefinitely.
-  Evidence: `platform/firefox/manifest.json` missing `devtools_page` entry; `platform/opera/manifest.json` and `platform/thunderbird/manifest.json` also missing it. Build script (`tools/copy-common-files.sh`) copies the HTML files but the manifest never references them.
-  Touches: `platform/firefox/manifest.json`, `platform/opera/manifest.json`, `platform/thunderbird/manifest.json`
-  Acceptance: Opening DevTools on Firefox with the extension installed shows the "Element Probe" tab.
+- [ ] P0 — Add test job to CI workflow
+  Why: 30 unit tests exist (`tests/classify-classes.test.js`, `tests/selector-validation.test.js`) but CI only runs lint. Fork-specific code changes can silently break classifyClasses() heuristic or procedural operator detection.
+  Evidence: `.github/workflows/main.yml` — only `lint` job runs on push/PR. `npm test` script exists in `package.json` but is never called in CI.
+  Touches: `.github/workflows/main.yml` (add `test` job after lint, `npm test`)
+  Acceptance: CI fails if any test in `tests/` breaks. Tests run on every push and PR.
   Complexity: S
 
-- [ ] P0 — Replace deprecated `/deep/` shadow DOM combinator
-  Why: `element-probe-panel.js:791` generates shadow-piercing selectors using `/deep/` which was removed from all browsers years ago. These selectors silently match nothing.
-  Evidence: Code at line 791: `result.shadowHost + ' /deep/ ' + result.tag`. Chrome removed `/deep/` in 2018.
-  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT shadow DOM section, ~line 789-796)
-  Acceptance: Shadow DOM selectors use a functional approach (e.g., uBO's `element.shadowRoot` recursion walk) and either produce a working selector or explicitly report "closed shadow root — unreachable".
-  Complexity: M
+- [ ] P0 — Fix Makefile publish targets (gorhill → SysAdminDoc)
+  Why: 8 `publish-*` Makefile targets still reference `ghowner=gorhill` and `ghrepo=uBlock`. If triggered, they would attempt to deploy to the upstream repo, not the fork.
+  Evidence: `Makefile:105-165` — `ghowner=gorhill` on lines 105, 114, 126, 136, 145, 155, 165. Line 121 links to `gorhill/uBlock/releases`.
+  Touches: `Makefile`
+  Acceptance: All publish targets reference `SysAdminDoc/uBlockVanced`. No gorhill references remain in Makefile.
+  Complexity: S
 
 ### P1 — High (significant user value, moderate effort)
 
-- [ ] P1 — Add `:matches-css()`, `:matches-attr()`, `:matches-prop()` procedural operators to Element Probe
-  Why: These are upstream uBO operators that Element Probe doesn't generate. `:matches-attr()` matches elements by attribute name/value patterns (regex), `:matches-css()` by computed CSS property values, `:matches-prop()` by JS property values. Essential for sites that use data attributes or CSS-in-JS.
-  Evidence: uBO wiki procedural-cosmetic-filters; Ghostery compatibility matrix. Element Probe currently only generates `:has-text()`, `:upward()`, `:matches-path()`, `:not(:has-text())`.
-  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT procedural section, ~lines 800-933)
-  Acceptance: Inspecting an element with data attributes generates `:matches-attr()` suggestions; elements with distinctive computed styles generate `:matches-css()` suggestions.
+- [ ] P1 — `:style()` procedural operator generation in Element Probe
+  Why: `:style()` is a table-stakes action operator — supported by uBO, AdGuard, Ghostery, and Brave. Element Probe can generate `:remove()` but not `:style()`, forcing users to hand-edit filters for common use cases like `opacity: 0`, `visibility: hidden`, or `pointer-events: none`.
+  Evidence: `src/js/element-probe-panel.js` — `:style()` is absent from both the generation functions and the isProcedural regex. gorhill/uBlock wiki "Procedural cosmetic filters" documents `:style()` as a core action operator.
+  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT + UI for style value input), `tests/selector-validation.test.js` (new cases)
+  Acceptance: User can select an element, choose `:style()` action, enter CSS properties, and the panel generates a valid `domain##selector:style(property: value)` filter.
   Complexity: M
 
-- [ ] P1 — Add `:min-text-length()` and `:remove()` procedural operators to Element Probe
-  Why: `:min-text-length(n)` prevents false positives on empty wrappers (common filter authoring pain point). `:remove()` removes elements from DOM instead of hiding (prevents layout-shift flicker from `display:none`).
-  Evidence: uBO wiki procedural syntax; AdGuard `{ remove: true; }` equivalence. Community complaints about layout shift from hidden-not-removed elements.
-  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT, procedural filter UI rendering)
-  Acceptance: Element Probe offers `:min-text-length()` for elements with short text content, and `:remove()` as an action option alongside the default hiding behavior.
-  Complexity: S
+- [ ] P1 — `forced-colors` media query accessibility support
+  Why: Zero `@media (forced-colors: active)` rules exist in any CSS file. Users with Windows High Contrast mode see a broken UI — `box-shadow` (used for focus rings) is forced to `none`, custom backgrounds disappear, and the Catppuccin palette is overridden without fallback borders. `prefers-reduced-motion` (3 files) and `prefers-contrast: more` (1 file) are already handled.
+  Evidence: Grep for `forced-colors` across `src/` returns zero matches. MDN docs confirm `box-shadow` and non-URL `background-image` are forced to `none` under `forced-colors: active`.
+  Touches: `src/css/common.css`, `src/css/popup-fenix.css`, `src/css/dashboard.css`, `src/css/element-probe-panel.css`, `src/css/themes/default.css`
+  Acceptance: All extension UI pages are usable in Windows High Contrast mode. Focus rings use explicit `border` or `outline` as fallback. System colors (`CanvasText`, `Canvas`, `LinkText`) used where custom palette is forced off.
+  Complexity: M
 
-- [ ] P1 — Live procedural filter preview
-  Why: The #1 filter authoring pain point per community research — authors write procedural filters blind (type syntax, save, reload, check). No tool currently offers interactive procedural preview. Element Probe's "Test filter" button explicitly rejects procedural filters (`btnTestFilter` handler, line 1609-1615).
-  Evidence: Reddit r/uBlockOrigin threads, GitHub Issues discussions about filter authoring workflow. AdGuard DevTools assistant also lacks this.
-  Touches: `src/js/element-probe-panel.js` (new `PROCEDURAL_PREVIEW_SCRIPT`, `btnTestFilter` handler modification)
-  Acceptance: Clicking "Preview" on a `:has-text()` filter highlights matching elements on the page in real-time. Works for `:has-text()`, `:upward()`, `:matches-path()`.
+- [ ] P1 — Generate `:matches-path()` filters (currently detection-only)
+  Why: Element Probe detects `:matches-path()` in the isProcedural regex but cannot generate it. This operator restricts filters to specific URL paths — essential for sites that use the same template across different sections (e.g., blocking ads on `/video/` pages but not `/channel/` pages).
+  Evidence: `src/js/element-probe-panel.js` — `:matches-path` appears in PROCEDURAL_RE but no generation function exists. It's a uBO-only operator (not in AdGuard or Brave).
+  Touches: `src/js/element-probe-panel.js` (generation function + UI to input/select path pattern), `tests/selector-validation.test.js`
+  Acceptance: User can generate a filter with `:matches-path(/pattern/)` scoping. Path auto-populated from current page URL.
+  Complexity: M
+
+- [ ] P1 — Generate `:matches-prop()` filters (currently detection-only)
+  Why: Element Probe detects `:matches-prop` in the isProcedural regex but cannot generate it. This operator matches elements by JavaScript property chains — critical for React/SPA sites where DOM attributes are minimal but JS properties contain ad-tech identifiers.
+  Evidence: `src/js/element-probe-panel.js` — `:matches-prop` in PROCEDURAL_RE, no generation code. Supported by uBO and AdGuard (as `:matches-property()`).
+  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT property enumeration + generation function), `tests/selector-validation.test.js`
+  Acceptance: User can inspect an element's JS properties and generate a `:matches-prop()` filter from them. Property chain syntax matches uBO documentation.
   Complexity: L
 
-- [ ] P1 — Live element count in filter output field
-  Why: When a user selects or edits a filter, they can't see how many elements currently match without clicking "Preview". uBO's element picker shows this live. AdGuard's assistant shows it in the input field.
-  Evidence: uBO element picker UI pattern; AdGuard DevTools assistant.
-  Touches: `src/js/element-probe-panel.js` (filter output section, `syncFilterActions()`)
-  Acceptance: A badge or counter next to the filter output shows "N matches" that updates as the user edits the selector.
-  Complexity: S
-
-- [ ] P1 — Replace picker polling loop with message passing
-  Why: `element-probe-panel.js:1429-1442` polls `window.__ubp_picker_active__` via `setInterval(300ms)` to detect when the user picks an element. This wastes devtools eval bandwidth and has a 300ms detection delay. Should use `inspect()` + a message from the page-context script back to the panel.
-  Evidence: Code at lines 1429-1442. Chrome DevTools API documentation recommends message-based communication.
-  Touches: `src/js/element-probe-panel.js` (PICK_ELEMENT_SCRIPT and polling handler)
-  Acceptance: Element selection is detected within 50ms without polling. No `setInterval` in the picker flow.
-  Complexity: S
-
-- [ ] P1 — Use `useContentScriptContext: true` for safe DOM reads
-  Why: `evalInPage()` always runs in the page context, which is unnecessary for read-only DOM inspection and exposes the panel to page-world state (e.g., overridden prototypes). Chrome DevTools API supports `useContentScriptContext: true` for safer, isolated reads.
-  Evidence: Chrome DevTools API docs; OWASP browser extension security cheat sheet.
-  Touches: `src/js/element-probe-panel.js` (`evalInPage()` at line 266-278)
-  Acceptance: DOM inspection (INSPECT_SCRIPT) runs in content script context; only highlight/hide scripts run in page context (where they need `querySelectorAll` access).
-  Complexity: M
-
-- [ ] P1 — Firefox AMO listing and distribution strategy
-  Why: Chrome MV2 dies June 30 2026. Firefox is the only major browser with indefinite MV2 support. The extension already has a Firefox manifest with an AMO-compatible ID (`uBlockVanced@sysadmindoc.dev`) and `gecko_android` settings. Publishing to AMO captures users fleeing Chrome.
-  Evidence: Mozilla blog confirming indefinite MV2 support; Chrome 150 MV2 removal confirmed; Firefox manifest already has `browser_specific_settings.gecko.id`.
-  Touches: CI/CD workflow (`.github/workflows/main.yml`), signing process, AMO developer account setup
-  Acceptance: Extension is installable from addons.mozilla.org. Firefox Android users can install it.
-  Complexity: M
+- [ ] P1 — Trusted Types compatibility for cosmetic filter injection
+  Why: Google and YouTube enforce Trusted Types via CSP (`require-trusted-types-for 'script'`). Content scripts using `innerHTML`/`insertAdjacentHTML`/`document.write` for cosmetic filter injection may throw `TypeError` on these sites. Since YouTube is Element Probe's primary use case, this is high-impact.
+  Evidence: MDN Trusted Types API (Baseline 2026). YouTube already enforces TT. uBO upstream has related discussions (uBlock-issues #3322).
+  Touches: `src/js/contentscript.js`, `src/js/contentscript-extra.js`, `src/js/scriptlets/dom-inspector.js`
+  Acceptance: Cosmetic filters apply correctly on sites enforcing Trusted Types CSP. No `TypeError` in console.
+  Complexity: L
 
 ### P2 — Medium (quality, testing, DX improvements)
-
-- [ ] P2 — Test suite for fork-specific code
-  Why: Zero tests exist for Element Probe, context menu integration, filter persistence, or the class classification heuristic. `package.json` test script is `echo "Error: no test specified" && exit 1`. As the procedural operator set grows, regression risk increases without automated testing.
-  Evidence: `package.json:9`; `platform/npm/tests/` only covers upstream SNFE. No test files for `element-probe-panel.js`, `contextmenu.js` probe functions, or `storage.js` fork additions.
-  Touches: New test files (e.g., `tests/element-probe/classify-classes.test.js`, `tests/element-probe/inspect-script.test.js`), `package.json` test script
-  Acceptance: `npm test` runs tests for `classifyClasses()`, `isValidCssSelector()`, INSPECT_SCRIPT output parsing, and `persistFilter()`/`undoFilter()` round-trip. CI runs these on PR.
-  Complexity: L
-
-- [ ] P2 — CI lint job in GitHub Actions workflow
-  Why: `npm run lint` (eslint) exists and works but isn't run in CI. Only the build + release job runs. Regressions can be pushed without lint checks.
-  Evidence: `.github/workflows/main.yml` has no lint step; `eslint.config.mjs` is configured.
-  Touches: `.github/workflows/main.yml`
-  Acceptance: PRs and pushes trigger eslint. Lint failures block the build.
-  Complexity: S
 
 - [ ] P2 — Element Probe panel i18n
   Why: 72 locale directories exist with translations for all uBO UI, but Element Probe panel text is hardcoded English in HTML and JS. Only the context menu entry ("Inspect with Element Probe") uses i18n.
@@ -209,33 +163,6 @@ uBlockForge (v0.2.6, branded "uBlockVanced" in-repo) is an MV2 uBlock Origin for
   Acceptance: Panel behavior is identical; each module is <400 lines; new operators can be added by editing only `inspect.js`.
   Complexity: L
 
-- [ ] P2 — Support exception filters and domain-scoped rules in filter output
-  Why: `generateFilter()` only produces `hostname##selector`. No support for exception filters (`#@#`), multi-domain scoping (`domain1,domain2##`), or action operators. Filter authors need these for precise targeting.
-  Evidence: `src/js/element-probe-panel.js:1399-1402` — `generateFilter` is 3 lines: `hostname + '##' + selector`.
-  Touches: `src/js/element-probe-panel.js` (generateFilter, filter output UI)
-  Acceptance: Users can generate exception filters and multi-domain rules from the Element Probe UI. Filter output field has a dropdown for filter type (block/exception/remove).
-  Complexity: M
-
-- [ ] P2 — Use `content-visibility: hidden` for cosmetic hiding
-  Why: CSS `content-visibility: hidden` (Baseline Sept 2025, all modern browsers) skips rendering of hidden elements entirely (layout + paint + compositing) vs `display: none` which still computes layout. 7x rendering improvement measured in benchmarks for complex ad containers.
-  Evidence: MDN `content-visibility` docs; Can I Use data (Chrome 85+, Firefox 125+, Safari 18+).
-  Touches: `src/js/element-probe-panel.js` (HIDE_ELEMENT_SCRIPT), potentially `src/js/cosmetic-filtering.js`
-  Acceptance: Cosmetic filter hiding uses `content-visibility: hidden` where supported, with `display: none` fallback.
-  Complexity: S
-
-- [ ] P2 — In-panel filter syntax help reference
-  Why: No user-facing documentation for procedural filter syntax within Element Probe. Users must leave the panel to read the uBO wiki. AdGuard's assistant includes inline help.
-  Evidence: No help/documentation content in `src/element-probe-panel.html`. README covers installation but not filter syntax.
-  Touches: `src/element-probe-panel.html` (new collapsible help section), `src/css/element-probe-panel.css`
-  Acceptance: A "Help" toggle in the panel shows a concise reference for all supported procedural operators with examples.
-  Complexity: S
-
-- [ ] P2 — Freeze page state during element picking
-  Why: Overlays, popups, and JS-injected content disappear when the picker activates or when focus shifts to DevTools. The picker can't target these dynamic elements. This is the #3 element-picker complaint from community research.
-  Evidence: Reddit r/uBlockOrigin threads; GitHub Issues about dynamic content picking failures.
-  Touches: `src/js/element-probe-panel.js` (PICK_ELEMENT_SCRIPT — add `debugger` statement or MutationObserver pause before pick)
-  Acceptance: Activating pick mode pauses DOM mutations so overlays/popups remain visible for selection.
-  Complexity: L
 
 - [ ] P2 — Filter list update diff view in dashboard
   Why: When subscribed filter lists update, users can't see what changed. Debugging breakage from list updates is trial-and-error. This is distinct from the existing "Side-panel diff" nice-to-have (which is about site DOM changes).
@@ -244,39 +171,103 @@ uBlockForge (v0.2.6, branded "uBlockVanced" in-repo) is an MV2 uBlock Origin for
   Acceptance: After a filter list updates, a "View changes" link shows added/removed/modified rules since the previous version.
   Complexity: L
 
-### P3 — Low (nice-to-have, future differentiation)
-
-- [ ] P3 — Compatibility matrix badge for cross-engine filter warnings
-  Why: Filters using uBO-specific operators (`:has-text()`, `:upward()`) won't work if exported to AdGuard, ABP, Brave, or Ghostery. A visual badge warns users about portability.
-  Evidence: Ghostery compatibility matrix wiki; operator support varies widely across engines.
-  Touches: `src/js/element-probe-panel.js` (filter output section)
-  Acceptance: When a filter uses non-universal operators, a badge shows which engines support it.
-  Complexity: M
-
-- [ ] P3 — Add `:watch-attr()` operator to Element Probe
-  Why: Re-evaluates filter when specific attributes change (not just DOM mutations). Essential for SPA-heavy sites like X/YouTube where elements are recycled with attribute changes.
-  Evidence: uBO wiki — `:watch-attr(...)` added in uBO 1.40+.
-  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT procedural section)
-  Acceptance: For elements with frequently-changing attributes, Element Probe suggests `:watch-attr()` with the relevant attribute names.
-  Complexity: M
-
-- [ ] P3 — Add `:others()` operator to Element Probe
-  Why: Selects everything NOT matching a selector. Useful for "hide sidebar except X" recipes. Experimental in upstream uBO.
-  Evidence: uBO wiki — `:others()` experimental operator.
-  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT procedural section)
-  Acceptance: Element Probe offers an "Inverse selection" option that generates `:others()` filters.
+- [ ] P2 — Exception filter support (`#@#`) in generateFilter()
+  Why: `generateFilter()` only produces blocking rules (`##`). Users can't generate exception filters from the Element Probe — they must hand-edit to `#@#` syntax. Exception filters are essential when a subscribed list over-blocks.
+  Evidence: `src/js/element-probe-panel.js` — `generateFilter()` does `hostname + '##' + selector` with no toggle for exception syntax. uBO wiki documents `#@#` as core syntax.
+  Touches: `src/js/element-probe-panel.js` (add exception toggle in filter output UI, modify `generateFilter()`), `src/element-probe-panel.html`
+  Acceptance: A toggle in the filter output section switches between `##` (block) and `#@#` (allow). Generated filter uses the selected syntax.
   Complexity: S
 
-- [ ] P3 — Snapshot-based regression test suite with real HTML fixtures
-  Why: As the procedural operator set grows, testing against contrived inputs isn't enough. Real-world HTML fixtures (YouTube, eBay, news sites) catch edge cases in selector generation that unit tests miss.
-  Evidence: Ghostery `adblocker` test runner pattern; upstream uBO's `dig` test infrastructure.
-  Touches: New `tests/fixtures/` directory, test runner configuration
-  Acceptance: CI runs selector generation against 10+ real-world HTML snapshots and validates output stability across changes.
-  Complexity: XL
+- [ ] P2 — Multi-domain filter scoping in generateFilter()
+  Why: `generateFilter()` scopes filters to the current hostname only. Users can't generate `domain1,domain2##selector` rules for filters that should apply across related sites (e.g., `google.com,google.co.uk`).
+  Evidence: `src/js/element-probe-panel.js` — filter output hardcodes single hostname. uBO syntax supports comma-separated domain lists.
+  Touches: `src/js/element-probe-panel.js` (domain input field in filter output), `src/element-probe-panel.html`
+  Acceptance: User can add/remove domains in the filter output. Generated filter uses comma-separated domain list.
+  Complexity: S
 
-- [ ] P3 — MV3 Element Probe feasibility assessment
-  Why: Chrome MV2 is dead, but MV3's `chrome.devtools.inspectedWindow.eval()` still exists. The main blockers are service worker lifecycle (filter persistence), `chrome.scripting` migration (context menu probe injection), and DNR constraints. Need a documented assessment before committing to MV3 port.
-  Evidence: `platform/mv3/chromium/manifest.json` exists but has no `devtools_page`. MV3 scaffold is from upstream uBOL, not adapted for Element Probe.
-  Touches: Documentation only (RESEARCH.md update with MV3 port plan)
-  Acceptance: Written assessment covers: what works, what needs rewriting, estimated effort, and whether MV3 Element Probe is worth pursuing vs. Firefox-only strategy.
+- [ ] P2 — Replace picker state polling with message passing
+  Why: Element Probe uses `setInterval(300ms)` to poll `window.__ubp_picker_active__` for picker state changes. This wastes resources and introduces 300ms detection delay. Message passing via `chrome.runtime.sendMessage` is the standard pattern.
+  Evidence: `src/js/element-probe-panel.js` — polling loop at the picker state check. Chrome extension best practices recommend message passing over polling.
+  Touches: `src/js/element-probe-panel.js` (replace polling with `onMessage` listener), content script that sets picker state
+  Acceptance: Picker state changes are detected instantly via messages. No `setInterval` polling for picker state.
+  Complexity: S
+
+- [ ] P2 — `:matches-css-before()` and `:matches-css-after()` operator generation
+  Why: These operators match elements by computed styles of `::before` and `::after` pseudo-elements. Common use case: detecting ad containers that use pseudo-elements for "Sponsored" labels or decorative ad borders.
+  Evidence: gorhill/uBlock wiki lists both as supported procedural operators. AdGuard and Brave also support them. Element Probe generates `:matches-css()` but not the pseudo-element variants.
+  Touches: `src/js/element-probe-panel.js` (INSPECT_SCRIPT computed style inspection for pseudo-elements), `tests/selector-validation.test.js`
+  Acceptance: Element Probe offers `:matches-css-before()` and `:matches-css-after()` when relevant pseudo-element styles are detected.
   Complexity: M
+
+- [ ] P2 — `:matches-media()` operator generation
+  Why: Restricts cosmetic filters to specific viewport/media conditions. Useful for hiding mobile-only ad banners or elements that only appear at certain breakpoints.
+  Evidence: uBO wiki documents `:matches-media()` (added v1.43.1b8). uBO-only operator — differentiator over AdGuard/Brave.
+  Touches: `src/js/element-probe-panel.js` (UI for media query input, generation function), `tests/selector-validation.test.js`
+  Acceptance: User can generate a filter with `:matches-media()` scoping. Current viewport dimensions suggested as default.
+  Complexity: M
+
+- [ ] P2 — Auto-strip `www.` prefix from generated filter hostnames
+  Why: Top-requested upstream feature (uBlock-issues #1277, 18 thumbs-up) that gorhill hasn't implemented. Filters scoped to `www.example.com` don't match `example.com` — users get confused when their filter doesn't work on the bare domain.
+  Evidence: https://github.com/uBlockOrigin/uBlock-issues/issues/1277 — 18 reactions, open since 2021.
+  Touches: `src/js/element-probe-panel.js` (`generateFilter()` hostname processing)
+  Acceptance: Generated filters use bare domain by default (strip `www.`). Toggle to keep `www.` if needed.
+  Complexity: S
+
+- [ ] P2 — Sender-origin validation on message handlers
+  Why: `createUserFilter` and `removeUserFilter` handlers in `messaging.js` don't validate `sender.id`. Chrome's messaging API provides implicit isolation (only extension scripts can send), but `web_accessible_resources` could theoretically send messages. Defense-in-depth per Chrome extension security best practices.
+  Evidence: `src/js/messaging.js` — no `sender.id` or `sender.url` checks in any of the 11 `onMessage` handler functions. Chrome docs recommend `sender.id === chrome.runtime.id` validation.
+  Touches: `src/js/messaging.js` (add sender validation to `createUserFilter`, `removeUserFilter`, and other sensitive handlers)
+  Acceptance: Message handlers reject messages where `sender.id !== chrome.runtime.id`. Existing functionality unaffected.
+  Complexity: S
+
+- [ ] P2 — Resizable logger columns
+  Why: Upstream declined this request (uBlock-issues #853, 4 thumbs-up). Logger columns are fixed-width, making it hard to read long URLs or filter expressions. A differentiator the fork can implement that upstream won't.
+  Evidence: https://github.com/uBlockOrigin/uBlock-issues/issues/853 — declined by gorhill.
+  Touches: `src/js/logger-ui.js`, `src/css/logger-ui.css`
+  Acceptance: Logger columns are draggable-resizable. Column widths persist across sessions via `chrome.storage.local`.
+  Complexity: M
+
+### P3 — Low (nice-to-have, future differentiation)
+
+- [ ] P3 — Cookie consent auto-dismiss integration
+  Why: Ghostery's Never-Consent and Brave's built-in consent handling auto-reject cookie banners. This is increasingly expected by privacy-focused users. The `@duckduckgo/autoconsent` library (MIT-licensed, 116 stars) provides ready-made rules for navigating consent popups.
+  Evidence: Ghostery v10.5.40+ uses `@duckduckgo/autoconsent` v14.97.0. uBO has annoyance filter lists but no auto-dismiss logic.
+  Touches: New content script integrating autoconsent library, settings toggle, `src/js/settings.js`
+  Acceptance: Cookie consent banners are automatically dismissed (opt-out) on supported sites. User can enable/disable in settings.
+  Complexity: L
+
+- [ ] P3 — Global Privacy Control (GPC) signal header
+  Why: GPC (`Sec-GPC: 1` header) is a legal signal recognized by CCPA and GDPR. Ghostery v10.5.40 added GPC support. Simple to implement via `webRequest.onBeforeSendHeaders`.
+  Evidence: Ghostery release notes v10.5.40. GPC spec at https://globalprivacycontrol.github.io/gpc-spec/.
+  Touches: `src/js/traffic.js` or new `src/js/gpc.js`, `src/js/settings.js` (toggle), Firefox/Chromium manifest permissions
+  Acceptance: `Sec-GPC: 1` header sent on all requests when enabled. Toggle in settings. Respects per-site whitelist.
+  Complexity: S
+
+- [ ] P3 — `content-visibility: hidden` as performance-optimized cosmetic hiding
+  Why: `content-visibility: hidden` skips rendering (layout + paint) for hidden elements, potentially faster than `display: none !important` for pages with many cosmetic filter matches. Elements remain in DOM for JavaScript access but browsers skip expensive rendering work.
+  Evidence: MDN `content-visibility` — Baseline since September 2024. Brave's cosmetic filtering uses two-phase approach (URL-specific at load, generic on discovery) suggesting performance matters at scale.
+  Touches: `src/js/cosmetic-filtering.js`, `src/js/contentscript-extra.js`
+  Acceptance: Option to use `content-visibility: hidden` instead of `display: none` for cosmetic filters. Measurable rendering performance improvement on heavy pages (100+ cosmetic matches).
+  Complexity: M
+
+- [ ] P3 — Dead domain detection for user filter lists
+  Why: Over time, user filters accumulate rules targeting domains that no longer exist. AdGuard ships DeadDomainsLinter (33 stars) for this purpose. A built-in check would help users prune stale filters.
+  Evidence: https://github.com/AdguardTeam/DeadDomainsLinter. No ad-blocker has this as a built-in feature.
+  Touches: `src/js/1p-filters.js`, `src/1p-filters.html` (UI for "check for dead domains" action)
+  Acceptance: "Check for dead domains" button in My Filters page. Highlights rules targeting unresolvable domains. User can bulk-remove.
+  Complexity: M
+
+- [ ] P3 — Configurable class name classifier
+  Why: `classifyClasses()` uses 11 hardcoded regex patterns to distinguish stable vs. dynamic (CSS-in-JS) class names. New CSS-in-JS frameworks or naming conventions require modifying the INSPECT_SCRIPT. A user-configurable pattern list would future-proof the heuristic.
+  Evidence: `src/js/element-probe-panel.js` — `classifyClasses()` function. `tests/classify-classes.test.js` documents known tradeoff: BEM-like classes (`btn-primary`) are false-positively flagged as dynamic.
+  Touches: `src/js/element-probe-panel.js` (externalize patterns to configurable list), Element Probe settings UI
+  Acceptance: Users can add/remove regex patterns for dynamic class detection. Default patterns match current behavior. BEM false-positive rate documented.
+  Complexity: M
+
+- [ ] P3 — "Distractions" toggle UI for annoyance categories
+  Why: Ghostery v10.5.44 introduced "Distractions" — toggle-based hiding for YouTube Shorts, Instagram/Facebook Reels, social share widgets, Google Sign-In popups. uBO has annoyance filter lists but no dedicated toggle UI. A category-based toggle is more discoverable than subscribing to filter lists.
+  Evidence: Ghostery release notes v10.5.44. uBO ships EasyList Cookie, uBO Annoyances, AdGuard Annoyances as subscribable lists.
+  Touches: `src/js/popup-fenix.js`, `src/popup-fenix.html`, `src/css/popup-fenix.css` (toggle section), `src/js/messaging.js` (list subscription management)
+  Acceptance: Popup has toggles for annoyance categories (cookie banners, social widgets, newsletter popups, video autoplay). Each toggle subscribes/unsubscribes the corresponding filter list.
+  Complexity: L
+
