@@ -102,8 +102,8 @@ cleanassets:
 # Usage: make publish-publish version=?
 publish-chromium:
 	node publish-extension/publish-chromium.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=chromium \
 		storeid=cjpalhdlnbpafiamejdnhcphjbkeiagm
@@ -111,20 +111,20 @@ publish-chromium:
 # Usage: make publish-edge version=?
 publish-edge:
 	node publish-extension/publish-edge.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=chromium \
 		datebasedmajor=1 \
 		storeid=odfafepnkmbhccpbejgmiehpchacaeak \
 		productid=$(shell secret-tool lookup token ubo_edge_id) \
-		notes="See release notes at https://github.com/gorhill/uBlock/releases"
+		notes="See release notes at https://github.com/SysAdminDoc/uBlockVanced/releases"
 
 # Usage: make publish-firefox version=?
 publish-firefox:
 	node publish-extension/publish-firefox.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=firefox \
 		storeid=uBlock0@raymondhill.net \
@@ -133,8 +133,8 @@ publish-firefox:
 # Usage: make publish-dev-chromium version=?
 publish-dev-chromium:
 	node publish-extension/publish-chromium.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=chromium \
 		storeid=cgbcahbpdhpcegmbfconppldiemgcoii
@@ -142,8 +142,8 @@ publish-dev-chromium:
 # Usage: make publish-dev-firefox version=?
 publish-dev-firefox:
 	node publish-extension/publish-firefox.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=firefox \
 		storeid=uBlock0@raymondhill.net \
@@ -152,8 +152,8 @@ publish-dev-firefox:
 # Usage: make upload-firefox version=?
 upload-firefox:
 	node publish-extension/upload-firefox.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=firefox \
 		storeid=uBlock0@raymondhill.net \
@@ -162,8 +162,8 @@ upload-firefox:
 # Usage: make upload-dev-firefox version=?
 upload-dev-firefox:
 	node publish-extension/upload-firefox.js \
-		ghowner=gorhill \
-		ghrepo=uBlock \
+		ghowner=SysAdminDoc \
+		ghrepo=uBlockVanced \
 		ghtag=$(version) \
 		ghasset=firefox \
 		storeid=uBlock0@raymondhill.net \
