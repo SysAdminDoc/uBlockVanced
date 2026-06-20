@@ -1458,6 +1458,23 @@ const PICK_ELEMENT_SCRIPT = `
     if (window.__ubp_picker_active__) return 'already_active';
 
     window.__ubp_picker_active__ = true;
+
+    // Freeze page state: intercept timers so dynamic elements stay visible
+    var frozenTimers = [];
+    var origSetTimeout = window.setTimeout;
+    var origSetInterval = window.setInterval;
+    var origRAF = window.requestAnimationFrame;
+    window.setTimeout = function(fn, ms) {
+        if (ms === undefined || ms > 50) { frozenTimers.push({ type: 'timeout', fn: fn, ms: ms }); return -1; }
+        return origSetTimeout.call(window, fn, ms);
+    };
+    window.setInterval = function(fn, ms) {
+        frozenTimers.push({ type: 'interval', fn: fn, ms: ms }); return -1;
+    };
+    window.requestAnimationFrame = function(fn) {
+        frozenTimers.push({ type: 'raf', fn: fn }); return -1;
+    };
+
     var overlay = document.createElement('div');
     overlay.id = '__ubp_picker_overlay__';
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483646;cursor:crosshair;pointer-events:none;';
@@ -1527,6 +1544,10 @@ const PICK_ELEMENT_SCRIPT = `
         if (o) o.remove();
         if (h) h.remove();
         if (l) l.remove();
+        // Unfreeze: restore timer APIs
+        window.setTimeout = origSetTimeout;
+        window.setInterval = origSetInterval;
+        window.requestAnimationFrame = origRAF;
     }
 
     // Delay pointer-events to avoid capturing the triggering click
