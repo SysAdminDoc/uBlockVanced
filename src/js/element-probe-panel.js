@@ -1063,6 +1063,28 @@ const INSPECT_SCRIPT = `
         });
     }
 
+    // :matches-path() - restrict filter to specific URL paths
+    var pagePath = location.pathname;
+    if (pagePath && pagePath !== '/' && result.selectors.length > 0) {
+        var pathBase = result.selectors[0].selector;
+        var escapedPath = pagePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        result.proceduralFilters.push({
+            type: 'matches-path',
+            label: ':matches-path()',
+            filter: pathBase + ':matches-path(' + escapedPath + ')',
+            description: 'Only apply on pages matching ' + pagePath
+        });
+        var pathDir = pagePath.replace(/\/[^/]*$/, '/');
+        if (pathDir !== pagePath && pathDir !== '/') {
+            result.proceduralFilters.push({
+                type: 'matches-path',
+                label: ':matches-path(dir)',
+                filter: pathBase + ':matches-path(/' + pathDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/^\//, '') + '/)',
+                description: 'Apply on pages under ' + pathDir
+            });
+        }
+    }
+
     // :matches-attr() - match elements by attribute name/value patterns
     var attrKeys = Object.keys(result.attrs);
     if (attrKeys.length > 0) {
@@ -1135,6 +1157,62 @@ const INSPECT_SCRIPT = `
             description: 'Only match if text content is at least ' + minLen + ' chars (skips empty wrappers)'
         });
     }
+
+    // :matches-prop() - match by JS property chains (React/SPA frameworks)
+    (function generateMatchesProp() {
+        var propBaseSel = result.tag;
+        if (classified.stable.length > 0) {
+            propBaseSel += '.' + escCSS(classified.stable[0]);
+        }
+        var reactFiberKey = '';
+        var reactPropsKey = '';
+        var ownKeys;
+        try { ownKeys = Object.getOwnPropertyNames(el); } catch(e) { ownKeys = []; }
+        for (var pk = 0; pk < ownKeys.length; pk++) {
+            if (ownKeys[pk].startsWith('__reactFiber$')) reactFiberKey = ownKeys[pk];
+            if (ownKeys[pk].startsWith('__reactProps$')) reactPropsKey = ownKeys[pk];
+        }
+        if (reactPropsKey) {
+            try {
+                var rProps = el[reactPropsKey];
+                if (rProps && typeof rProps === 'object') {
+                    var rpKeys = Object.keys(rProps);
+                    for (var rk = 0; rk < rpKeys.length; rk++) {
+                        var rpk = rpKeys[rk];
+                        if (rpk === 'children' || rpk === 'style' || rpk === 'className' || rpk === 'key' || rpk === 'ref') continue;
+                        var rpv = rProps[rpk];
+                        if (typeof rpv === 'string' && rpv.length >= 3 && rpv.length <= 60) {
+                            result.proceduralFilters.push({
+                                type: 'matches-prop',
+                                label: ':matches-prop(react)',
+                                filter: propBaseSel + ':matches-prop(' + reactPropsKey + '.' + rpk + '="' + escRegex(rpv) + '")',
+                                description: 'React prop ' + rpk + '="' + rpv.substring(0, 30) + '"'
+                            });
+                            break;
+                        }
+                    }
+                }
+            } catch(e) { /* cross-origin or frozen */ }
+        }
+        // Generic own-property scan for non-DOM properties
+        for (var gk = 0; gk < ownKeys.length; gk++) {
+            var gKey = ownKeys[gk];
+            if (gKey.startsWith('__') || gKey === 'style' || gKey === 'className' || gKey === 'id') continue;
+            if (gKey.startsWith('on') || gKey === 'innerHTML' || gKey === 'outerHTML' || gKey === 'textContent') continue;
+            try {
+                var gVal = el[gKey];
+                if (typeof gVal === 'string' && gVal.length >= 3 && gVal.length <= 60 && /[a-z]/i.test(gVal)) {
+                    result.proceduralFilters.push({
+                        type: 'matches-prop',
+                        label: ':matches-prop()',
+                        filter: propBaseSel + ':matches-prop(' + gKey + '="' + escRegex(gVal) + '")',
+                        description: 'JS property ' + gKey + '="' + gVal.substring(0, 30) + '"'
+                    });
+                    break;
+                }
+            } catch(e) { /* accessor threw */ }
+        }
+    })();
 
     // :remove() - offer as action variant on the best selector
     if (result.selectors.length > 0) {
