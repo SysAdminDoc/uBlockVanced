@@ -1725,8 +1725,13 @@ async function inspectSelected() {
         data.proceduralFilters = proceduralFilters;
 
         lastInspectedData = data;
-        currentHostname = data.hostname || '';
+        currentHostname = (data.hostname || '').replace(/^www\./, '');
         currentPageUrl = data.pageUrl || '';
+        const domainInput = $('filterDomains');
+        if (domainInput && (!domainInput.value || domainInput.dataset.auto !== 'false')) {
+            domainInput.value = currentHostname;
+            domainInput.dataset.auto = 'true';
+        }
 
         displayElementInfo(data);
         displaySelectors(selectors);
@@ -1926,7 +1931,8 @@ function selectSelector(idx) {
 }
 
 function generateFilter(sel) {
-    const hostname = currentHostname || '*';
+    const domainInput = $('filterDomains');
+    const hostname = domainInput ? domainInput.value.trim() || '*' : (currentHostname || '*');
     const typeSelect = $('filterType');
     const filterType = typeSelect ? typeSelect.value : '##';
 
@@ -2410,6 +2416,13 @@ $('filterType').addEventListener('change', () => {
 
 $('styleValue').addEventListener('input', () => {
     if ($('filterType').value === '##-style' && selectedSelectorIndex >= 0 && currentSelectors[selectedSelectorIndex]) {
+        $('filterOutput').value = generateFilter(currentSelectors[selectedSelectorIndex]);
+    }
+});
+
+$('filterDomains').addEventListener('input', () => {
+    $('filterDomains').dataset.auto = 'false';
+    if (selectedSelectorIndex >= 0 && currentSelectors[selectedSelectorIndex]) {
         $('filterOutput').value = generateFilter(currentSelectors[selectedSelectorIndex]);
     }
 });
