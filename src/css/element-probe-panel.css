@@ -1085,3 +1085,34 @@ details[open] > .help-toggle .section-title::before {
         transition-duration: 1ms !important;
     }
 }
+
+@media (forced-colors: active) {
+    :focus-visible {
+        outline: 2px solid LinkText;
+        outline-offset: 2px;
+    }
+    .btn {
+        border: 1px solid ButtonText;
+    }
+    .section {
+        border: 1px solid CanvasText;
+    }
+    .selector-item,
+    .history-item {
+        border: 1px solid CanvasText;
+    }
+    .selector-item.selected,
+    .history-item.active {
+        outline: 2px solid LinkText;
+    }
+    .status-indicator,
+    .filter-compat-badge,
+    .shadow-badge {
+        border: 1px solid CanvasText;
+    }
+    .filter-type-select,
+    .style-input,
+    #filterOutput {
+        border: 1px solid CanvasText;
+    }
+}

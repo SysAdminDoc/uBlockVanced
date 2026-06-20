@@ -271,3 +271,20 @@ iframe {
         flex: 1 1 calc(50% - 6px);
     }
 }
+
+@media (forced-colors: active) {
+    .tabButton {
+        border: 1px solid ButtonText;
+    }
+    .tabButton[aria-selected="true"],
+    .tabButton.selected {
+        outline: 2px solid LinkText;
+    }
+    fieldset {
+        border: 1px solid CanvasText;
+    }
+    .editorHero,
+    .notice {
+        border: 1px solid CanvasText;
+    }
+}

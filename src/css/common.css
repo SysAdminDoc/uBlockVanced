@@ -683,3 +683,30 @@ html:not(#uBO-popup-panel) .li.synopsis {
         transition-duration: 1ms !important;
     }
 }
+
+@media (forced-colors: active) {
+    :focus-visible {
+        outline: 2px solid LinkText;
+        outline-offset: 2px;
+    }
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+        outline: 2px solid LinkText;
+        outline-offset: 2px;
+    }
+    button,
+    select {
+        border: 1px solid ButtonText;
+    }
+    input,
+    textarea {
+        border: 1px solid CanvasText;
+    }
+    .statusPill,
+    .badge {
+        border: 1px solid CanvasText;
+    }
+}

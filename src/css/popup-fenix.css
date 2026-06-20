@@ -1561,3 +1561,17 @@ body.compact #moreOrLess > span {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
+
+@media (forced-colors: active) {
+    .statCard,
+    .toolRibbon .tool,
+    #firewall .ruleCell,
+    .filterChip {
+        border: 1px solid CanvasText;
+    }
+    .tool.selected,
+    .tool:focus-visible {
+        outline: 2px solid LinkText;
+        outline-offset: 1px;
+    }
+}
