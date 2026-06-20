@@ -135,7 +135,7 @@ const updateFilterHint = () => {
     if (!section || !output) { return; }
     const value = output.value.trim();
     const hasValue = value !== '';
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
 
     let badge = 'Selection required';
     let text = 'Choose a selector or procedural filter to build a rule.';
@@ -170,7 +170,7 @@ const updateFilterHint = () => {
 const updateWorkflowSummary = () => {
     const frameCount = Math.max(($('frameTarget')?.options.length || 1) - 1, 0);
     const hasFilterValue = $('filterOutput')?.value.trim() !== '';
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test($('filterOutput')?.value || '');
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test($('filterOutput')?.value || '');
 
     setText('overviewTargetValue', currentFrameUrl ? 'Focused iframe' : 'Top document');
     setText(
@@ -248,7 +248,7 @@ function syncFilterActions() {
     const output = $('filterOutput');
     const value = output ? output.value.trim() : '';
     const hasValue = value !== '';
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
 
     $('btnApplyFilter').disabled = !hasValue;
     $('btnCopyFilter').disabled = !hasValue;
@@ -1085,6 +1085,28 @@ const INSPECT_SCRIPT = `
         }
     }
 
+    // :matches-media() - restrict filter to specific viewport/media conditions
+    if (result.selectors.length > 0) {
+        var mediaBase = result.selectors[0].selector;
+        var vw = window.innerWidth;
+        if (vw > 0) {
+            result.proceduralFilters.push({
+                type: 'matches-media',
+                label: ':matches-media()',
+                filter: mediaBase + ':matches-media((min-width: ' + vw + 'px))',
+                description: 'Only apply at viewport width >= ' + vw + 'px'
+            });
+            if (vw <= 768) {
+                result.proceduralFilters.push({
+                    type: 'matches-media',
+                    label: ':matches-media(mobile)',
+                    filter: mediaBase + ':matches-media((max-width: 768px))',
+                    description: 'Only apply on mobile viewports (<=768px)'
+                });
+            }
+        }
+    }
+
     // :matches-attr() - match elements by attribute name/value patterns
     var attrKeys = Object.keys(result.attrs);
     if (attrKeys.length > 0) {
@@ -1141,6 +1163,33 @@ const INSPECT_SCRIPT = `
                 description: 'Match elements with high z-index (overlay/modal pattern)'
             });
         }
+    }
+
+    // :matches-css-before() / :matches-css-after() - match by pseudo-element styles
+    if (el.offsetWidth > 0 || el.offsetHeight > 0) {
+        var baseSel2 = result.tag;
+        if (classified.stable.length > 0) {
+            baseSel2 += '.' + escCSS(classified.stable[0]);
+        } else if (result.id) {
+            baseSel2 = '#' + escCSS(result.id);
+        }
+        ['before', 'after'].forEach(function(pseudo) {
+            try {
+                var pcs = getComputedStyle(el, '::' + pseudo);
+                var content = pcs.getPropertyValue('content');
+                if (content && content !== 'none' && content !== 'normal' && content !== '""') {
+                    var cleanContent = content.replace(/^["']|["']$/g, '');
+                    if (cleanContent.length >= 2 && cleanContent.length <= 60) {
+                        result.proceduralFilters.push({
+                            type: 'matches-css-' + pseudo,
+                            label: ':matches-css-' + pseudo + '()',
+                            filter: baseSel2 + ':matches-css-' + pseudo + '(content: /' + escRegex(cleanContent.substring(0, 30)) + '/)',
+                            description: '::' + pseudo + ' has content "' + cleanContent.substring(0, 30) + '"'
+                        });
+                    }
+                }
+            } catch(e) { /* cross-origin */ }
+        });
     }
 
     // :min-text-length() - filter out empty wrappers
@@ -2061,7 +2110,7 @@ $('btnApplyFilter').addEventListener('click', async () => {
     const rawSelector = match[1];
 
     // Check if this is a procedural filter (contains :has-text, :upward, :matches-path, etc.)
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(rawSelector);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(rawSelector);
 
     // Pre-flight validation for standard CSS filters only. Catches typos
     // (unbalanced brackets, stray punctuation, unknown pseudo-classes)
@@ -2136,7 +2185,7 @@ $('btnTestFilter').addEventListener('click', async () => {
     }
 
     const selector = match[1];
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
 
     if (isProcedural) {
         if (/:remove\(\)/.test(selector)) {
@@ -2191,7 +2240,7 @@ $('btnTestApply').addEventListener('click', async () => {
     const match = filter.match(/##(.+)$/);
     if (!match) { log('Invalid filter format', 'error'); return; }
     const selector = match[1];
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
     if (isProcedural) {
         log('Temporary apply only works with standard CSS selectors.', 'info');
         return;

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 // Extracted from element-probe-panel.js isProcedural regex
-const PROCEDURAL_RE = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/;
+const PROCEDURAL_RE = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/;
 
 describe('isProcedural detection', () => {
     it('detects :has-text()', () => {
@@ -23,6 +23,18 @@ describe('isProcedural detection', () => {
 
     it('detects :matches-css()', () => {
         assert.ok(PROCEDURAL_RE.test('div:matches-css(position: fixed)'));
+    });
+
+    it('detects :matches-css-before()', () => {
+        assert.ok(PROCEDURAL_RE.test('div:matches-css-before(content: /Sponsored/)'));
+    });
+
+    it('detects :matches-css-after()', () => {
+        assert.ok(PROCEDURAL_RE.test('div:matches-css-after(content: /Ad/)'));
+    });
+
+    it('detects :matches-media()', () => {
+        assert.ok(PROCEDURAL_RE.test('div.banner:matches-media((min-width: 1024px))'));
     });
 
     it('detects :min-text-length()', () => {
