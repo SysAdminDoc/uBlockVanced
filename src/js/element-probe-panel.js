@@ -1729,25 +1729,9 @@ $('btnInspectPoint').addEventListener('click', async () => {
             return;
         }
         log('Picker injected. Click an element on the page.', 'info');
-
-        // Poll for when picker sets $0 (element selected)
-        const pollForSelection = setInterval(async () => {
-            try {
-                const active = await evalInPage('!!window.__ubp_picker_active__');
-                if (!active) {
-                    clearInterval(pollForSelection);
-                    // Small delay for inspect() to propagate $0
-                    setTimeout(() => {
-                        inspectSelected();
-                    }, 200);
-                }
-            } catch(e) {
-                clearInterval(pollForSelection);
-            }
-        }, 300);
-
-        // Stop polling after 30s
-        setTimeout(() => clearInterval(pollForSelection), 30000);
+        // No polling needed: the picker calls inspect(target) which fires
+        // chrome.devtools.panels.elements.onSelectionChanged, and our
+        // existing listener (debounced at 120ms) calls inspectSelected().
     } catch(e) {
         log('Failed to enter pick mode: ' + (e.message || e), 'error');
         setStatus('Error', 'error');
