@@ -455,6 +455,9 @@ function unhideOnPage(selector) {
                 var els = document.querySelectorAll(sel);
                 for (var i = 0; i < els.length; i++) {
                     els[i].style.removeProperty('display');
+                    els[i].style.removeProperty('content-visibility');
+                    els[i].style.removeProperty('max-height');
+                    els[i].style.removeProperty('overflow');
                 }
                 return els.length;
             } catch(e) { return -1; }
@@ -1319,7 +1322,13 @@ const HIDE_ELEMENT_SCRIPT = (selector) => `
     try {
         var els = document.querySelectorAll(${JSON.stringify(selector)});
         for (var i = 0; i < els.length; i++) {
-            els[i].style.setProperty('display', 'none', 'important');
+            if (CSS.supports && CSS.supports('content-visibility', 'hidden')) {
+                els[i].style.setProperty('content-visibility', 'hidden', 'important');
+                els[i].style.setProperty('max-height', '0', 'important');
+                els[i].style.setProperty('overflow', 'hidden', 'important');
+            } else {
+                els[i].style.setProperty('display', 'none', 'important');
+            }
         }
         return els.length;
     } catch(e) {
