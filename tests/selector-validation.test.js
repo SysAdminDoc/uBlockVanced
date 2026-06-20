@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 // Extracted from element-probe-panel.js isProcedural regex
-const PROCEDURAL_RE = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/;
+const PROCEDURAL_RE = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/;
 
 describe('isProcedural detection', () => {
     it('detects :has-text()', () => {
@@ -39,6 +39,10 @@ describe('isProcedural detection', () => {
 
     it('detects :watch-attr()', () => {
         assert.ok(PROCEDURAL_RE.test('div:watch-attr(data-state)'));
+    });
+
+    it('detects :style()', () => {
+        assert.ok(PROCEDURAL_RE.test('div.banner:style(opacity: 0 !important)'));
     });
 
     it('detects :others()', () => {
@@ -93,5 +97,13 @@ describe('filter format parsing', () => {
         const m = 'example.com##div.banner:remove()'.match(FILTER_RE);
         assert.ok(m);
         assert.equal(m[3], 'div.banner:remove()');
+    });
+
+    it('parses filter with :style() action', () => {
+        const m = 'example.com##div.banner:style(opacity: 0 !important)'.match(FILTER_RE);
+        assert.ok(m);
+        assert.equal(m[1], 'example.com');
+        assert.equal(m[2], '##');
+        assert.equal(m[3], 'div.banner:style(opacity: 0 !important)');
     });
 });

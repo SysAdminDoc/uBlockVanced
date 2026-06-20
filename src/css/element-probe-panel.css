@@ -812,6 +812,29 @@ details[open] > .help-toggle .section-title::before {
     padding: 4px 8px;
 }
 
+.style-input-row {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.style-input {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-main);
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+.style-input:focus {
+    border-color: var(--accent-mauve);
+    outline: none;
+}
+
 .filter-actions {
     display: flex;
     flex-wrap: wrap;

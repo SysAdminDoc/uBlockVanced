@@ -157,7 +157,12 @@
                     <option value="##">Block (##)</option>
                     <option value="#@#">Exception (#@#)</option>
                     <option value="##-remove">Block + :remove()</option>
+                    <option value="##-style">Block + :style()</option>
                 </select>
+            </div>
+            <div class="style-input-row" id="styleInputRow" style="display:none">
+                <label class="filter-type-label" for="styleValue">CSS</label>
+                <input type="text" id="styleValue" class="style-input" placeholder="e.g. opacity: 0 !important" spellcheck="false">
             </div>
             <div class="filter-actions">
                 <button type="button" class="btn success" id="btnApplyFilter">Save filter</button>

@@ -135,7 +135,7 @@ const updateFilterHint = () => {
     if (!section || !output) { return; }
     const value = output.value.trim();
     const hasValue = value !== '';
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
 
     let badge = 'Selection required';
     let text = 'Choose a selector or procedural filter to build a rule.';
@@ -170,7 +170,7 @@ const updateFilterHint = () => {
 const updateWorkflowSummary = () => {
     const frameCount = Math.max(($('frameTarget')?.options.length || 1) - 1, 0);
     const hasFilterValue = $('filterOutput')?.value.trim() !== '';
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test($('filterOutput')?.value || '');
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test($('filterOutput')?.value || '');
 
     setText('overviewTargetValue', currentFrameUrl ? 'Focused iframe' : 'Top document');
     setText(
@@ -248,7 +248,7 @@ function syncFilterActions() {
     const output = $('filterOutput');
     const value = output ? output.value.trim() : '';
     const hasValue = value !== '';
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/i.test(value);
 
     $('btnApplyFilter').disabled = !hasValue;
     $('btnCopyFilter').disabled = !hasValue;
@@ -1855,6 +1855,11 @@ function generateFilter(sel) {
     if (filterType === '##-remove') {
         return hostname + '##' + sel.selector + ':remove()';
     }
+    if (filterType === '##-style') {
+        const styleInput = $('styleValue');
+        const styleVal = styleInput ? styleInput.value.trim() : '';
+        return hostname + '##' + sel.selector + ':style(' + (styleVal || 'opacity: 0 !important') + ')';
+    }
     return hostname + filterType + sel.selector;
 }
 
@@ -1972,7 +1977,7 @@ $('btnApplyFilter').addEventListener('click', async () => {
     const rawSelector = match[1];
 
     // Check if this is a procedural filter (contains :has-text, :upward, :matches-path, etc.)
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test(rawSelector);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(rawSelector);
 
     // Pre-flight validation for standard CSS filters only. Catches typos
     // (unbalanced brackets, stray punctuation, unknown pseudo-classes)
@@ -2047,7 +2052,7 @@ $('btnTestFilter').addEventListener('click', async () => {
     }
 
     const selector = match[1];
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
 
     if (isProcedural) {
         if (/:remove\(\)/.test(selector)) {
@@ -2102,7 +2107,7 @@ $('btnTestApply').addEventListener('click', async () => {
     const match = filter.match(/##(.+)$/);
     if (!match) { log('Invalid filter format', 'error'); return; }
     const selector = match[1];
-    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
     if (isProcedural) {
         log('Temporary apply only works with standard CSS selectors.', 'info');
         return;
@@ -2314,11 +2319,21 @@ syncFilterActions();
 $('filterOutput').addEventListener('input', syncFilterActions);
 
 $('filterType').addEventListener('change', () => {
+    const styleRow = $('styleInputRow');
+    if (styleRow) {
+        styleRow.style.display = $('filterType').value === '##-style' ? 'flex' : 'none';
+    }
     if (selectedSelectorIndex >= 0 && currentSelectors[selectedSelectorIndex]) {
         const filter = generateFilter(currentSelectors[selectedSelectorIndex]);
         $('filterOutput').value = filter;
     }
     syncFilterActions();
+});
+
+$('styleValue').addEventListener('input', () => {
+    if ($('filterType').value === '##-style' && selectedSelectorIndex >= 0 && currentSelectors[selectedSelectorIndex]) {
+        $('filterOutput').value = generateFilter(currentSelectors[selectedSelectorIndex]);
+    }
 });
 
 })();
