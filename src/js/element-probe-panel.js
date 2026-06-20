@@ -150,7 +150,7 @@ const updateFilterHint = () => {
         mode = 'ready';
     } else if (hasValue && isProcedural) {
         badge = 'Procedural rule';
-        text = 'Procedural rules save directly to your filters. In-page preview is unavailable for this rule type.';
+        text = 'Procedural rule — click Preview to highlight matching elements, or Apply to save to your filters.';
         mode = 'procedural';
     } else if (hasValue && isHighlighting) {
         badge = 'Preview active';
@@ -250,7 +250,7 @@ function syncFilterActions() {
 
     $('btnApplyFilter').disabled = !hasValue;
     $('btnCopyFilter').disabled = !hasValue;
-    $('btnTestFilter').disabled = !hasValue || isProcedural;
+    $('btnTestFilter').disabled = !hasValue || (isProcedural && /:remove\(\)/.test(value));
     $('btnRemoveFilter').disabled = !isHighlighting;
     updateFilterHint();
     updateWorkflowSummary();
@@ -1140,6 +1140,130 @@ const REMOVE_HIGHLIGHT_SCRIPT = `
 })()
 `;
 
+const PROCEDURAL_HIGHLIGHT_SCRIPT = (proceduralSelector) => {
+    const baseAndOp = proceduralSelector.match(/^([^:]*)(:.+)$/);
+    if (!baseAndOp) { return 'null'; }
+    const baseSel = baseAndOp[1];
+    const opChain = baseAndOp[2];
+    return `
+(function() {
+    var prev = document.querySelectorAll('.__ubp_highlight__');
+    for (var i = 0; i < prev.length; i++) prev[i].remove();
+
+    var baseSel = ${JSON.stringify(baseSel)};
+    var opChain = ${JSON.stringify(opChain)};
+
+    function matchesOp(el, op) {
+        var m;
+        // :has-text(literal) or :has-text(/regex/flags)
+        if ((m = op.match(/^:has-text\\(\\/(.*)\\/([gimsuy]*)\\)$/))) {
+            try { return new RegExp(m[1], m[2]).test(el.textContent || ''); } catch(e) { return false; }
+        }
+        if ((m = op.match(/^:has-text\\((.+)\\)$/))) {
+            return (el.textContent || '').indexOf(m[1]) !== -1;
+        }
+        // :min-text-length(n)
+        if ((m = op.match(/^:min-text-length\\((\\d+)\\)$/))) {
+            return (el.textContent || '').trim().length >= parseInt(m[1], 10);
+        }
+        // :matches-attr("name"="value") or :matches-attr("name")
+        if ((m = op.match(/^:matches-attr\\("([^"]+)"(?:="([^"]*)")?\\)$/))) {
+            if (m[2] !== undefined) {
+                try { return new RegExp(m[2]).test(el.getAttribute(m[1]) || ''); } catch(e) { return (el.getAttribute(m[1]) || '') === m[2]; }
+            }
+            return el.hasAttribute(m[1]);
+        }
+        // :matches-css(prop: value)
+        if ((m = op.match(/^:matches-css\\(([^:]+):\\s*(.+)\\)$/))) {
+            var cv = getComputedStyle(el).getPropertyValue(m[1].trim());
+            var pat = m[2].trim();
+            if (pat.startsWith('/') && pat.lastIndexOf('/') > 0) {
+                var ri = pat.lastIndexOf('/');
+                try { return new RegExp(pat.substring(1, ri), pat.substring(ri + 1)).test(cv); } catch(e) { return false; }
+            }
+            return cv.trim() === pat;
+        }
+        // :upward(N)
+        if ((m = op.match(/^:upward\\((\\d+)\\)$/))) {
+            var n = parseInt(m[1], 10);
+            var cur = el;
+            for (var i = 0; i < n && cur; i++) cur = cur.parentElement;
+            return cur || null;
+        }
+        // :upward(selector)
+        if ((m = op.match(/^:upward\\((.+)\\)$/))) {
+            return el.closest(m[1]);
+        }
+        // :matches-path(pattern)
+        if ((m = op.match(/^:matches-path\\((.+)\\)$/))) {
+            var pat = m[1];
+            if (pat.startsWith('/') && pat.lastIndexOf('/') > 0) {
+                var ri = pat.lastIndexOf('/');
+                try { return new RegExp(pat.substring(1, ri), pat.substring(ri + 1)).test(location.pathname + location.search); } catch(e) { return false; }
+            }
+            return (location.pathname + location.search).indexOf(pat) !== -1;
+        }
+        // :not(:has-text(...))
+        if ((m = op.match(/^:not\\((:has-text\\(.+\\))\\)$/))) {
+            return !matchesOp(el, m[1]);
+        }
+        return false;
+    }
+
+    // Parse operator chain (simplified: split on top-level colons)
+    var ops = [];
+    var remaining = opChain;
+    while (remaining.length > 0) {
+        var colon = remaining.indexOf(':');
+        if (colon === -1) break;
+        var depth = 0; var end = colon + 1;
+        for (; end < remaining.length; end++) {
+            if (remaining[end] === '(') depth++;
+            else if (remaining[end] === ')') { depth--; if (depth === 0) { end++; break; } }
+        }
+        ops.push(remaining.substring(colon, end));
+        remaining = remaining.substring(end);
+    }
+
+    // Skip :remove() — not previewable
+    ops = ops.filter(function(o) { return o !== ':remove()'; });
+    // :matches-path is a page-level filter, evaluate first
+    var pathOp = ops.filter(function(o) { return o.startsWith(':matches-path'); });
+    if (pathOp.length > 0 && !matchesOp(document.body, pathOp[0])) {
+        return JSON.stringify({ count: 0, note: 'Path does not match current page' });
+    }
+    ops = ops.filter(function(o) { return !o.startsWith(':matches-path'); });
+
+    var candidates;
+    try { candidates = baseSel ? Array.from(document.querySelectorAll(baseSel)) : [document.documentElement]; }
+    catch(e) { return JSON.stringify({ count: -1, note: 'Invalid base selector' }); }
+
+    var matched = [];
+    for (var i = 0; i < candidates.length; i++) {
+        var el = candidates[i];
+        var pass = true;
+        var target = el;
+        for (var j = 0; j < ops.length; j++) {
+            var r = matchesOp(target, ops[j]);
+            if (r === false || r === null || r === undefined) { pass = false; break; }
+            if (r instanceof HTMLElement || r instanceof Element) { target = r; }
+        }
+        if (pass) matched.push(target);
+    }
+
+    // Highlight matched elements
+    for (var i = 0; i < matched.length; i++) {
+        var rect = matched[i].getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) continue;
+        var overlay = document.createElement('div');
+        overlay.className = '__ubp_highlight__';
+        overlay.style.cssText = 'position:fixed !important;top:' + rect.top + 'px !important;left:' + rect.left + 'px !important;width:' + rect.width + 'px !important;height:' + rect.height + 'px !important;background:rgba(203,166,247,0.25) !important;border:2px solid rgba(203,166,247,0.8) !important;pointer-events:none !important;z-index:2147483647 !important;box-sizing:border-box !important;transition:opacity 150ms ease !important;';
+        document.documentElement.appendChild(overlay);
+    }
+    return JSON.stringify({ count: matched.length });
+})()`;
+};
+
 const HIDE_ELEMENT_SCRIPT = (selector) => `
 (function() {
     try {
@@ -1740,8 +1864,28 @@ $('btnTestFilter').addEventListener('click', async () => {
     const isProcedural = /:has-text|:upward|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:not\(:has-text\(/.test(selector);
 
     if (isProcedural) {
-        log('Procedural filters cannot be previewed in-page. Apply to test.', 'info');
-        setBusy('btnTestFilter', false);
+        if (/:remove\(\)/.test(selector)) {
+            log(':remove() cannot be previewed (irreversible). Apply to test.', 'info');
+            setBusy('btnTestFilter', false);
+            return;
+        }
+        try {
+            const raw = await evalInPage(PROCEDURAL_HIGHLIGHT_SCRIPT(selector));
+            if (panelClosed) { return; }
+            const result = JSON.parse(raw || '{}');
+            if (result.count > 0) {
+                setHighlighting(true);
+                log(`Preview: ${result.count} element(s) match procedural filter`, 'info');
+            } else if (result.count === 0) {
+                log(result.note || 'No elements match this procedural filter on the current page', 'info');
+            } else {
+                log(result.note || 'Could not evaluate procedural filter', 'error');
+            }
+        } catch(e) {
+            log('Procedural preview failed: ' + (e.message || e), 'error');
+        } finally {
+            setBusy('btnTestFilter', false);
+        }
         return;
     }
 
