@@ -257,6 +257,7 @@ function syncFilterActions() {
     updateFilterHint();
     updateWorkflowSummary();
     updateMatchCount(value, isProcedural);
+    updateCompatBadge(value);
 }
 
 function updateMatchCount(filterValue, isProcedural) {
@@ -304,6 +305,45 @@ function updateMatchCount(filterValue, isProcedural) {
             badge.removeAttribute('data-state');
         }
     }, 250);
+}
+
+function updateCompatBadge(filterValue) {
+    const badge = $('filterCompatBadge');
+    if (!badge) { return; }
+
+    if (!filterValue) {
+        badge.textContent = '';
+        badge.title = '';
+        return;
+    }
+
+    const uboOnly = [':matches-path', ':matches-media', ':watch-attr', ':others()'];
+    const uboAdguardBrave = [':has-text', ':upward', ':matches-attr', ':matches-css', ':remove()', ':min-text-length', ':not(:has-text'];
+    const universal = [':has(', ':xpath('];
+
+    const found = [];
+    for (const op of uboOnly) {
+        if (filterValue.includes(op)) { found.push({ op, engines: 'uBO only' }); }
+    }
+    for (const op of uboAdguardBrave) {
+        if (filterValue.includes(op)) { found.push({ op, engines: 'uBO, AdGuard, Brave' }); }
+    }
+
+    if (found.length === 0) {
+        badge.textContent = '';
+        badge.title = '';
+        return;
+    }
+
+    const hasUboOnly = found.some(f => f.engines === 'uBO only');
+    if (hasUboOnly) {
+        badge.textContent = 'uBO only';
+        badge.dataset.level = 'narrow';
+    } else {
+        badge.textContent = 'uBO+AG+Brave';
+        badge.dataset.level = 'wide';
+    }
+    badge.title = found.map(f => f.op + ' → ' + f.engines).join('\n');
 }
 
 function setHighlighting(state) {

@@ -764,6 +764,31 @@ details[open] > .help-toggle .section-title::before {
     color: var(--accent-green);
 }
 
+.filter-compat-badge {
+    border-radius: 6px;
+    cursor: help;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 2px 8px;
+}
+
+.filter-compat-badge:empty {
+    display: none;
+}
+
+.filter-compat-badge[data-level="narrow"] {
+    background: rgb(250 179 135 / 0.15);
+    border: 1px solid rgb(250 179 135 / 0.3);
+    color: rgb(250 179 135);
+}
+
+.filter-compat-badge[data-level="wide"] {
+    background: rgb(166 227 161 / 0.12);
+    border: 1px solid rgb(166 227 161 / 0.2);
+    color: rgb(166 227 161);
+}
+
 .filter-type-row {
     align-items: center;
     display: flex;
