@@ -2096,6 +2096,39 @@ $('btnRemoveFilter').addEventListener('click', async () => {
     }
 });
 
+$('btnTestApply').addEventListener('click', async () => {
+    const filter = $('filterOutput').value.trim();
+    if (!filter) return;
+    const match = filter.match(/##(.+)$/);
+    if (!match) { log('Invalid filter format', 'error'); return; }
+    const selector = match[1];
+    const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-prop|:min-text-length|:remove\(\)|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
+    if (isProcedural) {
+        log('Temporary apply only works with standard CSS selectors.', 'info');
+        return;
+    }
+
+    setBusy('btnTestApply', true, 'Testing...');
+    try {
+        const count = await evalInPage(HIDE_ELEMENT_SCRIPT(selector));
+        if (panelClosed) { return; }
+        if (count > 0) {
+            log(`Test: hid ${count} element(s) — reverting in 5 seconds`, 'info');
+            setTimeout(async () => {
+                if (panelClosed) { return; }
+                await unhideOnPage(selector);
+                log('Test reverted', 'info');
+            }, 5000);
+        } else {
+            log('No elements matched for test', 'info');
+        }
+    } catch(e) {
+        log('Test failed: ' + (e.message || e), 'error');
+    } finally {
+        setBusy('btnTestApply', false);
+    }
+});
+
 // Clear history button
 const btnClearHistory = $('btnClearHistory');
 if (btnClearHistory) {
