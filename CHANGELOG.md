@@ -2,7 +2,18 @@
 
 Major Element Probe expansion, infrastructure improvements, and deep audit fixes.
 
-**Audit fixes (v0.3.0 hardening pass):**
+**Audit fixes (v0.3.0 hardening pass 2):**
+- **P1**: Picker timer-freezing now replays frozen callbacks on cleanup — no more permanently broken page timers. Capped at 500 entries with beforeunload safety net.
+- **P1**: User filter writes (append/remove) serialized through a mutex — concurrent writes no longer silently overwrite each other.
+- **P2**: Selector list click targeting scoped to correct list — mixed CSS/procedural selector indices no longer mismatch.
+- **P2**: History panel renders all entries (was capped at 20 of 50). Count badge now matches visible list.
+- **P2**: Context menu probe no longer injects page-visible `window.__ubp_*` properties. Dead `inspect()` call removed. Attribute marker shortened.
+- **P2**: Dead domain checker tooltip warns about IP exposure to checked domains.
+- **P3**: GPC setting toggleable without extension restart — listener always registered, checks setting on each request.
+- **P3**: Scrollbar tokens added to `@media prefers-color-scheme` blocks — invisible scrollbars fixed for system-theme users.
+- **P3**: Attribute names now escaped with CSS.escape() before selector interpolation — prevents injection via crafted attribute names.
+
+**Audit fixes (v0.3.0 hardening pass 1):**
 - **Critical**: Exception filters (`#@#`) can now be applied, previewed, and tested — regex only matched `##` before, silently rejecting all exception rules.
 - **Critical**: Filter collision detection now works — `getUserRules` message handler was missing so the feature silently did nothing.
 - **Critical**: `forced-color-adjust: none` removed from `:root` — was breaking Windows High Contrast mode for the entire extension.
