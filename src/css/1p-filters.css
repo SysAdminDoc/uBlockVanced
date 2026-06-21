@@ -165,3 +165,8 @@ body {
         width: calc(100% - 24px);
     }
 }
+
+.dead-domain-line {
+    background: rgb(var(--red-40) / 18%);
+    border-left: 3px solid rgb(var(--red-40));
+}

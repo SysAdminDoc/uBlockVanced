@@ -356,7 +356,69 @@ self.hasUnsavedData = function() {
 
 /******************************************************************************/
 
+async function checkDeadDomains() {
+    const btn = qs$('#checkDeadDomains');
+    if ( btn ) { btn.disabled = true; }
+    const text = getEditorText();
+    const lines = text.split('\n');
+    const domainRe = /^([a-zA-Z0-9][\w.-]+\.\w{2,})(##|#@#|\$|,|\^)/;
+    const domains = new Set();
+    for ( const line of lines ) {
+        if ( line.startsWith('!') || line.startsWith('[') || line.trim() === '' ) continue;
+        const m = line.match(domainRe);
+        if ( m && m[1] !== '*' ) { domains.add(m[1]); }
+    }
+    if ( domains.size === 0 ) {
+        const st = qs$('#userFiltersSaveState');
+        if ( st ) { st.textContent = 'No domains found in filters'; }
+        if ( btn ) { btn.disabled = false; }
+        return;
+    }
+    const dead = [];
+    const st = qs$('#userFiltersSaveState');
+    let checked = 0;
+    for ( const domain of domains ) {
+        checked++;
+        if ( st ) { st.textContent = `Checking ${checked}/${domains.size}...`; }
+        try {
+            const r = await fetch(`https://${domain}/`, {
+                method: 'HEAD',
+                mode: 'no-cors',
+                signal: AbortSignal.timeout(5000),
+            });
+            void r;
+        } catch {
+            try {
+                await fetch(`http://${domain}/`, {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    signal: AbortSignal.timeout(5000),
+                });
+            } catch {
+                dead.push(domain);
+            }
+        }
+    }
+    if ( st ) {
+        st.textContent = dead.length > 0
+            ? `${dead.length} dead domain(s): ${dead.join(', ')}`
+            : `All ${domains.size} domains are reachable`;
+    }
+    if ( dead.length > 0 ) {
+        for ( let i = 0; i < cmEditor.lineCount(); i++ ) {
+            const lineText = cmEditor.getLine(i);
+            for ( const d of dead ) {
+                if ( lineText.startsWith(d + '##') || lineText.startsWith(d + '#@#') || lineText.startsWith(d + '$') || lineText.startsWith(d + '^') ) {
+                    cmEditor.addLineClass(i, 'background', 'dead-domain-line');
+                }
+            }
+        }
+    }
+    if ( btn ) { btn.disabled = false; }
+}
+
 // Handle user interaction
+dom.on('#checkDeadDomains', 'click', checkDeadDomains);
 dom.on('#exportUserFiltersToFile', 'click', exportUserFiltersToFile);
 dom.on('#userFiltersApply', 'click', ( ) => { applyChanges(); });
 dom.on('#userFiltersRevert', 'click', revertChanges);
