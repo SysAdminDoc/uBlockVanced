@@ -255,6 +255,7 @@ const onMessage = function(request, sender, callback) {
             uiAccentStylesheet: µb.uiAccentStylesheet,
             uiStyles: µb.hiddenSettings.uiStyles,
             uiTheme: µb.userSettings.uiTheme,
+            catppuccinPalette: µb.hiddenSettings.catppuccinPalette || '',
         };
         break;
 

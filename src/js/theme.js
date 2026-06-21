@@ -54,6 +54,23 @@ function setTheme(theme, propagate = false) {
     }
 }
 
+const CTP_PALETTES = ['catppuccin-latte', 'catppuccin-frappe', 'catppuccin-macchiato'];
+
+function setCatppuccinPalette(palette, propagate = false) {
+    let w = self;
+    for (;;) {
+        const rootcl = w.document.documentElement.classList;
+        for ( const p of CTP_PALETTES ) { rootcl.remove(p); }
+        if ( palette && CTP_PALETTES.includes(palette) ) {
+            rootcl.add(palette);
+        }
+        if ( propagate === false ) { break; }
+        if ( w === w.parent ) { break; }
+        w = w.parent;
+        try { void w.document; } catch { return; }
+    }
+}
+
 function setAccentColor(
     accentEnabled,
     accentColor,
@@ -119,6 +136,9 @@ function setAccentColor(
     vAPI.messaging.send('dom', { what: 'uiStyles' }).then(response => {
         if ( typeof response !== 'object' || response === null ) { return; }
         setTheme(response.uiTheme);
+        if ( response.catppuccinPalette ) {
+            setCatppuccinPalette(response.catppuccinPalette);
+        }
         if ( response.uiAccentCustom ) {
             setAccentColor(
                 true,
@@ -151,4 +171,5 @@ export {
     getActualTheme,
     setTheme,
     setAccentColor,
+    setCatppuccinPalette,
 };
