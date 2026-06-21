@@ -72,7 +72,6 @@ const hiddenSettingsDefault = {
     extensionUpdateForceReload: false,
     filterAuthorMode: false,
     gpcEnabled: false,
-    probeClassPatterns: 'default',
     loggerPopupType: 'popup',
     manualUpdateAssetFetchPeriod: 500,
     modifyWebextFlavor: 'unset',

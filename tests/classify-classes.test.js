@@ -1,27 +1,21 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-// Extracted from element-probe-panel.js INSPECT_SCRIPT classifyClasses()
-function classifyClasses(classes) {
+import { DEFAULT_CLASS_PATTERNS } from '../src/js/element-probe/page-scripts.js';
+
+function classifyClasses(classes, patterns = DEFAULT_CLASS_PATTERNS) {
+    const compiled = patterns.map(p => new RegExp(p));
     const stable = [];
     const dynamic = [];
     for (let i = 0; i < classes.length; i++) {
         const c = classes[i];
-        if (/^[a-z]{1,3}-[a-zA-Z0-9]{6,}$/.test(c) ||
-            /^_[0-9a-f]{4,}/.test(c) ||
-            /^[A-Z][a-zA-Z0-9]{20,}$/.test(c) ||
-            /^css-[a-z0-9]+$/.test(c) ||
-            /^[a-f0-9]{8,}$/.test(c) ||
-            /^sc-[a-zA-Z0-9]+$/.test(c) ||
-            /^emotion-[a-z0-9]+$/.test(c) ||
-            /^_[A-Za-z0-9]{8,}$/.test(c) ||
-            /^styled-[a-z0-9]+$/.test(c) ||
-            /^[a-z]{1,2}[A-Z][a-zA-Z0-9]{10,}$/.test(c) ||
-            c.length > 40) {
-            dynamic.push(c);
-        } else {
-            stable.push(c);
+        let isDynamic = c.length > 40;
+        if (!isDynamic) {
+            for (let pi = 0; pi < compiled.length; pi++) {
+                if (compiled[pi].test(c)) { isDynamic = true; break; }
+            }
         }
+        if (isDynamic) { dynamic.push(c); } else { stable.push(c); }
     }
     return { stable, dynamic };
 }
@@ -34,8 +28,6 @@ describe('classifyClasses', () => {
     });
 
     it('flags BEM-like short-prefix classes as dynamic (known limitation)', () => {
-        // btn-primary matches the obfuscation regex ^[a-z]{1,3}-[a-zA-Z0-9]{6,}$
-        // This is a false positive but acceptable — the heuristic errs on caution
         const result = classifyClasses(['btn-primary']);
         assert.equal(result.dynamic.length, 1);
     });
@@ -103,5 +95,12 @@ describe('classifyClasses', () => {
         const result = classifyClasses(['ad', 'nav', 'header', 'footer', 'active']);
         assert.deepEqual(result.stable, ['ad', 'nav', 'header', 'footer', 'active']);
         assert.deepEqual(result.dynamic, []);
+    });
+
+    it('works with custom patterns', () => {
+        const custom = ['^custom-\\d+$'];
+        const result = classifyClasses(['custom-123', 'normal'], custom);
+        assert.deepEqual(result.stable, ['normal']);
+        assert.deepEqual(result.dynamic, ['custom-123']);
     });
 });
