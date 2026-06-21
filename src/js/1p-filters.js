@@ -307,6 +307,44 @@ function exportUserFiltersToFile() {
     });
 }
 
+function exportUserFiltersToJSON() {
+    const val = getEditorText();
+    if ( val === '' ) { return; }
+    const lines = val.split('\n');
+    const rules = [];
+    for ( const line of lines ) {
+        const trimmed = line.trim();
+        if ( trimmed === '' || trimmed.startsWith('!') ) { continue; }
+        const entry = { raw: trimmed };
+        const cosmetic = trimmed.match(/^(.+?)(##|#@#)(.+)$/);
+        if ( cosmetic ) {
+            entry.type = cosmetic[2] === '#@#' ? 'exception' : 'cosmetic';
+            entry.domains = cosmetic[1];
+            entry.selector = cosmetic[3];
+        } else if ( trimmed.startsWith('||') || trimmed.startsWith('@@') ) {
+            entry.type = trimmed.startsWith('@@') ? 'exception' : 'network';
+        } else {
+            entry.type = 'other';
+        }
+        rules.push(entry);
+    }
+    const data = {
+        format: 'uBlockVanced-filters',
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        filterCount: rules.length,
+        rules,
+    };
+    const json = JSON.stringify(data, null, 2);
+    const filename = 'uBlockVanced-filters_'
+        + uBlockDashboard.dateNowToSensibleString().replace(/ +/g, '_')
+        + '.json';
+    vAPI.download({
+        'url': `data:application/json;charset=utf-8,${encodeURIComponent(json)}`,
+        'filename': filename
+    });
+}
+
 /******************************************************************************/
 
 async function applyChanges() {
@@ -420,6 +458,7 @@ async function checkDeadDomains() {
 // Handle user interaction
 dom.on('#checkDeadDomains', 'click', checkDeadDomains);
 dom.on('#exportUserFiltersToFile', 'click', exportUserFiltersToFile);
+dom.on('#exportUserFiltersToJSON', 'click', exportUserFiltersToJSON);
 dom.on('#userFiltersApply', 'click', ( ) => { applyChanges(); });
 dom.on('#userFiltersRevert', 'click', revertChanges);
 dom.on('#enableMyFilters input', 'change', userFiltersChanged);
