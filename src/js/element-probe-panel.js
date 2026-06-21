@@ -574,6 +574,53 @@ async function reapplyFilter(idx) {
 }
 
 /******************************************************************************/
+// Filter Collision Detection
+/******************************************************************************/
+
+function checkFilterCollision(newFilter) {
+    return new Promise(resolve => {
+        try {
+            chrome.runtime.sendMessage({
+                what: 'getUserRules',
+            }, response => {
+                if (chrome.runtime.lastError || !response) {
+                    resolve(null);
+                    return;
+                }
+                const rules = (response.content || '').split('\n').filter(l => l.trim() && !l.startsWith('!'));
+                const newMatch = newFilter.match(/^(.+?)(##|#@#)(.+)$/);
+                if (!newMatch) { resolve(null); return; }
+                const newDomain = newMatch[1];
+                const newType = newMatch[2];
+                const newSelector = newMatch[3];
+                const collisions = [];
+                for (const rule of rules) {
+                    const m = rule.match(/^(.+?)(##|#@#)(.+)$/);
+                    if (!m) continue;
+                    const existDomain = m[1];
+                    const existType = m[2];
+                    const existSelector = m[3];
+                    if (rule === newFilter) {
+                        collisions.push({ type: 'duplicate', rule });
+                    } else if (existSelector === newSelector && existType === newType) {
+                        if (existDomain === '*' || existDomain === newDomain) {
+                            collisions.push({ type: 'superset', rule });
+                        } else if (newDomain === '*') {
+                            collisions.push({ type: 'subset', rule });
+                        }
+                    } else if (existDomain === newDomain && existType !== newType && existSelector === newSelector) {
+                        collisions.push({ type: 'conflict', rule });
+                    }
+                }
+                resolve(collisions.length > 0 ? collisions : null);
+            });
+        } catch (_) {
+            resolve(null);
+        }
+    });
+}
+
+/******************************************************************************/
 // Filter Persistence via vAPI messaging
 /******************************************************************************/
 
@@ -2129,6 +2176,25 @@ $('btnApplyFilter').addEventListener('click', async () => {
         log('Invalid CSS selector — not saved. Fix the syntax and try again.', 'error');
         setBusy('btnApplyFilter', false);
         return;
+    }
+
+    // Check for collisions with existing user filters
+    const collisions = await checkFilterCollision(filter);
+    if (collisions) {
+        for (const c of collisions) {
+            if (c.type === 'duplicate') {
+                log('Duplicate: this filter already exists in your list', 'error');
+                setBusy('btnApplyFilter', false);
+                return;
+            }
+            if (c.type === 'superset') {
+                log('Warning: existing rule already covers this — ' + c.rule, 'info');
+            } else if (c.type === 'subset') {
+                log('Warning: this new rule is broader than existing — ' + c.rule, 'info');
+            } else if (c.type === 'conflict') {
+                log('Warning: conflicting rule type — ' + c.rule, 'info');
+            }
+        }
     }
 
     // For procedural filters, we can't use querySelectorAll to preview,
