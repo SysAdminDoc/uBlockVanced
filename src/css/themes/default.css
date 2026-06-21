@@ -176,6 +176,8 @@
         --surface-1: rgb(var(--gray-95));
         --surface-2: rgb(var(--gray-90));
         --surface-3: rgb(var(--gray-80));
+        --scrollbar-thumb: rgb(var(--gray-70) / 0.6);
+        --scrollbar-thumb-hover: rgb(var(--primary-50) / 0.7);
     }
 }
 @media (prefers-color-scheme: dark) {
@@ -184,6 +186,8 @@
         --surface-1: rgb(24 24 37); /* Catppuccin Mantle */
         --surface-2: rgb(49 50 68); /* Catppuccin Surface0 */
         --surface-3: rgb(69 71 90); /* Catppuccin Surface1 */
+        --scrollbar-thumb: rgb(88 91 112 / 0.72);
+        --scrollbar-thumb-hover: rgb(137 180 250 / 0.9);
     }
 }
 

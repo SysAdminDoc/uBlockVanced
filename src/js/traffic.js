@@ -1314,16 +1314,15 @@ const webRequest = {
                 types: [ 'main_frame', 'sub_frame' ],
                 urls: [ 'http://*/*', 'https://*/*' ]
             });
-            if ( µb.hiddenSettings.gpcEnabled ) {
-                vAPI.net.addListener('onBeforeSendHeaders', details => {
-                    if ( details.requestHeaders.some(h => h.name.toLowerCase() === 'sec-gpc') === false ) {
-                        details.requestHeaders.push({ name: 'Sec-GPC', value: '1' });
-                    }
-                    return { requestHeaders: details.requestHeaders };
-                }, {
-                    urls: [ 'http://*/*', 'https://*/*' ]
-                }, [ 'blocking', 'requestHeaders' ]);
-            }
+            vAPI.net.addListener('onBeforeSendHeaders', details => {
+                if ( µb.hiddenSettings.gpcEnabled === false ) { return; }
+                if ( details.requestHeaders.some(h => h.name.toLowerCase() === 'sec-gpc') === false ) {
+                    details.requestHeaders.push({ name: 'Sec-GPC', value: '1' });
+                }
+                return { requestHeaders: details.requestHeaders };
+            }, {
+                urls: [ 'http://*/*', 'https://*/*' ]
+            }, [ 'blocking', 'requestHeaders' ]);
             vAPI.defer.once({ sec: µb.hiddenSettings.toolbarWarningTimeout }).then(( ) => {
                 if ( vAPI.net.hasUnprocessedRequest() === false ) { return; }
                 vAPI.net.removeUnprocessedRequest();

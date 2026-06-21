@@ -186,11 +186,12 @@ export function buildInspectScript(patterns) {
         var key = attrKeys[i];
         var val = result.attrs[key];
         if (goodAttrs.indexOf(key) !== -1 || key.startsWith('data-')) {
+            var safeKey = CSS.escape ? CSS.escape(key) : key.replace(/([\\[\\](){}|:.\\\\/^$*+?#"',>~ ])/g, '\\\\$1');
             var attrSel;
             if (val && val.length < 80) {
-                attrSel = result.tag + '[' + key + '="' + val.replace(/"/g, '\\\\"') + '"]';
+                attrSel = result.tag + '[' + safeKey + '="' + val.replace(/\\\\/g, '\\\\\\\\').replace(/"/g, '\\\\"') + '"]';
             } else {
-                attrSel = result.tag + '[' + key + ']';
+                attrSel = result.tag + '[' + safeKey + ']';
             }
             var count = countMatches(attrSel);
             if (count > 0 && count <= 20) {
