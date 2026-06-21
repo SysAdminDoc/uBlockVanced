@@ -31,6 +31,7 @@ import {
     REMOVE_HIGHLIGHT_SCRIPT,
     SCAN_IFRAMES_SCRIPT,
     SCAN_SHADOW_SCRIPT,
+    YT_SWEEP_SCRIPT,
     buildInspectScript,
 } from './element-probe/page-scripts.js';
 
@@ -1027,6 +1028,35 @@ $('btnScanIframes').addEventListener('click', async () => {
     }
 });
 
+$('btnYtSweep').addEventListener('click', async () => {
+    setBusy('btnYtSweep', true, 'Sweeping...');
+    log('Running YouTube ad container sweep...', 'info');
+    try {
+        const raw = await evalInPage(YT_SWEEP_SCRIPT);
+        const results = JSON.parse(raw);
+        if (results.error) {
+            log(results.error, 'error');
+            return;
+        }
+        const found = results.filter(r => r.total > 0);
+        if (found.length === 0) {
+            log('No known ad containers detected on this page', 'success');
+        } else {
+            log(`Found ${found.length} ad container type(s):`, 'info');
+            found.forEach(r => {
+                const vis = r.visible > 0 ? `${r.visible} visible` : 'hidden';
+                log(`  ${r.name}: ${r.total} element(s) (${vis}) — ${r.selector}`, r.visible > 0 ? 'error' : 'info');
+            });
+        }
+        const clean = results.filter(r => r.total === 0);
+        log(`${clean.length}/${results.length} container types clean`, 'success');
+    } catch(e) {
+        log('Sweep failed: ' + (e.message || e), 'error');
+    } finally {
+        setBusy('btnYtSweep', false);
+    }
+});
+
 // Quick preflight: does this look like a valid CSS selector? We ask the
 // browser by trying it against a detached document fragment so we don't
 // pollute the inspected page. Procedural filters use uBlock-specific
@@ -1402,8 +1432,18 @@ if (
         syncFilterActions();
         log('Page navigated — state reset', 'info');
         scanFrames();
+        detectYouTube();
     };
     chrome.devtools.inspectedWindow.onNavigated.addListener(onNav);
+}
+
+function detectYouTube() {
+    chrome.devtools.inspectedWindow.eval('location.hostname', (hostname) => {
+        const btn = $('btnYtSweep');
+        if (btn) {
+            btn.style.display = hostname && hostname.includes('youtube.com') ? '' : 'none';
+        }
+    });
 }
 
 // Load custom class patterns from storage
@@ -1416,6 +1456,7 @@ chrome.storage.local.get('probeClassPatterns', result => {
 // Initialize
 loadHistory();
 scanFrames(); // auto-detect iframes on panel open
+detectYouTube();
 syncLogState();
 log('Element Probe v0.3.0 initialized', 'info');
 setStatus(i18n('epStatusReady') || 'Ready');

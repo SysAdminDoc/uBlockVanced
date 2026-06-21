@@ -1147,3 +1147,60 @@ export const PICK_ELEMENT_SCRIPT = `
     return 'picker_started';
 })()
 `;
+
+export const YT_SWEEP_SCRIPT = `
+(function() {
+    if (!location.hostname.includes('youtube.com')) {
+        return JSON.stringify({ error: 'Not on YouTube' });
+    }
+    var selectors = [
+        { name: 'Masthead ad', sel: 'ytd-rich-item-renderer[is-ad]' },
+        { name: 'In-feed ad', sel: 'ytd-ad-slot-renderer' },
+        { name: 'Video ad overlay', sel: '.ytp-ad-overlay-container' },
+        { name: 'Skip button', sel: '.ytp-ad-skip-button-container' },
+        { name: 'Ad text overlay', sel: '.ytp-ad-text-overlay' },
+        { name: 'Player ad', sel: '.ytp-ad-player-overlay' },
+        { name: 'Companion ad banner', sel: '#companion .ytd-companion-slot-renderer' },
+        { name: 'Promoted video', sel: 'ytd-promoted-sparkles-web-renderer' },
+        { name: 'Promoted item', sel: 'ytd-display-ad-renderer' },
+        { name: 'Action companion', sel: 'ytd-action-companion-ad-renderer' },
+        { name: 'In-feed sponsored', sel: 'ytd-in-feed-ad-layout-renderer' },
+        { name: 'Merch shelf', sel: 'ytd-merch-shelf-renderer' },
+        { name: 'Movie offer', sel: 'ytd-movie-offer-module-renderer' },
+        { name: 'Donation prompt', sel: 'ytd-donation-shelf-renderer' },
+        { name: 'Live chat banner', sel: 'yt-live-chat-banner-renderer' },
+        { name: 'Live chat ticker', sel: 'yt-live-chat-ticker-renderer' },
+        { name: 'Paid sticker', sel: 'yt-live-chat-paid-sticker-renderer' },
+        { name: 'Super chat', sel: 'yt-live-chat-paid-message-renderer' },
+        { name: 'Membership item', sel: 'yt-live-chat-membership-item-renderer' },
+        { name: 'Shorts shelf', sel: 'ytd-reel-shelf-renderer' },
+        { name: 'Shorts entry', sel: 'ytd-rich-shelf-renderer[is-shorts]' },
+        { name: 'Survey', sel: 'ytd-survey-renderer' },
+        { name: 'Brand watermark', sel: '.ytp-watermark' },
+        { name: 'Engagement panel ad', sel: 'ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-ads"]' },
+        { name: 'Statement banner', sel: 'ytd-statement-banner-renderer' },
+        { name: 'Clarification renderer', sel: 'ytd-clarification-renderer' },
+        { name: 'Player ad module', sel: '.ytp-ad-module' },
+    ];
+    var results = [];
+    for (var i = 0; i < selectors.length; i++) {
+        var s = selectors[i];
+        try {
+            var els = document.querySelectorAll(s.sel);
+            var visible = 0;
+            for (var j = 0; j < els.length; j++) {
+                if (els[j].offsetParent !== null || els[j].offsetWidth > 0) visible++;
+            }
+            results.push({
+                name: s.name,
+                selector: s.sel,
+                total: els.length,
+                visible: visible
+            });
+        } catch(e) {
+            results.push({ name: s.name, selector: s.sel, total: 0, visible: 0 });
+        }
+    }
+    return JSON.stringify(results);
+})()
+`;
