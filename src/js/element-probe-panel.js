@@ -26,6 +26,24 @@
 
 const $ = id => document.getElementById(id);
 
+const i18n = key => chrome.i18n.getMessage(key) || '';
+
+function renderI18n() {
+    for (const el of document.querySelectorAll('[data-i18n]')) {
+        const text = i18n(el.getAttribute('data-i18n'));
+        if (text) { el.textContent = text; }
+    }
+    for (const el of document.querySelectorAll('[data-i18n-title]')) {
+        const text = i18n(el.getAttribute('data-i18n-title'));
+        if (text) { el.title = text; }
+    }
+    for (const el of document.querySelectorAll('[data-i18n-placeholder]')) {
+        const text = i18n(el.getAttribute('data-i18n-placeholder'));
+        if (text) { el.placeholder = text; }
+    }
+}
+renderI18n();
+
 // Set to true once the panel window unloads so async callbacks (devtools eval,
 // storage, sendMessage) skip UI updates instead of touching a detached DOM.
 let panelClosed = false;
@@ -2463,8 +2481,8 @@ $('frameTarget').addEventListener('change', function() {
         setSelectionSummary('Inspecting inside ' + label);
     } else {
         log('Targeting top frame', 'info');
-        setStatus('Ready');
-        setSelectionSummary('Targeting the top document.');
+        setStatus(i18n('epStatusReady') || 'Ready');
+        setSelectionSummary(i18n('epOverviewTargetHint') || 'Targeting the top document.');
     }
 });
 
@@ -2507,8 +2525,8 @@ if (
             while (select.options.length > 1) { select.remove(1); }
             select.value = '';
         }
-        setStatus('Page navigated', 'idle');
-        setSelectionSummary('No element selected yet.');
+        setStatus(i18n('epStatusReady') || 'Ready', 'idle');
+        setSelectionSummary(i18n('epNoElementSelected') || 'No element selected yet.');
         syncFilterActions();
         log('Page navigated — state reset', 'info');
         scanFrames();
@@ -2528,8 +2546,8 @@ loadHistory();
 scanFrames(); // auto-detect iframes on panel open
 syncLogState();
 log('Element Probe v0.3.0 initialized', 'info');
-setStatus('Ready');
-setSelectionSummary('No element selected yet.');
+setStatus(i18n('epStatusReady') || 'Ready');
+setSelectionSummary(i18n('epNoElementSelected') || 'No element selected yet.');
 syncFilterActions();
 
 $('filterOutput').addEventListener('input', syncFilterActions);

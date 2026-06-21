@@ -1880,6 +1880,298 @@
     "message": "Minimize picker",
     "description": "Aria label and title for the minimize button in the element picker"
   },
+  "epTitle": {
+    "message": "Element Probe",
+    "description": "Element Probe panel heading"
+  },
+  "epBranding": {
+    "message": "uBlockVanced DevTools",
+    "description": "Element Probe panel eyebrow branding"
+  },
+  "epSubtitle": {
+    "message": "Generate resilient selectors and cosmetic filters for shadow DOM, dynamic class names, live chat overlays, and other stubborn page elements.",
+    "description": "Element Probe panel subtitle description"
+  },
+  "epStatusReady": {
+    "message": "Ready",
+    "description": "Element Probe status: ready"
+  },
+  "epNoElementSelected": {
+    "message": "No element selected yet.",
+    "description": "Element Probe selection summary: none selected"
+  },
+  "epOverviewTarget": {
+    "message": "Target",
+    "description": "Element Probe overview card label: target"
+  },
+  "epOverviewTargetDefault": {
+    "message": "Top document",
+    "description": "Element Probe overview: default target"
+  },
+  "epOverviewTargetHint": {
+    "message": "Inspecting the main page context.",
+    "description": "Element Probe overview: target hint"
+  },
+  "epOverviewSelection": {
+    "message": "Selection",
+    "description": "Element Probe overview card label: selection"
+  },
+  "epOverviewSelectionDefault": {
+    "message": "Waiting for a node",
+    "description": "Element Probe overview: no selection"
+  },
+  "epOverviewSelectionHint": {
+    "message": "Select in Elements or use Pick on page.",
+    "description": "Element Probe overview: selection hint"
+  },
+  "epOverviewOutput": {
+    "message": "Output",
+    "description": "Element Probe overview card label: output"
+  },
+  "epOverviewOutputDefault": {
+    "message": "No output yet",
+    "description": "Element Probe overview: no output"
+  },
+  "epOverviewOutputHint": {
+    "message": "Inspect an element to generate selectors and cosmetic rules.",
+    "description": "Element Probe overview: output hint"
+  },
+  "epSectionInspection": {
+    "message": "Inspection",
+    "description": "Element Probe section title: inspection controls"
+  },
+  "epSectionInspectionSub": {
+    "message": "Start from the current DevTools selection or pick directly on the page.",
+    "description": "Element Probe section subtitle: inspection"
+  },
+  "epBtnInspect": {
+    "message": "Inspect selection",
+    "description": "Element Probe button: inspect selected element"
+  },
+  "epBtnPick": {
+    "message": "Pick on page",
+    "description": "Element Probe button: pick element on page"
+  },
+  "epBtnScanShadow": {
+    "message": "Scan shadow DOM",
+    "description": "Element Probe button: scan shadow DOM"
+  },
+  "epBtnScanIframes": {
+    "message": "Scan iframes",
+    "description": "Element Probe button: scan iframes"
+  },
+  "epFrameTarget": {
+    "message": "Frame target",
+    "description": "Element Probe label: frame target selector"
+  },
+  "epFrameTopDoc": {
+    "message": "Top document",
+    "description": "Element Probe frame selector: top document"
+  },
+  "epBtnRefreshFrames": {
+    "message": "Refresh",
+    "description": "Element Probe button: refresh iframe list"
+  },
+  "epLiveHighlight": {
+    "message": "Live highlight on hover",
+    "description": "Element Probe checkbox: live highlight on hover"
+  },
+  "epSectionElement": {
+    "message": "Element details",
+    "description": "Element Probe section title: element details"
+  },
+  "epSectionElementSub": {
+    "message": "Quick context for the currently inspected node.",
+    "description": "Element Probe section subtitle: element details"
+  },
+  "epShadowBadge": {
+    "message": "SHADOW DOM",
+    "description": "Element Probe badge: shadow DOM element"
+  },
+  "epLabelTag": {
+    "message": "Tag",
+    "description": "Element Probe element info label"
+  },
+  "epLabelId": {
+    "message": "ID",
+    "description": "Element Probe element info label"
+  },
+  "epLabelClasses": {
+    "message": "Classes",
+    "description": "Element Probe element info label"
+  },
+  "epLabelAttrs": {
+    "message": "Attributes",
+    "description": "Element Probe element info label"
+  },
+  "epLabelText": {
+    "message": "Text",
+    "description": "Element Probe element info label"
+  },
+  "epLabelDims": {
+    "message": "Dimensions",
+    "description": "Element Probe element info label"
+  },
+  "epLabelVisibility": {
+    "message": "Visibility",
+    "description": "Element Probe element info label"
+  },
+  "epLabelPosition": {
+    "message": "Position",
+    "description": "Element Probe element info label"
+  },
+  "epLabelComputed": {
+    "message": "Computed",
+    "description": "Element Probe element info label"
+  },
+  "epSectionSelectors": {
+    "message": "CSS selectors",
+    "description": "Element Probe section title: CSS selectors"
+  },
+  "epSectionSelectorsSub": {
+    "message": "Choose the most stable selector before generating a cosmetic filter.",
+    "description": "Element Probe section subtitle: CSS selectors"
+  },
+  "epSelectorCount": {
+    "message": "{{count}} selectors",
+    "description": "Element Probe selector count"
+  },
+  "epSectionProcedural": {
+    "message": "Procedural filters",
+    "description": "Element Probe section title: procedural filters"
+  },
+  "epSectionProceduralSub": {
+    "message": "Use these when standard selectors are not expressive enough.",
+    "description": "Element Probe section subtitle: procedural filters"
+  },
+  "epFilterCount": {
+    "message": "{{count}} filters",
+    "description": "Element Probe filter count"
+  },
+  "epSectionFilter": {
+    "message": "Filter output",
+    "description": "Element Probe section title: filter output"
+  },
+  "epSectionFilterSub": {
+    "message": "Preview or save the final rule to your user filters.",
+    "description": "Element Probe section subtitle: filter output"
+  },
+  "epFilterPlaceholder": {
+    "message": "Select a selector or procedural filter above to build a filter...",
+    "description": "Element Probe filter output placeholder"
+  },
+  "epHintBadgeDefault": {
+    "message": "Selection required",
+    "description": "Element Probe filter hint badge default"
+  },
+  "epHintTextDefault": {
+    "message": "Choose a selector or procedural filter to build a rule.",
+    "description": "Element Probe filter hint text default"
+  },
+  "epLabelDomains": {
+    "message": "Domains",
+    "description": "Element Probe label: domain input"
+  },
+  "epLabelRuleType": {
+    "message": "Rule type",
+    "description": "Element Probe label: rule type selector"
+  },
+  "epRuleBlock": {
+    "message": "Block (##)",
+    "description": "Element Probe rule type: block"
+  },
+  "epRuleException": {
+    "message": "Exception (#@#)",
+    "description": "Element Probe rule type: exception"
+  },
+  "epRuleRemove": {
+    "message": "Block + :remove()",
+    "description": "Element Probe rule type: block and remove"
+  },
+  "epRuleStyle": {
+    "message": "Block + :style()",
+    "description": "Element Probe rule type: block and style"
+  },
+  "epLabelCss": {
+    "message": "CSS",
+    "description": "Element Probe label: CSS style value input"
+  },
+  "epBtnSave": {
+    "message": "Save filter",
+    "description": "Element Probe button: save filter"
+  },
+  "epBtnCopy": {
+    "message": "Copy",
+    "description": "Element Probe button: copy filter"
+  },
+  "epBtnPreview": {
+    "message": "Preview",
+    "description": "Element Probe button: preview filter"
+  },
+  "epBtnTest": {
+    "message": "Test (5s)",
+    "description": "Element Probe button: test filter for 5 seconds"
+  },
+  "epBtnClearPreview": {
+    "message": "Clear preview",
+    "description": "Element Probe button: clear preview"
+  },
+  "epSyntaxRef": {
+    "message": "Filter syntax reference",
+    "description": "Element Probe section title: syntax reference"
+  },
+  "epSyntaxNote": {
+    "message": "Procedural filters must be site-scoped (e.g. example.com##). Generic procedural rules are discarded by uBO.",
+    "description": "Element Probe syntax reference note"
+  },
+  "epSectionHistory": {
+    "message": "Filter history",
+    "description": "Element Probe section title: filter history"
+  },
+  "epSectionHistorySub": {
+    "message": "Quickly copy, undo, or re-apply recent rules.",
+    "description": "Element Probe section subtitle: filter history"
+  },
+  "epBtnClearHistory": {
+    "message": "Clear",
+    "description": "Element Probe button: clear filter history"
+  },
+  "epEmptyStateMain": {
+    "message": "Select an element in the Elements panel, then use Inspect selection to analyze it.",
+    "description": "Element Probe empty state main text"
+  },
+  "epEmptyStateHint1": {
+    "message": "You can also use Pick on page to hover and click elements directly in the inspected tab.",
+    "description": "Element Probe empty state hint"
+  },
+  "epEmptyStateHint2": {
+    "message": "Element Probe is built for hard targets: shadow DOM, obfuscated classes, live chat overlays, and dynamic UI that the standard picker struggles to reach.",
+    "description": "Element Probe empty state hint"
+  },
+  "epSectionLog": {
+    "message": "Activity log",
+    "description": "Element Probe section title: activity log"
+  },
+  "epSectionLogSub": {
+    "message": "Recent actions and results from this panel.",
+    "description": "Element Probe section subtitle: activity log"
+  },
+  "epBtnClearLog": {
+    "message": "Clear",
+    "description": "Element Probe button: clear activity log"
+  },
+  "epHelpColOperator": {
+    "message": "Operator",
+    "description": "Element Probe syntax help table column header"
+  },
+  "epHelpColUsage": {
+    "message": "Usage",
+    "description": "Element Probe syntax help table column header"
+  },
+  "epHelpColDesc": {
+    "message": "Description",
+    "description": "Element Probe syntax help table column header"
+  },
   "dummy": {
     "message": "This entry must be the last one",
     "description": "so we dont need to deal with comma for last entry"

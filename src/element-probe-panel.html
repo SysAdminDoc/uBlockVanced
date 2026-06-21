@@ -14,38 +14,38 @@
     <div class="panel-brand">
         <div class="brand-mark" aria-hidden="true">EP</div>
         <div class="panel-brand-copy">
-            <p class="panel-eyebrow">uBlockVanced DevTools</p>
+            <p class="panel-eyebrow" data-i18n="epBranding">uBlockVanced DevTools</p>
             <div class="heading-row">
-                <h1>Element Probe</h1>
+                <h1 data-i18n="epTitle">Element Probe</h1>
                 <span class="version">v0.3.0</span>
             </div>
-            <p class="panel-subtitle">Generate resilient selectors and cosmetic filters for shadow DOM, dynamic class names, live chat overlays, and other stubborn page elements.</p>
+            <p class="panel-subtitle" data-i18n="epSubtitle">Generate resilient selectors and cosmetic filters for shadow DOM, dynamic class names, live chat overlays, and other stubborn page elements.</p>
         </div>
     </div>
     <div class="panel-status-group">
         <div class="status-indicator" aria-live="polite">
             <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">Ready</span>
+            <span id="statusText" data-i18n="epStatusReady">Ready</span>
         </div>
-        <p class="selection-summary" id="selectionSummary">No element selected yet.</p>
+        <p class="selection-summary" id="selectionSummary" data-i18n="epNoElementSelected">No element selected yet.</p>
     </div>
 </div>
 
 <div class="panel-overview" aria-label="Workflow summary">
     <div class="overview-card">
-        <span class="overview-label">Target</span>
-        <strong class="overview-value" id="overviewTargetValue">Top document</strong>
-        <span class="overview-hint" id="overviewTargetHint">Inspecting the main page context.</span>
+        <span class="overview-label" data-i18n="epOverviewTarget">Target</span>
+        <strong class="overview-value" id="overviewTargetValue" data-i18n="epOverviewTargetDefault">Top document</strong>
+        <span class="overview-hint" id="overviewTargetHint" data-i18n="epOverviewTargetHint">Inspecting the main page context.</span>
     </div>
     <div class="overview-card">
-        <span class="overview-label">Selection</span>
-        <strong class="overview-value" id="overviewSelectionValue">Waiting for a node</strong>
-        <span class="overview-hint" id="overviewSelectionHint">Select in Elements or use Pick on page.</span>
+        <span class="overview-label" data-i18n="epOverviewSelection">Selection</span>
+        <strong class="overview-value" id="overviewSelectionValue" data-i18n="epOverviewSelectionDefault">Waiting for a node</strong>
+        <span class="overview-hint" id="overviewSelectionHint" data-i18n="epOverviewSelectionHint">Select in Elements or use Pick on page.</span>
     </div>
     <div class="overview-card">
-        <span class="overview-label">Output</span>
-        <strong class="overview-value" id="overviewOutputValue">No output yet</strong>
-        <span class="overview-hint" id="overviewOutputHint">Inspect an element to generate selectors and cosmetic rules.</span>
+        <span class="overview-label" data-i18n="epOverviewOutput">Output</span>
+        <strong class="overview-value" id="overviewOutputValue" data-i18n="epOverviewOutputDefault">No output yet</strong>
+        <span class="overview-hint" id="overviewOutputHint" data-i18n="epOverviewOutputHint">Inspect an element to generate selectors and cosmetic rules.</span>
     </div>
 </div>
 
@@ -54,28 +54,28 @@
     <div class="section">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">Inspection</span>
-                <span class="section-subtitle">Start from the current DevTools selection or pick directly on the page.</span>
+                <span class="section-title" data-i18n="epSectionInspection">Inspection</span>
+                <span class="section-subtitle" data-i18n="epSectionInspectionSub">Start from the current DevTools selection or pick directly on the page.</span>
             </div>
         </div>
         <div class="section-body">
             <div class="inspect-controls">
-                <button type="button" class="btn primary" id="btnInspectSelected">Inspect selection</button>
-                <button type="button" class="btn" id="btnInspectPoint">Pick on page</button>
-                <button type="button" class="btn" id="btnScanShadow">Scan shadow DOM</button>
-                <button type="button" class="btn" id="btnScanIframes">Scan iframes</button>
+                <button type="button" class="btn primary" id="btnInspectSelected" data-i18n="epBtnInspect">Inspect selection</button>
+                <button type="button" class="btn" id="btnInspectPoint" data-i18n="epBtnPick">Pick on page</button>
+                <button type="button" class="btn" id="btnScanShadow" data-i18n="epBtnScanShadow">Scan shadow DOM</button>
+                <button type="button" class="btn" id="btnScanIframes" data-i18n="epBtnScanIframes">Scan iframes</button>
             </div>
             <div class="control-row">
                 <div class="frame-field">
-                    <label class="field-label" for="frameTarget">Frame target</label>
+                    <label class="field-label" for="frameTarget" data-i18n="epFrameTarget">Frame target</label>
                     <select id="frameTarget" class="control-select">
-                        <option value="">Top document</option>
+                        <option value="" data-i18n="epFrameTopDoc">Top document</option>
                     </select>
-                    <button type="button" class="btn-mini" id="btnRefreshFrames" title="Refresh iframe list">Refresh</button>
+                    <button type="button" class="btn-mini" id="btnRefreshFrames" data-i18n="epBtnRefreshFrames" title="Refresh iframe list">Refresh</button>
                 </div>
                 <label class="preview-toggle" for="chkLivePreview">
                     <input type="checkbox" id="chkLivePreview" checked>
-                    <span>Live highlight on hover</span>
+                    <span data-i18n="epLiveHighlight">Live highlight on hover</span>
                 </label>
             </div>
         </div>
@@ -85,22 +85,22 @@
     <div class="section" id="elementSection" style="display:none;">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">Element details</span>
-                <span class="section-subtitle">Quick context for the currently inspected node.</span>
+                <span class="section-title" data-i18n="epSectionElement">Element details</span>
+                <span class="section-subtitle" data-i18n="epSectionElementSub">Quick context for the currently inspected node.</span>
             </div>
-            <span id="shadowBadge" class="shadow-badge" style="display:none;">SHADOW DOM</span>
+            <span id="shadowBadge" class="shadow-badge" style="display:none;" data-i18n="epShadowBadge">SHADOW DOM</span>
         </div>
         <div class="section-body">
             <div class="element-info" id="elementInfo">
-                <span class="label">Tag</span><span class="value tag" id="elTag">--</span>
-                <span class="label">ID</span><span class="value id" id="elId">--</span>
-                <span class="label">Classes</span><span class="value classes" id="elClasses">--</span>
-                <span class="label">Attributes</span><span class="value" id="elAttrs">--</span>
-                <span class="label">Text</span><span class="value text-content" id="elText">--</span>
-                <span class="label">Dimensions</span><span class="value" id="elDims">--</span>
-                <span class="label">Visibility</span><span class="value" id="elVisibility">--</span>
-                <span class="label">Position</span><span class="value" id="elPosition">--</span>
-                <span class="label">Computed</span><span class="value" id="elComputed">--</span>
+                <span class="label" data-i18n="epLabelTag">Tag</span><span class="value tag" id="elTag">--</span>
+                <span class="label" data-i18n="epLabelId">ID</span><span class="value id" id="elId">--</span>
+                <span class="label" data-i18n="epLabelClasses">Classes</span><span class="value classes" id="elClasses">--</span>
+                <span class="label" data-i18n="epLabelAttrs">Attributes</span><span class="value" id="elAttrs">--</span>
+                <span class="label" data-i18n="epLabelText">Text</span><span class="value text-content" id="elText">--</span>
+                <span class="label" data-i18n="epLabelDims">Dimensions</span><span class="value" id="elDims">--</span>
+                <span class="label" data-i18n="epLabelVisibility">Visibility</span><span class="value" id="elVisibility">--</span>
+                <span class="label" data-i18n="epLabelPosition">Position</span><span class="value" id="elPosition">--</span>
+                <span class="label" data-i18n="epLabelComputed">Computed</span><span class="value" id="elComputed">--</span>
             </div>
         </div>
     </div>
@@ -109,8 +109,8 @@
     <div class="section" id="selectorSection" style="display:none;">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">CSS selectors</span>
-                <span class="section-subtitle">Choose the most stable selector before generating a cosmetic filter.</span>
+                <span class="section-title" data-i18n="epSectionSelectors">CSS selectors</span>
+                <span class="section-subtitle" data-i18n="epSectionSelectorsSub">Choose the most stable selector before generating a cosmetic filter.</span>
             </div>
             <span id="selectorCount" class="section-meta">0 selectors</span>
         </div>
@@ -123,8 +123,8 @@
     <div class="section" id="proceduralSection" style="display:none;">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">Procedural filters</span>
-                <span class="section-subtitle">Use these when standard selectors are not expressive enough.</span>
+                <span class="section-title" data-i18n="epSectionProcedural">Procedural filters</span>
+                <span class="section-subtitle" data-i18n="epSectionProceduralSub">Use these when standard selectors are not expressive enough.</span>
             </div>
             <span id="proceduralCount" class="section-meta">0 filters</span>
         </div>
@@ -137,43 +137,43 @@
     <div class="section" id="filterSection" style="display:none;">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">Filter output</span>
-                <span class="section-subtitle">Preview or save the final rule to your user filters.</span>
+                <span class="section-title" data-i18n="epSectionFilter">Filter output</span>
+                <span class="section-subtitle" data-i18n="epSectionFilterSub">Preview or save the final rule to your user filters.</span>
             </div>
         </div>
         <div class="section-body">
             <div class="filter-output">
-                <textarea id="filterOutput" placeholder="Select a selector or procedural filter above to build a filter..." spellcheck="false"></textarea>
+                <textarea id="filterOutput" data-i18n-placeholder="epFilterPlaceholder" placeholder="Select a selector or procedural filter above to build a filter..." spellcheck="false"></textarea>
                 <span class="filter-match-count" id="filterMatchCount"></span>
             </div>
             <div class="filter-hint">
-                <span class="filter-hint-badge" id="filterHintBadge">Selection required</span>
-                <span class="filter-hint-text" id="filterHintText">Choose a selector or procedural filter to build a rule.</span>
+                <span class="filter-hint-badge" id="filterHintBadge" data-i18n="epHintBadgeDefault">Selection required</span>
+                <span class="filter-hint-text" id="filterHintText" data-i18n="epHintTextDefault">Choose a selector or procedural filter to build a rule.</span>
             </div>
             <span class="filter-compat-badge" id="filterCompatBadge"></span>
             <div class="filter-type-row">
-                <label class="filter-type-label" for="filterDomains">Domains</label>
+                <label class="filter-type-label" for="filterDomains" data-i18n="epLabelDomains">Domains</label>
                 <input type="text" id="filterDomains" class="style-input" placeholder="example.com" spellcheck="false" title="Comma-separated domains, or * for global">
             </div>
             <div class="filter-type-row">
-                <label class="filter-type-label" for="filterType">Rule type</label>
+                <label class="filter-type-label" for="filterType" data-i18n="epLabelRuleType">Rule type</label>
                 <select id="filterType" class="filter-type-select">
-                    <option value="##">Block (##)</option>
-                    <option value="#@#">Exception (#@#)</option>
-                    <option value="##-remove">Block + :remove()</option>
-                    <option value="##-style">Block + :style()</option>
+                    <option value="##" data-i18n="epRuleBlock">Block (##)</option>
+                    <option value="#@#" data-i18n="epRuleException">Exception (#@#)</option>
+                    <option value="##-remove" data-i18n="epRuleRemove">Block + :remove()</option>
+                    <option value="##-style" data-i18n="epRuleStyle">Block + :style()</option>
                 </select>
             </div>
             <div class="style-input-row" id="styleInputRow" style="display:none">
-                <label class="filter-type-label" for="styleValue">CSS</label>
+                <label class="filter-type-label" for="styleValue" data-i18n="epLabelCss">CSS</label>
                 <input type="text" id="styleValue" class="style-input" placeholder="e.g. opacity: 0 !important" spellcheck="false">
             </div>
             <div class="filter-actions">
-                <button type="button" class="btn success" id="btnApplyFilter">Save filter</button>
-                <button type="button" class="btn" id="btnCopyFilter">Copy</button>
-                <button type="button" class="btn" id="btnTestFilter">Preview</button>
-                <button type="button" class="btn" id="btnTestApply">Test (5s)</button>
-                <button type="button" class="btn danger" id="btnRemoveFilter">Clear preview</button>
+                <button type="button" class="btn success" id="btnApplyFilter" data-i18n="epBtnSave">Save filter</button>
+                <button type="button" class="btn" id="btnCopyFilter" data-i18n="epBtnCopy">Copy</button>
+                <button type="button" class="btn" id="btnTestFilter" data-i18n="epBtnPreview">Preview</button>
+                <button type="button" class="btn" id="btnTestApply" data-i18n="epBtnTest">Test (5s)</button>
+                <button type="button" class="btn danger" id="btnRemoveFilter" data-i18n="epBtnClearPreview">Clear preview</button>
             </div>
         </div>
     </div>
@@ -181,11 +181,11 @@
     <!-- Syntax Help -->
     <details class="section help-section" id="helpSection">
         <summary class="section-header help-toggle">
-            <span class="section-title">Filter syntax reference</span>
+            <span class="section-title" data-i18n="epSyntaxRef">Filter syntax reference</span>
         </summary>
         <div class="section-body help-body">
             <table class="help-table">
-                <tr><th>Operator</th><th>Usage</th><th>Description</th></tr>
+                <tr><th data-i18n="epHelpColOperator">Operator</th><th data-i18n="epHelpColUsage">Usage</th><th data-i18n="epHelpColDesc">Description</th></tr>
                 <tr><td><code>##</code></td><td><code>example.com##div.ad</code></td><td>Hide elements matching CSS selector</td></tr>
                 <tr><td><code>#@#</code></td><td><code>example.com#@#div.ad</code></td><td>Exception — unblock a hiding rule</td></tr>
                 <tr><td><code>:has-text()</code></td><td><code>div:has-text(Subscribe)</code></td><td>Match by text content (literal or /regex/)</td></tr>
@@ -200,7 +200,7 @@
                 <tr><td><code>:others()</code></td><td><code>div.main:others()</code></td><td>Hide everything EXCEPT matched elements</td></tr>
                 <tr><td><code>:not()</code></td><td><code>div:not(:has-text(Keep))</code></td><td>Negate any procedural operator</td></tr>
             </table>
-            <p class="help-note">Procedural filters must be site-scoped (e.g. <code>example.com##</code>). Generic procedural rules are discarded by uBO.</p>
+            <p class="help-note" data-i18n="epSyntaxNote">Procedural filters must be site-scoped (e.g. example.com##). Generic procedural rules are discarded by uBO.</p>
         </div>
     </details>
 
@@ -208,12 +208,12 @@
     <div class="section" id="historySection" style="display:none;">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">Filter history</span>
-                <span class="section-subtitle">Quickly copy, undo, or re-apply recent rules.</span>
+                <span class="section-title" data-i18n="epSectionHistory">Filter history</span>
+                <span class="section-subtitle" data-i18n="epSectionHistorySub">Quickly copy, undo, or re-apply recent rules.</span>
             </div>
             <span style="display:flex;align-items:center;gap:8px;">
                 <span id="historyCount" class="section-meta">0 filters</span>
-                <button type="button" class="btn-mini danger" id="btnClearHistory">Clear</button>
+                <button type="button" class="btn-mini danger" id="btnClearHistory" data-i18n="epBtnClearHistory">Clear</button>
             </span>
         </div>
         <div class="section-body" style="padding:0;">
@@ -224,19 +224,19 @@
     <!-- Empty State -->
     <div id="emptyState" class="empty-state">
         <div class="icon">&#9881;</div>
-        <p>Select an element in the Elements panel, then use <strong>Inspect selection</strong> to analyze it.</p>
-        <p class="hint">You can also use <strong>Pick on page</strong> to hover and click elements directly in the inspected tab.</p>
-        <p class="hint">Element Probe is built for hard targets: shadow DOM, obfuscated classes, live chat overlays, and dynamic UI that the standard picker struggles to reach.</p>
+        <p data-i18n="epEmptyStateMain">Select an element in the Elements panel, then use <strong>Inspect selection</strong> to analyze it.</p>
+        <p class="hint" data-i18n="epEmptyStateHint1">You can also use <strong>Pick on page</strong> to hover and click elements directly in the inspected tab.</p>
+        <p class="hint" data-i18n="epEmptyStateHint2">Element Probe is built for hard targets: shadow DOM, obfuscated classes, live chat overlays, and dynamic UI that the standard picker struggles to reach.</p>
     </div>
 
     <!-- Log -->
     <div class="section">
         <div class="section-header">
             <div class="section-heading">
-                <span class="section-title">Activity log</span>
-                <span class="section-subtitle">Recent actions and results from this panel.</span>
+                <span class="section-title" data-i18n="epSectionLog">Activity log</span>
+                <span class="section-subtitle" data-i18n="epSectionLogSub">Recent actions and results from this panel.</span>
             </div>
-            <button type="button" class="btn-mini" id="btnClearLog">Clear</button>
+            <button type="button" class="btn-mini" id="btnClearLog" data-i18n="epBtnClearLog">Clear</button>
         </div>
         <div class="section-body">
             <div id="log"></div>
