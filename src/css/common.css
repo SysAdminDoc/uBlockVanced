@@ -475,6 +475,7 @@ textarea:focus-visible {
 }
 
 [role="button"]:focus-visible {
+    box-shadow: var(--focus-ring);
     outline: none;
 }
 

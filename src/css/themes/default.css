@@ -612,12 +612,6 @@
     :root.dark {
         --focus-ring: none;
         --border-1: CanvasText;
-        forced-color-adjust: none;
-    }
-    .fa-icon,
-    .fa-icon.info,
-    .wikilink.fa-icon {
-        forced-color-adjust: auto;
     }
 }
 

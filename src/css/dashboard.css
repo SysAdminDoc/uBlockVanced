@@ -45,7 +45,7 @@ body.notReady {
     text-decoration: none;
     white-space: nowrap;
     }
-.tabButton:focus {
+.tabButton:focus:not(:focus-visible) {
     outline: 0;
     }
 .tabButton.selected {

@@ -32,7 +32,7 @@ a {
         fill: var(--ink-1);
     text-decoration: none;
     }
-:focus {
+:focus:not(:focus-visible) {
     outline: 0;
     }
 
