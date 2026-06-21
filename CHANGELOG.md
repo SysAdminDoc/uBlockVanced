@@ -9,6 +9,10 @@ Major Element Probe expansion and infrastructure improvements.
 - **Infrastructure**: CI now runs 35 unit tests on every push/PR alongside lint. Makefile publish targets fixed (gorhill → SysAdminDoc).
 - **Element Probe internals**: Configurable class name classifier patterns (externalized from hardcoded regexes to `probeClassPatterns` storage key). `buildInspectScript()` function replaces static `INSPECT_SCRIPT` const for dynamic pattern injection.
 - **Dead domain detection**: "Check domains" button in My Filters page. Tests each domain via HEAD request and highlights rules targeting unresolvable domains.
+- **i18n**: Element Probe panel internationalized — 65+ message keys added, lightweight `renderI18n()` renderer for DevTools panel context, all HTML static text uses `data-i18n` attributes.
+- **Modularization**: Element Probe split into ES modules — page-context scripts (1149 lines) extracted to `src/js/element-probe/page-scripts.js`. New operators can now be added by editing only the scripts module.
+- **YouTube sweep**: One-shot scan of 27 known YouTube ad container selectors (in-feed ads, overlays, companion banners, shorts, live chat, super chats, etc.) with visibility reporting. Auto-shows on YouTube pages.
+- **JSON export**: Export user filters as structured JSON with per-rule type classification (cosmetic/exception/network), domain parsing, and metadata.
 
 ----------
 
