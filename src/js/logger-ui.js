@@ -591,19 +591,26 @@ const viewPort = (( ) => {
             cellWidths[COLUMN_PARTYNESS] +
             cellWidths[COLUMN_METHOD] +
             cellWidths[COLUMN_TYPE];
-        cellWidths[COLUMN_URL] = 0.5;
-        if ( cellWidths[COLUMN_FILTER] === 0 && cellWidths[COLUMN_INITIATOR] === 0 ) {
-            cellWidths[COLUMN_URL] = 1;
-        } else if ( cellWidths[COLUMN_FILTER] === 0 ) {
-            cellWidths[COLUMN_INITIATOR] = 0.35;
-            cellWidths[COLUMN_URL] = 0.65;
-        } else if ( cellWidths[COLUMN_INITIATOR] === 0 ) {
-            cellWidths[COLUMN_FILTER] = 0.35;
-            cellWidths[COLUMN_URL] = 0.65;
+        const cw = loggerSettings.columnWidths;
+        if ( cw && cellWidths[COLUMN_FILTER] !== 0 && cellWidths[COLUMN_INITIATOR] !== 0 ) {
+            cellWidths[COLUMN_FILTER] = cw[0] || 0.25;
+            cellWidths[COLUMN_INITIATOR] = cw[1] || 0.25;
+            cellWidths[COLUMN_URL] = cw[2] || 0.5;
         } else {
-            cellWidths[COLUMN_FILTER] = 0.25;
-            cellWidths[COLUMN_INITIATOR] = 0.25;
             cellWidths[COLUMN_URL] = 0.5;
+            if ( cellWidths[COLUMN_FILTER] === 0 && cellWidths[COLUMN_INITIATOR] === 0 ) {
+                cellWidths[COLUMN_URL] = 1;
+            } else if ( cellWidths[COLUMN_FILTER] === 0 ) {
+                cellWidths[COLUMN_INITIATOR] = 0.35;
+                cellWidths[COLUMN_URL] = 0.65;
+            } else if ( cellWidths[COLUMN_INITIATOR] === 0 ) {
+                cellWidths[COLUMN_FILTER] = 0.35;
+                cellWidths[COLUMN_URL] = 0.65;
+            } else {
+                cellWidths[COLUMN_FILTER] = 0.25;
+                cellWidths[COLUMN_INITIATOR] = 0.25;
+                cellWidths[COLUMN_URL] = 0.5;
+            }
         }
         const style = qs$('#vwRendererRuntimeStyles');
         const cssRules = [
@@ -664,6 +671,106 @@ const viewPort = (( ) => {
     resizeObserver.observe(qs$('#netInspector .vscrollable'));
 
     updateLayout();
+
+    // Column resize drag handlers
+    {
+        const vwEl = qs$('#vwRenderer');
+        const handles = document.createElement('div');
+        handles.id = 'columnResizeHandles';
+        handles.style.cssText = 'position:absolute;top:0;left:0;right:0;height:100%;pointer-events:none;z-index:10;';
+        vwEl.style.position = 'relative';
+        vwEl.appendChild(handles);
+
+        const createHandle = (colIndex) => {
+            const h = document.createElement('div');
+            h.className = 'column-resize-handle';
+            h.dataset.col = colIndex;
+            h.style.cssText = 'position:absolute;top:0;height:100%;width:6px;cursor:col-resize;pointer-events:auto;';
+            handles.appendChild(h);
+            return h;
+        };
+        const handle1 = createHandle(COLUMN_FILTER);
+        const handle2 = createHandle(COLUMN_INITIATOR);
+
+        const positionHandles = () => {
+            const sizer = qs$(vwLineSizer, '.oneLine');
+            if ( !sizer ) return;
+            const spans = sizer.querySelectorAll('span');
+            if ( spans.length < 8 ) return;
+            const parentRect = vwEl.getBoundingClientRect();
+            const s1 = spans[COLUMN_FILTER];
+            const s2 = spans[COLUMN_INITIATOR];
+            if ( s1 && s1.offsetWidth > 0 ) {
+                handle1.style.left = (s1.getBoundingClientRect().right - parentRect.left - 3) + 'px';
+                handle1.style.display = '';
+            } else {
+                handle1.style.display = 'none';
+            }
+            if ( s2 && s2.offsetWidth > 0 ) {
+                handle2.style.left = (s2.getBoundingClientRect().right - parentRect.left - 3) + 'px';
+                handle2.style.display = '';
+            } else {
+                handle2.style.display = 'none';
+            }
+        };
+
+        const origOnLayoutChanged = onLayoutChanged;
+        const wrappedLayout = () => { origOnLayoutChanged(); positionHandles(); };
+        resizeTimer.callback = wrappedLayout;
+
+        let dragCol = -1;
+        let dragStartX = 0;
+        let dragStartWidths = null;
+        const onDragStart = (e) => {
+            dragCol = parseInt(e.target.dataset.col, 10);
+            dragStartX = e.clientX;
+            const el = qs$('#vwRenderer');
+            const totalFlex = el ? el.clientWidth : 1;
+            dragStartWidths = loggerSettings.columnWidths
+                ? loggerSettings.columnWidths.slice()
+                : [0.25, 0.25, 0.5];
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', onDragEnd);
+            e.preventDefault();
+        };
+        const onDragMove = (e) => {
+            const el = qs$('#vwRenderer');
+            if ( !el ) return;
+            const sizer = qs$(vwLineSizer, '.oneLine');
+            if ( !sizer ) return;
+            const spans = sizer.querySelectorAll('span');
+            let reservedW = 0;
+            for ( let i = 0; i < spans.length; i++ ) {
+                if ( i === COLUMN_FILTER || i === COLUMN_INITIATOR || i === COLUMN_URL ) continue;
+                reservedW += spans[i].clientWidth + 1;
+            }
+            const flexTotal = el.clientWidth - reservedW;
+            if ( flexTotal <= 0 ) return;
+            const dx = e.clientX - dragStartX;
+            const dFrac = dx / flexTotal;
+            const w = dragStartWidths.slice();
+            if ( dragCol === COLUMN_FILTER ) {
+                w[0] = Math.max(0.1, Math.min(0.7, w[0] + dFrac));
+                w[2] = Math.max(0.1, 1 - w[0] - w[1]);
+            } else if ( dragCol === COLUMN_INITIATOR ) {
+                w[1] = Math.max(0.1, Math.min(0.7, w[1] + dFrac));
+                w[2] = Math.max(0.1, 1 - w[0] - w[1]);
+            }
+            loggerSettings.columnWidths = w;
+            updateLayout();
+        };
+        const onDragEnd = () => {
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('mouseup', onDragEnd);
+            if ( loggerSettings.columnWidths ) {
+                vAPI.localStorage.setItem('loggerSettings', JSON.stringify(loggerSettings));
+            }
+            dragCol = -1;
+        };
+        handle1.addEventListener('mousedown', onDragStart);
+        handle2.addEventListener('mousedown', onDragStart);
+        positionHandles();
+    }
 
     const renderFilterToSpan = function(span, filter) {
         if ( filter.charCodeAt(0) !== 0x23 /* '#' */ ) { return false; }
@@ -3016,6 +3123,7 @@ const loggerSettings = (( ) => {
             maxLoadCount: 20,       // per-tab
         },
         columns: [ true, true, true, true, true, true, true, true, true ],
+        columnWidths: null,
         linesPerEntry: 4,
     };
 
@@ -3036,6 +3144,9 @@ const loggerSettings = (( ) => {
             }
             if ( Array.isArray(stored.columns) ) {
                 settings.columns = stored.columns;
+            }
+            if ( Array.isArray(stored.columnWidths) ) {
+                settings.columnWidths = stored.columnWidths;
             }
         } catch {
         }

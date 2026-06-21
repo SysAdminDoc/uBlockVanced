@@ -1226,3 +1226,10 @@ body > .permatoolbar {
 .hide {
     display: none !important;
     }
+.column-resize-handle {
+    background: transparent;
+    transition: background-color 0.15s;
+    }
+.column-resize-handle:hover {
+    background: rgb(var(--primary-70) / 35%);
+    }
