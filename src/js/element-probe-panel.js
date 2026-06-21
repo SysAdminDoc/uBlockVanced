@@ -605,7 +605,23 @@ function persistFilter(filter) {
 // Core inspection script - runs in the inspected page context
 /******************************************************************************/
 
-const INSPECT_SCRIPT = `
+const DEFAULT_CLASS_PATTERNS = [
+    '^[a-z]{1,3}-[a-zA-Z0-9]{6,}$',
+    '^_[0-9a-f]{4,}',
+    '^[A-Z][a-zA-Z0-9]{20,}$',
+    '^css-[a-z0-9]+$',
+    '^[a-f0-9]{8,}$',
+    '^sc-[a-zA-Z0-9]+$',
+    '^emotion-[a-z0-9]+$',
+    '^_[A-Za-z0-9]{8,}$',
+    '^styled-[a-z0-9]+$',
+    '^[a-z]{1,2}[A-Z][a-zA-Z0-9]{10,}$',
+];
+let activeClassPatterns = DEFAULT_CLASS_PATTERNS;
+
+function buildInspectScript() {
+    const patternsJson = JSON.stringify(activeClassPatterns);
+    return `
 (function() {
     var el = $0;
     if (!el) return JSON.stringify({ error: 'No element selected. Select one in the Elements panel.' });
@@ -699,26 +715,19 @@ const INSPECT_SCRIPT = `
         }
     }
 
+    var DYNAMIC_PATTERNS = ${patternsJson}.map(function(p) { return new RegExp(p); });
     function classifyClasses(classes) {
         var stable = [];
         var dynamic = [];
         for (var i = 0; i < classes.length; i++) {
             var c = classes[i];
-            if (/^[a-z]{1,3}-[a-zA-Z0-9]{6,}$/.test(c) ||
-                /^_[0-9a-f]{4,}/.test(c) ||
-                /^[A-Z][a-zA-Z0-9]{20,}$/.test(c) ||
-                /^css-[a-z0-9]+$/.test(c) ||
-                /^[a-f0-9]{8,}$/.test(c) ||
-                /^sc-[a-zA-Z0-9]+$/.test(c) ||
-                /^emotion-[a-z0-9]+$/.test(c) ||
-                /^_[A-Za-z0-9]{8,}$/.test(c) ||
-                /^styled-[a-z0-9]+$/.test(c) ||
-                /^[a-z]{1,2}[A-Z][a-zA-Z0-9]{10,}$/.test(c) ||
-                c.length > 40) {
-                dynamic.push(c);
-            } else {
-                stable.push(c);
+            var isDynamic = c.length > 40;
+            if (!isDynamic) {
+                for (var pi = 0; pi < DYNAMIC_PATTERNS.length; pi++) {
+                    if (DYNAMIC_PATTERNS[pi].test(c)) { isDynamic = true; break; }
+                }
             }
+            if (isDynamic) { dynamic.push(c); } else { stable.push(c); }
         }
         return { stable: stable, dynamic: dynamic };
     }
@@ -1406,6 +1415,7 @@ const INSPECT_SCRIPT = `
     return JSON.stringify(result);
 })()
 `;
+}
 
 /******************************************************************************/
 
@@ -1741,7 +1751,7 @@ async function inspectSelected() {
     log('Inspecting selected element...', 'info');
 
     try {
-        const raw = await evalInPage(INSPECT_SCRIPT);
+        const raw = await evalInPage(buildInspectScript());
         if (panelClosed) { return; }
         let data;
         try {
@@ -2439,6 +2449,13 @@ if (
     };
     chrome.devtools.inspectedWindow.onNavigated.addListener(onNav);
 }
+
+// Load custom class patterns from storage
+chrome.storage.local.get('probeClassPatterns', result => {
+    if (result.probeClassPatterns && Array.isArray(result.probeClassPatterns)) {
+        activeClassPatterns = result.probeClassPatterns;
+    }
+});
 
 // Initialize
 loadHistory();
