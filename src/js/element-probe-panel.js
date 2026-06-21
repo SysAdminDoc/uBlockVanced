@@ -348,7 +348,6 @@ function updateCompatBadge(filterValue) {
 
     const uboOnly = [':matches-path', ':matches-media', ':watch-attr', ':others()'];
     const uboAdguardBrave = [':has-text', ':upward', ':matches-attr', ':matches-css', ':remove()', ':min-text-length', ':not(:has-text'];
-    const universal = [':has(', ':xpath('];
 
     const found = [];
     for (const op of uboOnly) {

@@ -724,8 +724,6 @@ const viewPort = (( ) => {
         const onDragStart = (e) => {
             dragCol = parseInt(e.target.dataset.col, 10);
             dragStartX = e.clientX;
-            const el = qs$('#vwRenderer');
-            const totalFlex = el ? el.clientWidth : 1;
             dragStartWidths = loggerSettings.columnWidths
                 ? loggerSettings.columnWidths.slice()
                 : [0.25, 0.25, 0.5];

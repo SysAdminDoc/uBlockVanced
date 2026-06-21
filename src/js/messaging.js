@@ -694,7 +694,12 @@ const retrieveContentScriptParameters = async function(sender, request) {
         collapseBlocked: µb.userSettings.collapseBlocked,
         noGenericCosmeticFiltering,
         noSpecificCosmeticFiltering,
-        hideStyle: µb.hiddenSettings.cosmeticHideStyle || undefined,
+        hideStyle: (() => {
+            const s = µb.hiddenSettings.cosmeticHideStyle;
+            if ( !s ) { return; }
+            if ( /[{}]|url\s*\(|@import|expression\s*\(|javascript:/i.test(s) ) { return; }
+            return s;
+        })(),
     };
 
     request.tabId = tabId;

@@ -1316,7 +1316,9 @@ const webRequest = {
             });
             if ( µb.hiddenSettings.gpcEnabled ) {
                 vAPI.net.addListener('onBeforeSendHeaders', details => {
-                    details.requestHeaders.push({ name: 'Sec-GPC', value: '1' });
+                    if ( details.requestHeaders.some(h => h.name.toLowerCase() === 'sec-gpc') === false ) {
+                        details.requestHeaders.push({ name: 'Sec-GPC', value: '1' });
+                    }
                     return { requestHeaders: details.requestHeaders };
                 }, {
                     urls: [ 'http://*/*', 'https://*/*' ]

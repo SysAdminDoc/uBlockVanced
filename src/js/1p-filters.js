@@ -394,7 +394,9 @@ self.hasUnsavedData = function() {
 
 /******************************************************************************/
 
+let deadDomainAbort = null;
 async function checkDeadDomains() {
+    if ( deadDomainAbort ) { deadDomainAbort.abort(); }
     const btn = qs$('#checkDeadDomains');
     if ( btn ) { btn.disabled = true; }
     const text = getEditorText();
@@ -412,31 +414,42 @@ async function checkDeadDomains() {
         if ( btn ) { btn.disabled = false; }
         return;
     }
+    const MAX_DOMAINS = 100;
+    if ( domains.size > MAX_DOMAINS ) {
+        const st = qs$('#userFiltersSaveState');
+        if ( st ) { st.textContent = `Too many domains (${domains.size}). Max ${MAX_DOMAINS}.`; }
+        if ( btn ) { btn.disabled = false; }
+        return;
+    }
+    deadDomainAbort = new AbortController();
+    const { signal } = deadDomainAbort;
     const dead = [];
     const st = qs$('#userFiltersSaveState');
     let checked = 0;
     for ( const domain of domains ) {
+        if ( signal.aborted ) { break; }
         checked++;
         if ( st ) { st.textContent = `Checking ${checked}/${domains.size}...`; }
         try {
-            const r = await fetch(`https://${domain}/`, {
+            await fetch(`https://${domain}/`, {
                 method: 'HEAD',
                 mode: 'no-cors',
-                signal: AbortSignal.timeout(5000),
+                signal: AbortSignal.any([signal, AbortSignal.timeout(4000)]),
             });
-            void r;
         } catch {
+            if ( signal.aborted ) { break; }
             try {
                 await fetch(`http://${domain}/`, {
                     method: 'HEAD',
                     mode: 'no-cors',
-                    signal: AbortSignal.timeout(5000),
+                    signal: AbortSignal.any([signal, AbortSignal.timeout(4000)]),
                 });
             } catch {
-                dead.push(domain);
+                if ( !signal.aborted ) { dead.push(domain); }
             }
         }
     }
+    deadDomainAbort = null;
     if ( st ) {
         st.textContent = dead.length > 0
             ? `${dead.length} dead domain(s): ${dead.join(', ')}`
