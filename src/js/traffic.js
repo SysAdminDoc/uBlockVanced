@@ -1314,6 +1314,14 @@ const webRequest = {
                 types: [ 'main_frame', 'sub_frame' ],
                 urls: [ 'http://*/*', 'https://*/*' ]
             });
+            if ( µb.hiddenSettings.gpcEnabled ) {
+                vAPI.net.addListener('onBeforeSendHeaders', details => {
+                    details.requestHeaders.push({ name: 'Sec-GPC', value: '1' });
+                    return { requestHeaders: details.requestHeaders };
+                }, {
+                    urls: [ 'http://*/*', 'https://*/*' ]
+                }, [ 'blocking', 'requestHeaders' ]);
+            }
             vAPI.defer.once({ sec: µb.hiddenSettings.toolbarWarningTimeout }).then(( ) => {
                 if ( vAPI.net.hasUnprocessedRequest() === false ) { return; }
                 vAPI.net.removeUnprocessedRequest();

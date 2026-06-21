@@ -70,6 +70,7 @@ const hiddenSettingsDefault = {
     dnsResolveEnabled: true,
     extensionUpdateForceReload: false,
     filterAuthorMode: false,
+    gpcEnabled: false,
     loggerPopupType: 'popup',
     manualUpdateAssetFetchPeriod: 500,
     modifyWebextFlavor: 'unset',
