@@ -2136,6 +2136,10 @@
     "message": "Clear",
     "description": "Element Probe button: clear filter history"
   },
+  "epHistorySearchPlaceholder": {
+    "message": "Search filters...",
+    "description": "Element Probe: placeholder for filter history search input"
+  },
   "epEmptyStateMain": {
     "message": "Select an element in the Elements panel, then use Inspect selection to analyze it.",
     "description": "Element Probe empty state main text"

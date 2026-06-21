@@ -1273,7 +1273,31 @@ if (btnClearHistory) {
         filterHistory = [];
         saveHistory();
         renderHistory();
+        const searchInput = $('historySearch');
+        if (searchInput) { searchInput.value = ''; }
         log('Filter history cleared', 'info');
+    });
+}
+
+const historySearch = $('historySearch');
+if (historySearch) {
+    historySearch.addEventListener('input', () => {
+        const query = historySearch.value.trim().toLowerCase();
+        const items = document.querySelectorAll('#historyList .history-item');
+        let visible = 0;
+        items.forEach(item => {
+            const filterText = item.querySelector('.history-filter');
+            const text = filterText ? filterText.textContent.toLowerCase() : '';
+            const match = !query || text.includes(query);
+            item.classList.toggle('search-hidden', !match);
+            if (match) visible++;
+        });
+        const badge = $('historyCount');
+        if (badge) {
+            badge.textContent = query
+                ? visible + ' of ' + filterHistory.length + ' filter' + (filterHistory.length !== 1 ? 's' : '')
+                : filterHistory.length + ' filter' + (filterHistory.length !== 1 ? 's' : '');
+        }
     });
 }
 

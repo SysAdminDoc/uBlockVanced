@@ -890,12 +890,38 @@ details[open] > .help-toggle .section-title::before {
     margin-top: 10px;
 }
 
+.history-search-row {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.history-search-input {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 6px 10px;
+    width: 100%;
+}
+
+.history-search-input:focus-visible {
+    border-color: var(--accent-mauve);
+    box-shadow: 0 0 0 3px rgb(203 166 247 / 0.28);
+    outline: none;
+}
+
 .history-item {
     align-items: center;
     border-bottom: 1px solid rgb(255 255 255 / 0.04);
     display: flex;
     gap: 10px;
     padding: 10px 12px;
+}
+
+.history-item.search-hidden {
+    display: none;
 }
 
 .history-item.undone {
