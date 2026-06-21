@@ -1032,20 +1032,28 @@ export const PICK_ELEMENT_SCRIPT = `
 
     window.__ubp_picker_active__ = true;
 
-    // Freeze page state: intercept timers so dynamic elements stay visible
+    // Freeze page state: intercept timers so dynamic elements stay visible.
+    // Frozen callbacks are replayed on cleanup so the page is not permanently broken.
     var frozenTimers = [];
+    var MAX_FROZEN = 500;
     var origSetTimeout = window.setTimeout;
     var origSetInterval = window.setInterval;
     var origRAF = window.requestAnimationFrame;
+    var nextFakeId = -1;
     window.setTimeout = function(fn, ms) {
-        if (ms === undefined || ms > 50) { frozenTimers.push({ type: 'timeout', fn: fn, ms: ms }); return -1; }
+        if (ms === undefined || ms > 50) {
+            if (frozenTimers.length < MAX_FROZEN) { frozenTimers.push({ type: 'timeout', fn: fn, ms: ms }); }
+            return nextFakeId--;
+        }
         return origSetTimeout.call(window, fn, ms);
     };
     window.setInterval = function(fn, ms) {
-        frozenTimers.push({ type: 'interval', fn: fn, ms: ms }); return -1;
+        if (frozenTimers.length < MAX_FROZEN) { frozenTimers.push({ type: 'interval', fn: fn, ms: ms }); }
+        return nextFakeId--;
     };
     window.requestAnimationFrame = function(fn) {
-        frozenTimers.push({ type: 'raf', fn: fn }); return -1;
+        if (frozenTimers.length < MAX_FROZEN) { frozenTimers.push({ type: 'raf', fn: fn }); }
+        return nextFakeId--;
     };
 
     var overlay = document.createElement('div');
@@ -1107,21 +1115,34 @@ export const PICK_ELEMENT_SCRIPT = `
     }
 
     function cleanup() {
+        if (!window.__ubp_picker_active__ && window.setTimeout === origSetTimeout) return;
         window.__ubp_picker_active__ = false;
         document.removeEventListener('mousemove', onMove, true);
         document.removeEventListener('click', onClick, true);
         document.removeEventListener('keydown', onKeydown, true);
+        window.removeEventListener('beforeunload', cleanup);
         var o = document.getElementById('__ubp_picker_overlay__');
         var h = document.getElementById('__ubp_picker_highlight__');
         var l = document.getElementById('__ubp_picker_label__');
         if (o) o.remove();
         if (h) h.remove();
         if (l) l.remove();
-        // Unfreeze: restore timer APIs
+        // Unfreeze: restore timer APIs FIRST, then replay frozen callbacks
         window.setTimeout = origSetTimeout;
         window.setInterval = origSetInterval;
         window.requestAnimationFrame = origRAF;
+        for (var ti = 0; ti < frozenTimers.length; ti++) {
+            var t = frozenTimers[ti];
+            try {
+                if (t.type === 'timeout') { origSetTimeout.call(window, t.fn, t.ms); }
+                else if (t.type === 'interval') { origSetInterval.call(window, t.fn, t.ms); }
+                else if (t.type === 'raf') { origRAF.call(window, t.fn); }
+            } catch(e) {}
+        }
+        frozenTimers.length = 0;
     }
+
+    window.addEventListener('beforeunload', cleanup);
 
     // Delay pointer-events to avoid capturing the triggering click
     setTimeout(function() {

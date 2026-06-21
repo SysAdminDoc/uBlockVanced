@@ -577,6 +577,8 @@ onBroadcast(msg => {
 
 /******************************************************************************/
 
+µb._userFilterMutex = Promise.resolve();
+
 µb.saveUserFilters = function(content) {
     // https://github.com/gorhill/uBlock/issues/1022
     //   Be sure to end with an empty line.
@@ -589,7 +591,13 @@ onBroadcast(msg => {
     return io.get(this.userFiltersPath);
 };
 
-µb.appendUserFilters = async function(filters, options) {
+µb.appendUserFilters = function(filters, options) {
+    const task = this._appendUserFiltersImpl(filters, options);
+    this._userFilterMutex = this._userFilterMutex.then(() => task, () => task);
+    return task;
+};
+
+µb._appendUserFiltersImpl = async function(filters, options) {
     filters = filters.trim();
     if ( filters.length === 0 ) { return; }
 
@@ -680,7 +688,13 @@ onBroadcast(msg => {
     staticFilteringReverseLookup.resetLists();
 };
 
-µb.removeUserFilter = async function(details) {
+µb.removeUserFilter = function(details) {
+    const task = this._removeUserFilterImpl(details);
+    this._userFilterMutex = this._userFilterMutex.then(() => task, () => task);
+    return task;
+};
+
+µb._removeUserFilterImpl = async function(details) {
     const filters = details.filters;
     if ( typeof filters !== 'string' || filters.trim() === '' ) { return; }
     const result = await this.loadUserFilters();
