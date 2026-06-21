@@ -145,13 +145,9 @@ const onElementProbe = function(details, tab) {
     vAPI.tabs.executeScript(tab.id, {
         frameId,
         code: `(function(){
-            var el = document.querySelector('[data-ubp-ctx-target]');
-            if ( !el ) {
-                el = document.body;
-            }
-            el.removeAttribute('data-ubp-ctx-target');
-            window.__ubp_target__ = el;
-            if ( typeof inspect === 'function' ) { inspect(el); }
+            var el = document.querySelector('[data-uv-ctx]');
+            if ( !el ) { el = document.body; }
+            el.removeAttribute('data-uv-ctx');
         })()`,
         runAt: 'document_start',
     }).catch(( ) => { /* tab may have closed or navigated */ });
@@ -165,13 +161,13 @@ const onElementProbe = function(details, tab) {
 const ensureProbeListener = function(tabId) {
     const script = {
         code: `(function(){
-            if ( window.__ubp_ctx_installed__ ) return;
-            window.__ubp_ctx_installed__ = true;
+            if ( document.__uv_ctx_ready__ ) return;
+            document.__uv_ctx_ready__ = true;
             document.addEventListener('contextmenu', function(ev) {
-                var prev = document.querySelector('[data-ubp-ctx-target]');
-                if ( prev ) prev.removeAttribute('data-ubp-ctx-target');
+                var prev = document.querySelector('[data-uv-ctx]');
+                if ( prev ) prev.removeAttribute('data-uv-ctx');
                 if ( ev.target && ev.target.setAttribute ) {
-                    ev.target.setAttribute('data-ubp-ctx-target', '');
+                    ev.target.setAttribute('data-uv-ctx', '');
                 }
             }, true);
         })()`,

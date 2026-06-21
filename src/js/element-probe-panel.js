@@ -464,7 +464,7 @@ function renderHistory() {
         return;
     }
 
-    filterHistory.slice(0, 20).forEach((entry, idx) => {
+    filterHistory.forEach((entry, idx) => {
         const item = document.createElement('div');
         item.className = 'history-item' + (entry.active ? '' : ' undone');
 
@@ -906,13 +906,18 @@ function selectSelector(idx) {
     selectedSelectorIndex = idx;
     const sel = currentSelectors[idx];
 
-    document.querySelectorAll('.selector-item').forEach((item, i) => {
-        if (item.closest('#selectorList')) {
+    const selectorList = $('selectorList');
+    if (selectorList) {
+        selectorList.querySelectorAll('.selector-item').forEach((item, i) => {
             item.classList.toggle('selected', i === idx);
-        } else {
+        });
+    }
+    const procList = $('proceduralList');
+    if (procList) {
+        procList.querySelectorAll('.selector-item').forEach(item => {
             item.classList.remove('selected');
-        }
-    });
+        });
+    }
 
     const filter = generateFilter(sel);
     $('filterOutput').value = filter;
