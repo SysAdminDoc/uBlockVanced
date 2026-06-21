@@ -1286,6 +1286,10 @@ vAPI.DOMFilterer = class {
         vAPI.noSpecificCosmeticFiltering = noSpecificCosmeticFiltering;
         vAPI.noGenericCosmeticFiltering = noGenericCosmeticFiltering;
 
+        if ( response.hideStyle ) {
+            vAPI.hideStyle = response.hideStyle;
+        }
+
         if ( noSpecificCosmeticFiltering && noGenericCosmeticFiltering ) {
             vAPI.domFilterer = null;
             vAPI.domSurveyor = null;

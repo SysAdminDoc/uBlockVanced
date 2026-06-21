@@ -61,6 +61,7 @@ const hiddenSettingsDefault = {
     cnameIgnoreRootDocument: true,
     cnameReplayFullURL: false,
     consoleLogLevel: 'unset',
+    cosmeticHideStyle: '',
     debugAssetsJson: false,
     debugScriptlets: false,
     debugScriptletInjector: false,

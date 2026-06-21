@@ -686,6 +686,7 @@ const retrieveContentScriptParameters = async function(sender, request) {
         collapseBlocked: µb.userSettings.collapseBlocked,
         noGenericCosmeticFiltering,
         noSpecificCosmeticFiltering,
+        hideStyle: µb.hiddenSettings.cosmeticHideStyle || undefined,
     };
 
     request.tabId = tabId;
