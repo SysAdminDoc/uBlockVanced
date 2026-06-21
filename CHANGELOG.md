@@ -1,3 +1,17 @@
+# uBlockVanced 0.3.0
+
+Major Element Probe expansion and infrastructure improvements.
+
+- **Element Probe**: `:style()` procedural operator with inline CSS input field. `:matches-path()` filter generation (exact path + directory patterns). `:matches-prop()` generation with React `__reactProps$` scanning and generic JS property inspection. `:matches-css-before()`/`:matches-css-after()` for pseudo-element computed styles. `:matches-media()` for viewport-conditional filters with mobile breakpoint preset.
+- **Filter authoring**: Editable domain input field with auto-strip `www.` prefix (top upstream request #1277). Multi-domain filter scoping (`domain1,domain2##`). Filter collision detection — warns on duplicate, superset, subset, or conflicting rules before saving.
+- **Accessibility**: `forced-colors` media query support across 5 CSS files — outline-based focus rings, system color fallbacks, border replacements for box-shadow under Windows High Contrast mode.
+- **Privacy**: Global Privacy Control (`Sec-GPC: 1`) header via `gpcEnabled` hidden setting.
+- **Infrastructure**: CI now runs 35 unit tests on every push/PR alongside lint. Makefile publish targets fixed (gorhill → SysAdminDoc).
+- **Element Probe internals**: Configurable class name classifier patterns (externalized from hardcoded regexes to `probeClassPatterns` storage key). `buildInspectScript()` function replaces static `INSPECT_SCRIPT` const for dynamic pattern injection.
+- **Dead domain detection**: "Check domains" button in My Filters page. Tests each domain via HEAD request and highlights rules targeting unresolvable domains.
+
+----------
+
 # uBlockVanced 0.2.6
 
 Reliability hardening across dashboards, build tooling, and the Element Probe save path.

@@ -112,7 +112,7 @@
     },
     "open_at_install": false
   },
-  "version": "0.2.6",
+  "version": "0.3.0",
   "web_accessible_resources": [
     "/web_accessible_resources/*"
   ]

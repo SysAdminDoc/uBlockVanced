@@ -4,7 +4,7 @@
   <img src="src/img/icon_128.png" alt="uBlockVanced" width="80">
 </p>
 
-<h1 align="center">uBlockVanced v0.2.6</h1>
+<h1 align="center">uBlockVanced v0.3.0</h1>
 
 <p align="center">
   Enhanced fork of <a href="https://github.com/gorhill/uBlock">uBlock Origin</a> (Manifest V2) with deep element inspection, procedural cosmetic filters, and Catppuccin Mocha dark theme.

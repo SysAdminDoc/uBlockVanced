@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlockVanced - Element Probe Panel v0.2.6
+    uBlockVanced - Element Probe Panel v0.3.0
 
     Deep element inspection panel for Chrome DevTools.
     Generates robust CSS selectors AND procedural cosmetic filters for elements
@@ -2527,7 +2527,7 @@ chrome.storage.local.get('probeClassPatterns', result => {
 loadHistory();
 scanFrames(); // auto-detect iframes on panel open
 syncLogState();
-log('Element Probe v0.2.6 initialized', 'info');
+log('Element Probe v0.3.0 initialized', 'info');
 setStatus('Ready');
 setSelectionSummary('No element selected yet.');
 syncFilterActions();

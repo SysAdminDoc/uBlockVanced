@@ -50,7 +50,7 @@
   "storage": {
     "managed_schema": "managed_storage.json"
   },
-  "version": "0.2.6",
+  "version": "0.3.0",
   "web_accessible_resources": [
     {
       "resources": [
