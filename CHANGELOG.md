@@ -1,6 +1,22 @@
 # uBlockVanced 0.3.0
 
-Major Element Probe expansion and infrastructure improvements.
+Major Element Probe expansion, infrastructure improvements, and deep audit fixes.
+
+**Audit fixes (v0.3.0 hardening pass):**
+- **Critical**: Exception filters (`#@#`) can now be applied, previewed, and tested — regex only matched `##` before, silently rejecting all exception rules.
+- **Critical**: Filter collision detection now works — `getUserRules` message handler was missing so the feature silently did nothing.
+- **Critical**: `forced-color-adjust: none` removed from `:root` — was breaking Windows High Contrast mode for the entire extension.
+- **Security**: `:has-text()` filter text now escapes parentheses — attacker-controlled page text could break out of filter syntax.
+- **Security**: `cosmeticHideStyle` hidden setting now validates against dangerous CSS patterns (url(), @import, expression(), braces).
+- **Security**: GPC header deduplication — avoids duplicate `Sec-GPC` headers.
+- **Security**: Dead domain checker capped at 100 domains with AbortController cancellation.
+- **Reliability**: Highlight overlay creation capped at 200 elements — broad selectors no longer freeze pages.
+- **Reliability**: Shadow DOM scan bounded to 10K nodes — prevents hangs on massive DOMs.
+- **Reliability**: `reapplyFilter` only marks history entry active on successful persist — was desynchronizing state.
+- **Accessibility**: Focus ring restored for `[role="button"]` elements, popup/dashboard blanket `:focus { outline: 0 }` changed to `:focus:not(:focus-visible)`.
+- **Accessibility**: Fixed 3 undefined CSS variables in Element Probe panel (`--text-secondary` → `--text-dim`, `--accent-warn` → `--accent-peach`).
+- **Code quality**: Removed duplicate `:matches-path()` generation, dead `universal` array, dead `totalFlex` variable, dead `probeClassPatterns` hidden setting. Synced classifyClasses test with actual implementation.
+
 
 - **Element Probe**: `:style()` procedural operator with inline CSS input field. `:matches-path()` filter generation (exact path + directory patterns). `:matches-prop()` generation with React `__reactProps$` scanning and generic JS property inspection. `:matches-css-before()`/`:matches-css-after()` for pseudo-element computed styles. `:matches-media()` for viewport-conditional filters with mobile breakpoint preset.
 - **Filter authoring**: Editable domain input field with auto-strip `www.` prefix (top upstream request #1277). Multi-domain filter scoping (`domain1,domain2##`). Filter collision detection — warns on duplicate, superset, subset, or conflicting rules before saving.
