@@ -302,7 +302,7 @@ function updateMatchCount(filterValue, isProcedural) {
 
     matchCountTimer = setTimeout(async () => {
         if (panelClosed) { return; }
-        const match = filterValue.match(/##(.+)$/);
+        const match = filterValue.match(/(?:##|#@#)(.+)$/);
         if (!match) { badge.textContent = ''; return; }
         const selector = match[1];
 
@@ -583,21 +583,20 @@ async function reapplyFilter(idx) {
     const entry = filterHistory[idx];
     if (!entry) { return; }
 
+    let persisted = false;
     try {
         const count = await evalInPage(HIDE_ELEMENT_SCRIPT(entry.selector));
         if (panelClosed) { return; }
         if (count > 0) {
             log('Re-applied: hid ' + count + ' element(s)', 'success');
         }
-        // Wait for the persist round-trip so the history state matches
-        // what was actually written to the user filter list.
-        await persistFilter(entry.filter);
+        persisted = await persistFilter(entry.filter);
     } catch(e) {
         log('Re-apply failed: ' + e, 'error');
     }
 
     if (panelClosed) { return; }
-    entry.active = true;
+    entry.active = persisted;
     saveHistory();
     renderHistory();
 }
@@ -1077,7 +1076,7 @@ $('btnApplyFilter').addEventListener('click', async () => {
     if (!filter) return;
     setBusy('btnApplyFilter', true, 'Saving...');
 
-    const match = filter.match(/##(.+)$/);
+    const match = filter.match(/(?:##|#@#)(.+)$/);
     if (!match) {
         log('Invalid filter format — expected "domain##selector"', 'error');
         setBusy('btnApplyFilter', false);
@@ -1173,7 +1172,7 @@ $('btnTestFilter').addEventListener('click', async () => {
     if (!filter) return;
     setBusy('btnTestFilter', true, 'Previewing...');
 
-    const match = filter.match(/##(.+)$/);
+    const match = filter.match(/(?:##|#@#)(.+)$/);
     if (!match) {
         log('Invalid filter format', 'error');
         setBusy('btnTestFilter', false);
@@ -1233,7 +1232,7 @@ $('btnRemoveFilter').addEventListener('click', async () => {
 $('btnTestApply').addEventListener('click', async () => {
     const filter = $('filterOutput').value.trim();
     if (!filter) return;
-    const match = filter.match(/##(.+)$/);
+    const match = filter.match(/(?:##|#@#)(.+)$/);
     if (!match) { log('Invalid filter format', 'error'); return; }
     const selector = match[1];
     const isProcedural = /:has-text|:upward|:xpath\(|:matches-path|:matches-attr|:matches-css|:matches-media|:matches-prop|:min-text-length|:remove\(\)|:style\(|:watch-attr|:others\(\)|:not\(:has-text\(/.test(selector);
@@ -1438,7 +1437,8 @@ if (
 }
 
 function detectYouTube() {
-    chrome.devtools.inspectedWindow.eval('location.hostname', (hostname) => {
+    chrome.devtools.inspectedWindow.eval('location.hostname', (hostname, err) => {
+        if (panelClosed || err) { return; }
         const btn = $('btnYtSweep');
         if (btn) {
             btn.style.display = hostname && hostname.includes('youtube.com') ? '' : 'none';

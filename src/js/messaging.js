@@ -165,6 +165,14 @@ const onMessage = function(request, sender, callback) {
         });
         return;
 
+    case 'getUserRules':
+        µb.loadUserFilters().then(result => {
+            callback(result);
+        }, ( ) => {
+            callback();
+        });
+        return;
+
     case 'getAppData':
         response = {
             name: browser.runtime.getManifest().name,

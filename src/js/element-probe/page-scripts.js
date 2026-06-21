@@ -143,6 +143,10 @@ export function buildInspectScript(patterns) {
         return str.replace(/[.*+?^()|[\\]\\\\$]/g, '\\\\$&');
     }
 
+    function escFilterText(str) {
+        return str.replace(/\\\\/g, '\\\\\\\\').replace(/[()]/g, '\\\\$&');
+    }
+
     var classified = classifyClasses(result.classes);
 
     // ---- Standard CSS Selector Generation ----
@@ -358,7 +362,7 @@ export function buildInspectScript(patterns) {
             result.proceduralFilters.push({
                 type: 'has-text',
                 label: ':has-text()',
-                filter: baseSel + ':has-text(' + textForFilter + ')',
+                filter: baseSel + ':has-text(' + escFilterText(textForFilter) + ')',
                 description: 'Match elements containing "' + textForFilter.substring(0, 40) + (textForFilter.length > 40 ? '...' : '') + '"'
             });
         }
@@ -474,31 +478,9 @@ export function buildInspectScript(patterns) {
         result.proceduralFilters.push({
             type: 'not-has-text',
             label: ':not(:has-text())',
-            filter: baseSel + ':not(:has-text(' + textForFilter + '))',
+            filter: baseSel + ':not(:has-text(' + escFilterText(textForFilter) + '))',
             description: 'Match all ' + baseSel + ' EXCEPT those containing this text'
         });
-    }
-
-    // :matches-path() - restrict filter to specific URL paths
-    var pagePath = location.pathname;
-    if (pagePath && pagePath !== '/' && result.selectors.length > 0) {
-        var pathBase = result.selectors[0].selector;
-        var escapedPath = pagePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        result.proceduralFilters.push({
-            type: 'matches-path',
-            label: ':matches-path()',
-            filter: pathBase + ':matches-path(' + escapedPath + ')',
-            description: 'Only apply on pages matching ' + pagePath
-        });
-        var pathDir = pagePath.replace(/\/[^/]*$/, '/');
-        if (pathDir !== pagePath && pathDir !== '/') {
-            result.proceduralFilters.push({
-                type: 'matches-path',
-                label: ':matches-path(dir)',
-                filter: pathBase + ':matches-path(/' + pathDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/^\//, '') + '/)',
-                description: 'Apply on pages under ' + pathDir
-            });
-        }
     }
 
     // :matches-media() - restrict filter to specific viewport/media conditions
@@ -804,7 +786,7 @@ export function buildInspectScript(patterns) {
             result.proceduralFilters.push({
                 type: 'has-text',
                 label: 'YT :has-text()',
-                filter: result.tag + ':has-text(' + (textForFilter || '').substring(0, 40) + ')',
+                filter: result.tag + ':has-text(' + escFilterText((textForFilter || '').substring(0, 40)) + ')',
                 description: 'Target obfuscated YT element by text (classes are dynamic)'
             });
         }
@@ -835,13 +817,15 @@ export const HIGHLIGHT_SCRIPT = (selector) => `
 
     try {
         var els = document.querySelectorAll(${JSON.stringify(selector)});
-        for (var i = 0; i < els.length; i++) {
+        var max = Math.min(els.length, 200);
+        for (var i = 0; i < max; i++) {
             var overlay = document.createElement('div');
             overlay.className = '__ubp_highlight__';
             var rect = els[i].getBoundingClientRect();
             overlay.style.cssText = 'position:fixed !important;top:' + rect.top + 'px !important;left:' + rect.left + 'px !important;width:' + rect.width + 'px !important;height:' + rect.height + 'px !important;background:rgba(137,180,250,0.25) !important;border:2px solid rgba(137,180,250,0.8) !important;pointer-events:none !important;z-index:2147483647 !important;box-sizing:border-box !important;transition:opacity 150ms ease !important;';
             document.documentElement.appendChild(overlay);
         }
+        return els.length;
     } catch(e) {}
 })()
 `;
@@ -905,7 +889,7 @@ export const PROCEDURAL_HIGHLIGHT_SCRIPT = (proceduralSelector) => {
         }
         // :upward(selector)
         if ((m = op.match(/^:upward\\((.+)\\)$/))) {
-            return el.closest(m[1]);
+            try { return el.closest(m[1]); } catch(e) { return false; }
         }
         // :matches-path(pattern)
         if ((m = op.match(/^:matches-path\\((.+)\\)$/))) {
@@ -964,8 +948,9 @@ export const PROCEDURAL_HIGHLIGHT_SCRIPT = (proceduralSelector) => {
         if (pass) matched.push(target);
     }
 
-    // Highlight matched elements
-    for (var i = 0; i < matched.length; i++) {
+    // Highlight matched elements (capped to prevent DOM bomb on broad selectors)
+    var hlMax = Math.min(matched.length, 200);
+    for (var i = 0; i < hlMax; i++) {
         var rect = matched[i].getBoundingClientRect();
         if (rect.width === 0 && rect.height === 0) continue;
         var overlay = document.createElement('div');
@@ -1000,8 +985,10 @@ export const HIDE_ELEMENT_SCRIPT = (selector) => `
 export const SCAN_SHADOW_SCRIPT = `
 (function() {
     var results = [];
+    var visited = 0;
     function walk(node, depth) {
-        if (depth > 10) return;
+        if (depth > 10 || visited > 10000) return;
+        visited++;
         if (node.shadowRoot) {
             results.push({
                 host: node.tagName.toLowerCase() + (node.id ? '#' + node.id : '') +
