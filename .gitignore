@@ -25,3 +25,11 @@ REMOVED.md
 /src/is-webrtc-supported.html
 /src/managed_storage.json
 /src/manifest.json
+
+# AI config
+CODEX_CHANGELOG.md
+.claude/
+.codex/
+.ai/
+PROJECT_CONTEXT.md
+CONTINUATION_PROMPT.md
