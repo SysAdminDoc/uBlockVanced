@@ -1228,6 +1228,7 @@ body > .permatoolbar {
     }
 .column-resize-handle {
     background: transparent;
+    touch-action: none;
     transition: background-color 0.15s;
     }
 .column-resize-handle:hover {

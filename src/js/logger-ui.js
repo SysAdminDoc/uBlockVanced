@@ -44,6 +44,25 @@ const COLUMN_PARTYNESS = 4;
 const COLUMN_METHOD = 5;
 const COLUMN_TYPE = 6;
 const COLUMN_URL = 7;
+const DEFAULT_COLUMN_WIDTHS = [ 0.25, 0.25, 0.5 ];
+
+const normalizeColumnWidths = widths => {
+    const values = Array.isArray(widths) ? widths : DEFAULT_COLUMN_WIDTHS;
+    let filter = Number(values[0]);
+    let initiator = Number(values[1]);
+    if ( Number.isFinite(filter) === false ) { filter = DEFAULT_COLUMN_WIDTHS[0]; }
+    if ( Number.isFinite(initiator) === false ) {
+        initiator = DEFAULT_COLUMN_WIDTHS[1];
+    }
+    filter = Math.max(0.1, Math.min(0.7, filter));
+    initiator = Math.max(0.1, Math.min(0.7, initiator));
+    if ( filter + initiator > 0.9 ) {
+        const scale = 0.9 / (filter + initiator);
+        filter *= scale;
+        initiator *= scale;
+    }
+    return [ filter, initiator, 1 - filter - initiator ];
+};
 
 let filteredLoggerEntries = [];
 let filteredLoggerEntryVoidedCount = 0;
@@ -593,9 +612,10 @@ const viewPort = (( ) => {
             cellWidths[COLUMN_TYPE];
         const cw = loggerSettings.columnWidths;
         if ( cw && cellWidths[COLUMN_FILTER] !== 0 && cellWidths[COLUMN_INITIATOR] !== 0 ) {
-            cellWidths[COLUMN_FILTER] = cw[0] || 0.25;
-            cellWidths[COLUMN_INITIATOR] = cw[1] || 0.25;
-            cellWidths[COLUMN_URL] = cw[2] || 0.5;
+            const widths = normalizeColumnWidths(cw);
+            cellWidths[COLUMN_FILTER] = widths[0];
+            cellWidths[COLUMN_INITIATOR] = widths[1];
+            cellWidths[COLUMN_URL] = widths[2];
         } else {
             cellWidths[COLUMN_URL] = 0.5;
             if ( cellWidths[COLUMN_FILTER] === 0 && cellWidths[COLUMN_INITIATOR] === 0 ) {
@@ -685,6 +705,8 @@ const viewPort = (( ) => {
             const h = document.createElement('div');
             h.className = 'column-resize-handle';
             h.dataset.col = colIndex;
+            h.setAttribute('role', 'separator');
+            h.setAttribute('aria-orientation', 'vertical');
             h.style.cssText = 'position:absolute;top:0;height:100%;width:6px;cursor:col-resize;pointer-events:auto;';
             handles.appendChild(h);
             return h;
@@ -724,11 +746,13 @@ const viewPort = (( ) => {
         const onDragStart = (e) => {
             dragCol = parseInt(e.target.dataset.col, 10);
             dragStartX = e.clientX;
-            dragStartWidths = loggerSettings.columnWidths
-                ? loggerSettings.columnWidths.slice()
-                : [0.25, 0.25, 0.5];
-            document.addEventListener('mousemove', onDragMove);
-            document.addEventListener('mouseup', onDragEnd);
+            dragStartWidths = normalizeColumnWidths(loggerSettings.columnWidths);
+            if ( e.target.setPointerCapture instanceof Function ) {
+                e.target.setPointerCapture(e.pointerId);
+            }
+            document.addEventListener('pointermove', onDragMove);
+            document.addEventListener('pointerup', onDragEnd);
+            document.addEventListener('pointercancel', onDragEnd);
             e.preventDefault();
         };
         const onDragMove = (e) => {
@@ -748,25 +772,30 @@ const viewPort = (( ) => {
             const dFrac = dx / flexTotal;
             const w = dragStartWidths.slice();
             if ( dragCol === COLUMN_FILTER ) {
-                w[0] = Math.max(0.1, Math.min(0.7, w[0] + dFrac));
-                w[2] = Math.max(0.1, 1 - w[0] - w[1]);
+                w[0] += dFrac;
             } else if ( dragCol === COLUMN_INITIATOR ) {
-                w[1] = Math.max(0.1, Math.min(0.7, w[1] + dFrac));
-                w[2] = Math.max(0.1, 1 - w[0] - w[1]);
+                w[1] += dFrac;
             }
-            loggerSettings.columnWidths = w;
+            loggerSettings.columnWidths = normalizeColumnWidths(w);
             updateLayout();
         };
         const onDragEnd = () => {
-            document.removeEventListener('mousemove', onDragMove);
-            document.removeEventListener('mouseup', onDragEnd);
+            document.removeEventListener('pointermove', onDragMove);
+            document.removeEventListener('pointerup', onDragEnd);
+            document.removeEventListener('pointercancel', onDragEnd);
             if ( loggerSettings.columnWidths ) {
-                vAPI.localStorage.setItem('loggerSettings', JSON.stringify(loggerSettings));
+                loggerSettings.columnWidths = normalizeColumnWidths(
+                    loggerSettings.columnWidths
+                );
+                vAPI.localStorage.setItem(
+                    'loggerSettings',
+                    JSON.stringify(loggerSettings)
+                );
             }
             dragCol = -1;
         };
-        handle1.addEventListener('mousedown', onDragStart);
-        handle2.addEventListener('mousedown', onDragStart);
+        handle1.addEventListener('pointerdown', onDragStart);
+        handle2.addEventListener('pointerdown', onDragStart);
         positionHandles();
     }
 
@@ -3144,8 +3173,9 @@ const loggerSettings = (( ) => {
                 settings.columns = stored.columns;
             }
             if ( Array.isArray(stored.columnWidths) ) {
-                settings.columnWidths = stored.columnWidths;
+                settings.columnWidths = normalizeColumnWidths(stored.columnWidths);
             }
+            viewPort.updateLayout();
         } catch {
         }
     });
