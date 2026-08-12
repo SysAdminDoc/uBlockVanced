@@ -14,6 +14,7 @@ mkdir -p "$DES"/js
 cp -R src/js/*.js                  "$DES"/js/
 cp -R src/js/resources             "$DES"/js/
 cp -R src/js/codemirror            "$DES"/js/
+cp -R src/js/element-probe         "$DES"/js/
 cp -R src/js/scriptlets            "$DES"/js/
 cp -R src/js/wasm                  "$DES"/js/
 cp -R src/lib                      "$DES"/
