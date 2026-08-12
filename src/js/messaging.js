@@ -1220,6 +1220,7 @@ const getLists = async function(callback) {
     prepListEntries(r.available);
     r.cache = metadata;
     prepListEntries(r.cache);
+    r.filterListDiffs = await µb.getFilterListDiffs();
     callback(r);
 };
 

@@ -987,6 +987,30 @@
     "message": "Last update: {{ago}}.\nClick to force an update.",
     "description": "used as a tooltip for the clock icon beside a list"
   },
+  "3pViewChanges": {
+    "message": "View changes",
+    "description": "Link to view the rules changed by the latest filter-list update"
+  },
+  "3pFilterListChanges": {
+    "message": "Changes since previous update",
+    "description": "Heading for the filter-list update diff panel"
+  },
+  "3pFilterListAdded": {
+    "message": "Added",
+    "description": "Filter-list diff category for added rules"
+  },
+  "3pFilterListRemoved": {
+    "message": "Removed",
+    "description": "Filter-list diff category for removed rules"
+  },
+  "3pFilterListModified": {
+    "message": "Modified",
+    "description": "Filter-list diff category for modified rules"
+  },
+  "3pFilterListDiffTruncated": {
+    "message": "Only the first part of each change set is shown.",
+    "description": "Note shown when a filter-list diff is capped for display"
+  },
   "3pUpdating": {
     "message": "Updating…",
     "description": "used as a tooltip for the spinner icon beside a list"

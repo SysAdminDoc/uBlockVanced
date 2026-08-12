@@ -276,6 +276,34 @@ body.working #actions button {
     padding: 0;
 }
 
+#lists .filterDiffLink {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dashed currentColor;
+    border-radius: 0;
+    color: var(--info0-ink);
+    cursor: pointer;
+    display: none;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    margin: 0 0.2rem;
+    padding: 0;
+    white-space: nowrap;
+}
+
+#lists .filterDiffLink:hover,
+#lists .filterDiffLink:focus-visible {
+    background: transparent;
+    border-color: currentColor;
+    box-shadow: none;
+    color: var(--ink-1);
+    outline: none;
+}
+
+#lists .listEntry.hasFilterDiff > .detailbar .filterDiffLink {
+    display: inline-flex;
+}
+
 #lists .iconbar .content,
 #lists .iconbar a.support[href]:not([href="#"]),
 #lists .iconbar a.mustread[href]:not([href="#"]),
@@ -316,6 +344,76 @@ body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconb
 #lists .listEntry.cached.recent:not(.obsolete) > .detailbar .iconbar .cache {
     color: var(--dashboard-happy-green);
     fill: var(--dashboard-happy-green);
+}
+
+#lists .filterDiffPanel {
+    background: var(--field-surface);
+    border: 1px solid var(--border-1);
+    border-radius: var(--radius-medium);
+    color: var(--ink-2);
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.2rem 0 0.35rem 1.85rem;
+    max-width: calc(100% - 1.85rem);
+    padding: 0.55rem 0.65rem;
+}
+
+#lists .filterDiffHeading {
+    color: var(--ink-1);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+#lists .filterDiffSummary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+}
+
+#lists .filterDiffCount.added {
+    color: var(--dashboard-happy-green);
+}
+
+#lists .filterDiffCount.removed {
+    color: var(--info3-ink);
+}
+
+#lists .filterDiffCount.modified {
+    color: var(--info2-ink);
+}
+
+#lists .filterDiffSection {
+    border-top: 1px solid var(--border-1);
+    min-width: 0;
+    padding-top: 0.4rem;
+}
+
+#lists .filterDiffSection summary {
+    color: var(--ink-1);
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+#lists .filterDiffSection pre {
+    background: rgb(0 0 0 / 0.12);
+    border-radius: var(--radius-small);
+    box-sizing: border-box;
+    color: var(--ink-2);
+    font: 0.68rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+    margin: 0.35rem 0 0;
+    max-height: 15rem;
+    overflow: auto;
+    padding: 0.45rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+#lists .filterDiffNote {
+    color: var(--ink-3);
+    font-size: 0.68rem;
+    margin: 0;
 }
 
 #lists .listEntry > .detailbar .nodestats {

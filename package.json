@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint --no-warn-ignored --ignore-pattern \"**/lib/\" --ignore-pattern \"**/npm/\" -- \"./src/js/*.js\" \"./src/js/**/*.js\" \"./**/*.json\" \"./platform/**/*.js\"",
-    "test": "node --test --test-name-pattern=. tests/classify-classes.test.js tests/selector-validation.test.js tests/filter-export.test.js tests/user-filters.test.js tests/user-filter-stats.test.js"
+    "test": "node --test --test-name-pattern=. tests/classify-classes.test.js tests/selector-validation.test.js tests/filter-export.test.js tests/filter-list-diff.test.js tests/user-filters.test.js tests/user-filter-stats.test.js"
   },
   "repository": {
     "type": "git",

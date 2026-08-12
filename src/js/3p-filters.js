@@ -48,6 +48,21 @@ onBroadcast(msg => {
     case 'staticFilteringDataChanged':
         renderFilterLists();
         break;
+    case 'filterListDiffUpdated': {
+        if ( listsetDetails.filterListDiffs === undefined ) {
+            listsetDetails.filterListDiffs = {};
+        }
+        if ( msg.diff === undefined ) {
+            delete listsetDetails.filterListDiffs[msg.key];
+        } else {
+            listsetDetails.filterListDiffs[msg.key] = msg.diff;
+        }
+        const listEntry = qs$(`#lists .listEntry[data-key="${msg.key}"]`);
+        if ( listEntry !== null ) {
+            syncFilterListDiff(listEntry);
+        }
+        break;
+    }
     default:
         break;
     }
@@ -87,6 +102,101 @@ const setTitleAndAriaLabel = (elem, text) => {
         dom.attr(elem, 'aria-label', normalizeAccessibleText(text));
     }
 };
+
+const filterDiffText = (key, fallback) => i18n$(key) || fallback;
+
+const createFilterDiffPanel = diff => {
+    const panel = document.createElement('div');
+    panel.className = 'filterDiffPanel';
+
+    const heading = document.createElement('div');
+    heading.className = 'filterDiffHeading';
+    heading.textContent = filterDiffText(
+        '3pFilterListChanges',
+        'Changes since previous update'
+    );
+    panel.append(heading);
+
+    const summary = document.createElement('div');
+    summary.className = 'filterDiffSummary';
+    const summaryParts = [
+        [ '3pFilterListAdded', 'Added', diff.addedCount || 0 ],
+        [ '3pFilterListRemoved', 'Removed', diff.removedCount || 0 ],
+        [ '3pFilterListModified', 'Modified', diff.modifiedCount || 0 ],
+    ];
+    for ( const [ key, fallback, count ] of summaryParts ) {
+        const item = document.createElement('span');
+        item.className = `filterDiffCount ${fallback.toLowerCase()}`;
+        item.textContent = `${filterDiffText(key, fallback)} ${count}`;
+        summary.append(item);
+    }
+    panel.append(summary);
+
+    const sections = [
+        [ 'added', '3pFilterListAdded', 'Added', diff.added || [], line => line ],
+        [ 'removed', '3pFilterListRemoved', 'Removed', diff.removed || [], line => line ],
+        [
+            'modified',
+            '3pFilterListModified',
+            'Modified',
+            diff.modified || [],
+            item => `- ${item.before}\n+ ${item.after}`,
+        ],
+    ];
+    for ( const [ className, key, fallback, items, format ] of sections ) {
+        if ( items.length === 0 ) { continue; }
+        const details = document.createElement('details');
+        details.className = `filterDiffSection ${className}`;
+        details.open = true;
+        const sectionSummary = document.createElement('summary');
+        sectionSummary.textContent =
+            `${filterDiffText(key, fallback)} (${items.length})`;
+        details.append(sectionSummary);
+        const code = document.createElement('pre');
+        code.textContent = items.map(format).join('\n');
+        details.append(code);
+        panel.append(details);
+    }
+
+    if ( diff.truncated ) {
+        const note = document.createElement('p');
+        note.className = 'filterDiffNote';
+        note.textContent = filterDiffText(
+            '3pFilterListDiffTruncated',
+            'Only the first part of each change set is shown.'
+        );
+        panel.append(note);
+    }
+    return panel;
+};
+
+function syncFilterListDiff(listEntry) {
+    if ( listEntry === null || listEntry.dataset.role !== 'leaf' ) { return; }
+    const button = qs$(listEntry, ':scope > .detailbar .filterDiffLink');
+    if ( button === null ) { return; }
+    const diff = listsetDetails.filterListDiffs instanceof Object
+        ? listsetDetails.filterListDiffs[listEntry.dataset.key]
+        : undefined;
+    const hasDiff = diff instanceof Object && diff !== null &&
+        ((diff.addedCount || 0) !== 0 ||
+        (diff.removedCount || 0) !== 0 ||
+        (diff.modifiedCount || 0) !== 0);
+    dom.cl.toggle(listEntry, 'hasFilterDiff', hasDiff);
+    dom.prop(button, 'hidden', !hasDiff);
+    dom.text(
+        button,
+        filterDiffText('3pViewChanges', 'View changes')
+    );
+    if ( hasDiff ) {
+        setTitleAndAriaLabel(button, filterDiffText(
+            '3pViewChanges',
+            'View changes'
+        ));
+        return;
+    }
+    const panel = qs$(listEntry, ':scope > .filterDiffPanel');
+    if ( panel !== null ) { panel.remove(); }
+}
 
 const syncExpandableState = expandable => {
     if ( expandable === null ) { return; }
@@ -254,6 +364,7 @@ const renderFilterLists = ( ) => {
         } else {
             dom.cl.remove(listEntry, 'cached');
         }
+        syncFilterListDiff(listEntry);
         syncListEntryControls(listEntry);
     };
 
@@ -620,6 +731,27 @@ const onRemoveExternalList = ev => {
 };
 
 dom.on('#lists', 'click', '.listEntry .remove', onRemoveExternalList);
+
+const onFilterDiffClicked = ev => {
+    const button = ev.target.closest('.filterDiffLink');
+    if ( button === null ) { return; }
+    const listEntry = button.closest('.listEntry[data-role="leaf"]');
+    if ( listEntry === null ) { return; }
+    const diff = listsetDetails.filterListDiffs instanceof Object
+        ? listsetDetails.filterListDiffs[listEntry.dataset.key]
+        : undefined;
+    if ( diff === undefined ) { return; }
+    let panel = qs$(listEntry, ':scope > .filterDiffPanel');
+    if ( panel === null ) {
+        panel = createFilterDiffPanel(diff);
+        listEntry.append(panel);
+    } else {
+        dom.prop(panel, 'hidden', !panel.hidden);
+    }
+    dom.attr(button, 'aria-expanded', panel.hidden ? 'false' : 'true');
+};
+
+dom.on('#lists', 'click', '.filterDiffLink', onFilterDiffClicked);
 
 /******************************************************************************/
 

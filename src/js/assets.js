@@ -750,6 +750,14 @@ async function assetCacheWrite(assetKey, content, options = {}) {
         return assetCacheRemove(assetKey);
     }
 
+    let previousContent = '';
+    if ( options.trackChanges === true ) {
+        const previous = await assetCacheRead(assetKey);
+        if ( typeof previous.content === 'string' ) {
+            previousContent = previous.content;
+        }
+    }
+
     const cacheDict = await getAssetCacheRegistry();
 
     const { resourceTime, url } = options;
@@ -766,6 +774,9 @@ async function assetCacheWrite(assetKey, content, options = {}) {
     saveAssetCacheRegistry(3);
 
     const result = { assetKey, content };
+    if ( previousContent !== '' && previousContent !== content ) {
+        result.previousContent = previousContent;
+    }
     // https://github.com/uBlockOrigin/uBlock-issues/issues/248
     if ( options.silent !== true ) {
         fireNotification('after-asset-updated', result);
@@ -972,6 +983,7 @@ assets.get = async function(assetKey, options = {}) {
         if ( details.content === '' ) { continue; }
         if ( reIsExternalPath.test(contentURL) && options.dontCache !== true ) {
             assetCacheWrite(assetKey, details.content, {
+                trackChanges: assetDetails.content === 'filters',
                 url: contentURL,
                 silent: options.silent === true,
             });
@@ -1048,6 +1060,7 @@ async function getRemote(assetKey, options = {}) {
 
         // Success
         assetCacheWrite(assetKey, result.content, {
+            trackChanges: assetDetails.content === 'filters',
             url: contentURL,
             resourceTime: result.resourceTime || 0,
         });
@@ -1305,6 +1318,7 @@ async function diffUpdater() {
                     'Diff-Expires',
                 ]);
                 assetCacheWrite(data.assetKey, data.text, {
+                    trackChanges: true,
                     resourceTime: metadata.lastModified || 0,
                 });
                 metadata.diffUpdated = true;

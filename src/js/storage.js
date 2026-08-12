@@ -27,6 +27,10 @@ import { CompiledListReader, CompiledListWriter } from './static-filtering-io.js
 import { LineIterator, orphanizeString } from './text-utils.js';
 import { broadcast, filteringBehaviorChanged, onBroadcast } from './broadcast.js';
 import {
+    createFilterListDiff,
+    filterListDiffIsEmpty,
+} from './filter-list-diff.js';
+import {
     getUserFilterDisabledSites,
     normalizeHostname,
     setUserFilterDisabledSites,
@@ -483,6 +487,75 @@ onBroadcast(msg => {
     newKeys = Array.from(newSet);
     this.selectedFilterLists = newKeys;
     return vAPI.storage.set({ selectedFilterLists: newKeys });
+};
+
+const FILTER_LIST_DIFF_STORAGE_KEY = 'filterListDiffs';
+const MAX_STORED_FILTER_LIST_DIFFS = 20;
+let filterListDiffs = Object.create(null);
+
+const filterListDiffsReady = vAPI.storage.get(FILTER_LIST_DIFF_STORAGE_KEY)
+    .then(bin => {
+        const stored = bin instanceof Object && bin[FILTER_LIST_DIFF_STORAGE_KEY];
+        if ( stored instanceof Object === false || stored === null ) { return; }
+        for ( const [ assetKey, diff ] of Object.entries(stored) ) {
+            if ( diff instanceof Object === false || diff === null ) { continue; }
+            filterListDiffs[assetKey] = diff;
+        }
+    });
+
+const saveFilterListDiffs = ( ) => {
+    return vAPI.storage.set({
+        [FILTER_LIST_DIFF_STORAGE_KEY]: filterListDiffs,
+    });
+};
+
+µb.getFilterListDiffs = async function() {
+    await filterListDiffsReady;
+    return filterListDiffs;
+};
+
+µb.recordFilterListDiff = function(details) {
+    if ( details instanceof Object === false ) { return; }
+    const assetKey = details.assetKey;
+    if ( typeof assetKey !== 'string' ) { return; }
+
+    const update = async ( ) => {
+        await filterListDiffsReady;
+
+        if (
+            typeof details.previousContent !== 'string' ||
+            typeof details.content !== 'string'
+        ) {
+            delete filterListDiffs[assetKey];
+        } else {
+            const diff = createFilterListDiff(
+                details.previousContent,
+                details.content
+            );
+            if ( filterListDiffIsEmpty(diff) ) {
+                delete filterListDiffs[assetKey];
+            } else {
+                diff.updatedAt = Date.now();
+                filterListDiffs[assetKey] = diff;
+            }
+        }
+
+        const entries = Object.entries(filterListDiffs)
+            .sort((a, b) => (b[1].updatedAt || 0) - (a[1].updatedAt || 0))
+            .slice(0, MAX_STORED_FILTER_LIST_DIFFS);
+        filterListDiffs = Object.fromEntries(entries);
+        await saveFilterListDiffs();
+
+        broadcast({
+            what: 'filterListDiffUpdated',
+            key: assetKey,
+            diff: filterListDiffs[assetKey],
+        });
+    };
+
+    update().catch(reason => {
+        ubolog(`Unable to save filter-list diff: ${reason}`);
+    });
 };
 
 µb.loadUserFilterDisabledSites = async function() {
@@ -1772,6 +1845,9 @@ onBroadcast(msg => {
     if ( topic === 'after-asset-updated' ) {
         // Skip selfie-related content.
         if ( details.assetKey.startsWith('selfie/') ) { return; }
+        if ( Object.hasOwn(this.availableFilterLists, details.assetKey) ) {
+            this.recordFilterListDiff(details);
+        }
         const cached = typeof details.content === 'string' && details.content !== '';
         if ( Object.hasOwn(this.availableFilterLists, details.assetKey) ) {
             if ( cached ) {
