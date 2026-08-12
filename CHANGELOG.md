@@ -1,6 +1,6 @@
-# uBlockVanced 0.3.0
+# uBlockVanced 0.3.1
 
-Major Element Probe expansion, infrastructure improvements, and deep audit fixes.
+Roadmap drain release: filter-list change visibility, resilient logger resizing, and the completed Element Probe and filtering improvements below.
 
 **New features:**
 - **Per-site user filters**: My filters now supports a persistent hostname list that disables all custom network, cosmetic, scriptlet, HTML, and response-header filters for a site and its subdomains without changing subscribed lists.

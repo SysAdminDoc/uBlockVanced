@@ -70,7 +70,7 @@ loadHistory();
 scanFrames();
 detectYouTube();
 syncLogState();
-log('Element Probe v0.3.0 initialized', 'info');
+log('Element Probe v0.3.1 initialized', 'info');
 setStatus(i18n('epStatusReady') || 'Ready');
 setSelectionSummary(i18n('epNoElementSelected') || 'No element selected yet.');
 syncFilterActions();

@@ -4,7 +4,7 @@
   <img src="src/img/icon_128.png" alt="uBlockVanced" width="80">
 </p>
 
-<h1 align="center">uBlockVanced v0.3.0</h1>
+<h1 align="center">uBlockVanced v0.3.1</h1>
 
 <p align="center">
   Enhanced fork of <a href="https://github.com/gorhill/uBlock">uBlock Origin</a> (Manifest V2) with deep element inspection, procedural cosmetic filters, and Catppuccin Mocha dark theme.
@@ -12,6 +12,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Manifest-V2-blue" alt="MV2">
+  <img src="https://img.shields.io/badge/Version-0.3.1-89b4fa" alt="Version 0.3.1">
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7" alt="Catppuccin Mocha">
   <img src="https://img.shields.io/badge/License-GPLv3-green" alt="GPLv3">
 </p>
