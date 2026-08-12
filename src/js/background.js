@@ -52,6 +52,7 @@ const hiddenSettingsDefault = {
     blockingProfiles: '11111/#F00 11010/#C0F 11001/#00F 00001',
     cacheStorageCompression: true,
     catppuccinPalette: '',
+    cspCompatibleMode: false,
     cacheStorageCompressionThreshold: 65536,
     cacheStorageMultithread: 2,
     cacheControlForFirefox1376932: 'unset',

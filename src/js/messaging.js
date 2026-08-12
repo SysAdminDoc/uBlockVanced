@@ -693,6 +693,7 @@ const retrieveContentScriptParameters = async function(sender, request) {
 
     const response = {
         collapseBlocked: µb.userSettings.collapseBlocked,
+        cspCompatibleMode: µb.hiddenSettings.cspCompatibleMode === true,
         noGenericCosmeticFiltering,
         noSpecificCosmeticFiltering,
         hideStyle: (() => {

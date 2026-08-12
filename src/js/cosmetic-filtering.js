@@ -903,12 +903,14 @@ CosmeticFilteringEngine.prototype.retrieveGenericSelectors = function(request) {
     if ( selectors.length === 0 ) { return out; }
 
     out.injectedCSS = `${selectors.join(',\n')}\n{display:none!important;}`;
-    vAPI.tabs.insertCSS(request.tabId, {
-        code: out.injectedCSS,
-        frameId: request.frameId,
-        matchAboutBlank: true,
-        runAt: 'document_start',
-    });
+    if ( request.cspCompatibleMode !== true ) {
+        vAPI.tabs.insertCSS(request.tabId, {
+            code: out.injectedCSS,
+            frameId: request.frameId,
+            matchAboutBlank: true,
+            runAt: 'document_start',
+        });
+    }
 
     return out;
 };
@@ -1161,7 +1163,11 @@ CosmeticFilteringEngine.prototype.retrieveSpecificSelectors = function(
     if ( injectedCSS.length !== 0 ) {
         out.injectedCSS = injectedCSS.join('\n\n');
         details.code = out.injectedCSS;
-        if ( request.tabId !== undefined && options.dontInject !== true ) {
+        if (
+            request.tabId !== undefined &&
+            options.dontInject !== true &&
+            options.cspCompatibleMode !== true
+        ) {
             vAPI.tabs.insertCSS(request.tabId, details);
         }
     }
@@ -1170,8 +1176,16 @@ CosmeticFilteringEngine.prototype.retrieveSpecificSelectors = function(
     if ( cacheEntry ) {
         const networkFilters = [];
         if ( cacheEntry.retrieveNet(networkFilters) ) {
-            details.code = `${networkFilters.join('\n')}\n{display:none!important;}`;
-            if ( request.tabId !== undefined && options.dontInject !== true ) {
+            const networkCSS = `${networkFilters.join('\n')}\n{display:none!important;}`;
+            details.code = networkCSS;
+            if ( options.cspCompatibleMode === true ) {
+                out.networkCSS = networkCSS;
+            }
+            if (
+                request.tabId !== undefined &&
+                options.dontInject !== true &&
+                options.cspCompatibleMode !== true
+            ) {
                 vAPI.tabs.insertCSS(request.tabId, details);
             }
         }

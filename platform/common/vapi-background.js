@@ -347,8 +347,10 @@ vAPI.Tabs = class {
         }
         try {
             await webext.tabs.insertCSS(...arguments);
+            return true;
         }
         catch {
+            return false;
         }
     }
 
@@ -368,8 +370,10 @@ vAPI.Tabs = class {
         }
         try {
             await webext.tabs.removeCSS(...arguments);
+            return true;
         }
         catch {
+            return false;
         }
     }
 
@@ -1052,8 +1056,8 @@ vAPI.messaging = {
                     promises.push(vAPI.tabs.removeCSS(tabId, details));
                 }
             }
-            Promise.all(promises).then(( ) => {
-                callback();
+            Promise.all(promises).then(results => {
+                callback(results.every(result => result !== false));
             });
             break;
         }

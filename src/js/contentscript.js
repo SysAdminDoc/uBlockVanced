@@ -216,26 +216,76 @@ vAPI.shutdown.add(( ) => {
 vAPI.userStylesheet = {
     added: new Set(),
     removed: new Set(),
+    adopted: new Map(),
+
+    applyCSPCompatible: function(add, remove) {
+        if (
+            vAPI.cspCompatibleMode !== true ||
+            typeof CSSStyleSheet !== 'function' ||
+            Array.isArray(document.adoptedStyleSheets) === false
+        ) {
+            return false;
+        }
+
+        const removeSet = new Set();
+        for ( const cssText of remove ) {
+            const sheet = this.adopted.get(cssText);
+            if ( sheet !== undefined ) { removeSet.add(sheet); }
+        }
+        const nextSheets = Array.from(document.adoptedStyleSheets)
+            .filter(sheet => removeSet.has(sheet) === false);
+        const additions = [];
+        try {
+            for ( const cssText of add ) {
+                if ( this.adopted.has(cssText) ) { continue; }
+                const sheet = new CSSStyleSheet();
+                sheet.replaceSync(cssText);
+                additions.push([ cssText, sheet ]);
+                nextSheets.push(sheet);
+            }
+            document.adoptedStyleSheets = nextSheets;
+        } catch {
+            return false;
+        }
+
+        for ( const cssText of remove ) {
+            this.adopted.delete(cssText);
+        }
+        for ( const [cssText, sheet] of additions ) {
+            this.adopted.set(cssText, sheet);
+        }
+        return true;
+    },
+
     apply: function(callback) {
         if ( this.added.size === 0 && this.removed.size === 0 ) { return; }
+        const add = Array.from(this.added);
+        const remove = Array.from(this.removed);
+        this.added.clear();
+        this.removed.clear();
+        if ( this.applyCSPCompatible(add, remove) ) {
+            if ( callback instanceof Function ) { callback(); }
+            return;
+        }
         vAPI.messaging.send('vapi', {
             what: 'userCSS',
-            add: Array.from(this.added),
-            remove: Array.from(this.removed),
-        }).then(( ) => {
+            add,
+            remove,
+        }).then(result => {
+            if ( result === false ) {
+                this.applyCSPCompatible(add, remove);
+            }
             if ( callback instanceof Function === false ) { return; }
             callback();
         });
-        this.added.clear();
-        this.removed.clear();
     },
     add: function(cssText, now) {
-        if ( cssText === '' ) { return; }
+        if ( typeof cssText !== 'string' || cssText === '' ) { return; }
         this.added.add(cssText);
         if ( now ) { this.apply(); }
     },
     remove: function(cssText, now) {
-        if ( cssText === '' ) { return; }
+        if ( typeof cssText !== 'string' || cssText === '' ) { return; }
         this.removed.add(cssText);
         if ( now ) { this.apply(); }
     }
@@ -1118,6 +1168,7 @@ vAPI.DOMFilterer = class {
                 hostname,
                 hashes: Array.from(newHashes),
                 exceptions: domFilterer.exceptions,
+                cspCompatibleMode: vAPI.cspCompatibleMode === true,
                 safeOnly,
             });
         promise.then(response => {
@@ -1176,11 +1227,17 @@ vAPI.DOMFilterer = class {
             const css = result.injectedCSS;
             if ( typeof css === 'string' && css.length !== 0 ) {
                 domFilterer.addCSS(css);
+                if ( vAPI.cspCompatibleMode ) {
+                    vAPI.userStylesheet.add(css);
+                }
                 mustCommit = true;
             }
             const selectors = result.excepted;
             if ( Array.isArray(selectors) && selectors.length !== 0 ) {
                 domFilterer.exceptCSSRules(selectors);
+            }
+            if ( vAPI.cspCompatibleMode ) {
+                vAPI.userStylesheet.apply();
             }
         }
         if ( hasPendingNodes() ) {
@@ -1357,6 +1414,8 @@ vAPI.DOMFilterer = class {
             return;
         }
 
+        vAPI.cspCompatibleMode = response.cspCompatibleMode === true;
+
         vAPI.domCollapser.start();
 
         const {
@@ -1381,6 +1440,10 @@ vAPI.DOMFilterer = class {
             }
             domFilterer.exceptions = cfeDetails.exceptionFilters;
             domFilterer.addCSS(cfeDetails.injectedCSS);
+            if ( vAPI.cspCompatibleMode ) {
+                vAPI.userStylesheet.add(cfeDetails.injectedCSS);
+                vAPI.userStylesheet.add(cfeDetails.networkCSS);
+            }
             domFilterer.addProceduralSelectors(cfeDetails.proceduralFilters);
             domFilterer.exceptCSSRules(cfeDetails.exceptedFilters);
             domFilterer.convertedProceduralFilters = cfeDetails.convertedProceduralFilters;

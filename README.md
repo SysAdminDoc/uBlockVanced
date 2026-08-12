@@ -44,6 +44,10 @@ uBlockVanced adds a **DevTools panel called Element Probe** that solves a specif
 - **Right-click context menu** -- "Inspect with Element Probe" on any page element
 - **Live preview** -- hover over generated selectors to highlight matching elements
 
+### Compatibility
+
+- **CSP-compatible cosmetic mode** -- on strict sites, set `cspCompatibleMode true` in Advanced Settings. Cosmetic styles are routed through constructable stylesheets when available, with the extension stylesheet API as a fallback, avoiding inline `<style>` injection.
+
 ### Theme
 
 Full **Catppuccin Mocha** dark theme applied across:
