@@ -43,6 +43,10 @@
     "message": "Add a hostname to stop all custom filters from applying there. Subdomains are included.",
     "description": "Explanation for per-site user-filter controls"
   },
+  "1pUserFiltersStaleDescription": {
+    "message": "Declarative cosmetic filters which match no elements for 30 days are commented out automatically. Procedural filters are left unchanged.",
+    "description": "Explanation for automatic stale user-filter cleanup"
+  },
   "1pUserFiltersPerSitePlaceholder": {
     "message": "example.com",
     "description": "Placeholder for a hostname in the per-site user-filter controls"

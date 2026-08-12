@@ -416,6 +416,9 @@ try {
         µb.loadUserFilterDisabledSites().then(( ) => {
             ubolog(`Per-site user-filter settings ready ${Date.now()-vAPI.T0} ms after launch`);
         }),
+        µb.loadUserFilterMatchStats().then(( ) => {
+            ubolog(`User-filter match stats ready ${Date.now()-vAPI.T0} ms after launch`);
+        }),
         µb.loadUserSettings().then(fetched => {
             ubolog(`User settings ready ${Date.now()-vAPI.T0} ms after launch`);
             onUserSettingsReady(fetched);

@@ -61,7 +61,7 @@ const extractSubTargets = target => {
 /******************************************************************************/
 
 export class StaticExtFilteringHostnameDB {
-    static VERSION = 1;
+    static VERSION = 2;
     constructor() {
         this.size = 0;
     }
@@ -102,7 +102,13 @@ export class StaticExtFilteringHostnameDB {
             this.#matcherSlots.length;
         if ( iMatcher === this.#matcherSlots.length ) {
             const { isRegex, hn, pn } = extractSubTargets(target);
-            this.#matcherSlots.push({ isRegex, hn, pn, iList: 0 });
+            this.#matcherSlots.push({
+                isRegex,
+                hn,
+                pn,
+                target,
+                iList: 0
+            });
             this.#matcherMap.set(target, iMatcher);
             if ( isRegex === false ) {
                 const iMatcherList = this.#hostnameToMatcherListMap.get(hn) ?? 0;
@@ -140,13 +146,13 @@ export class StaticExtFilteringHostnameDB {
         this.#strToSlotMap.clear();
     }
 
-    retrieveSpecifics(out, hostname) {
+    retrieveSpecifics(out, hostname, onRetrieve = undefined) {
         let hn = hostname;
         if ( hn === '' ) { return; }
         for (;;) {
             const iList = this.#hostnameToStringListMap.get(hn);
             if ( iList !== undefined ) {
-                this.#retrieveFromSlot(out, iList);
+                this.#retrieveFromSlot(out, iList, onRetrieve, hn);
             }
             const pos = hn.indexOf('.');
             if ( pos === -1 ) { break; }
@@ -155,33 +161,44 @@ export class StaticExtFilteringHostnameDB {
         }
     }
 
-    retrieveGenerics(out) {
+    retrieveGenerics(out, onRetrieve = undefined) {
         let iList = this.#hostnameToStringListMap.get('');
-        if ( iList ) { this.#retrieveFromSlot(out, iList); }
+        if ( iList ) { this.#retrieveFromSlot(out, iList, onRetrieve, ''); }
         iList = this.#hostnameToStringListMap.get('*');
-        if ( iList ) { this.#retrieveFromSlot(out, iList); }
+        if ( iList ) { this.#retrieveFromSlot(out, iList, onRetrieve, '*'); }
     }
 
-    retrieveSpecificsByRegex(out, hostname, url) {
+    retrieveSpecificsByRegex(out, hostname, url, onRetrieve = undefined) {
         let hn = hostname;
         if ( hn === '' ) { return; }
         const pathname = naivePathnameFromURL(url) ?? '';
         for (;;) {
-            this.#retrieveSpecificsByRegex(hn, out, hostname, pathname);
+            this.#retrieveSpecificsByRegex(
+                hn,
+                out,
+                hostname,
+                pathname,
+                onRetrieve
+            );
             const pos = hn.indexOf('.');
             if ( pos === -1 ) { break; }
             hn = hn.slice(pos + 1);
         }
-        this.#retrieveSpecificsByRegex('', out, hostname, pathname);
+        this.#retrieveSpecificsByRegex('', out, hostname, pathname, onRetrieve);
     }
 
-    #retrieveSpecificsByRegex(hn, out, hostname, pathname) {
+    #retrieveSpecificsByRegex(hn, out, hostname, pathname, onRetrieve) {
         let iMatchList = this.#hostnameToMatcherListMap.get(hn) ?? 0;
         while ( iMatchList !== 0 ) {
             const iMatchSlot = this.#linkedLists[iMatchList+0];
             const matcher = this.#matcherSlots[iMatchSlot];
             if ( this.#matcherTest(matcher, hostname, pathname) ) {
-                this.#retrieveFromSlot(out, matcher.iList);
+                this.#retrieveFromSlot(
+                    out,
+                    matcher.iList,
+                    onRetrieve,
+                    matcher.target
+                );
             }
             iMatchList = this.#linkedLists[iMatchList+1];
         }
@@ -204,11 +221,15 @@ export class StaticExtFilteringHostnameDB {
         return re.test(s);
     }
 
-    #retrieveFromSlot(out, iList) {
+    #retrieveFromSlot(out, iList, onRetrieve, target) {
         if ( iList === undefined ) { return; }
         do {
             const iStr = this.#linkedLists[iList+0];
-            out.add(this.#strSlots[iStr]);
+            const value = this.#strSlots[iStr];
+            out.add(value);
+            if ( onRetrieve !== undefined ) {
+                onRetrieve(target, value);
+            }
             iList = this.#linkedLists[iList+1];
         } while ( iList !== 0 );
     }

@@ -261,6 +261,12 @@ const CosmeticFilteringEngine = function() {
     // highly generic selectors sets
     this.highlyGeneric = createHighlyGeneric();
     this.userHighlyGeneric = createHighlyGeneric();
+
+    // Original user filter text is retained so content-script match reports
+    // can be associated with the exact line which produced a selector.
+    this.userSpecificFilterMetadata = new Map();
+    this.userLowlyGenericMetadata = new Map();
+    this.userHighlyGenericMetadata = new Map();
     this.reset();
 };
 
@@ -300,7 +306,11 @@ CosmeticFilteringEngine.prototype.reset = function() {
     this.userHighlyGeneric.complex.str = '';
     this.userHighlyGeneric.complex.mru.reset();
 
-    this.selfieVersion = 3;
+    this.userSpecificFilterMetadata.clear();
+    this.userLowlyGenericMetadata.clear();
+    this.userHighlyGenericMetadata.clear();
+
+    this.selfieVersion = 4;
 };
 
 /******************************************************************************/
@@ -399,11 +409,15 @@ CosmeticFilteringEngine.prototype.compileGenericHideSelector = function(
 
     const key = keyFromSelector(compiled);
     if ( key !== undefined ) {
-        writer.push([
+        const args = [
             0,
             hashFromStr(key.charCodeAt(0), key.slice(1)),
             compiled,
-        ]);
+        ];
+        if ( writer.properties.get('userFilters') === true ) {
+            args.push(parser.raw);
+        }
+        writer.push(args);
         return;
     }
 
@@ -413,9 +427,17 @@ CosmeticFilteringEngine.prototype.compileGenericHideSelector = function(
     // selectors.
 
     if ( this.reSimpleHighGeneric.test(compiled) ) {
-        writer.push([ 4 /* simple */, compiled ]);
+        const args = [ 4 /* simple */, compiled ];
+        if ( writer.properties.get('userFilters') === true ) {
+            args.push(parser.raw);
+        }
+        writer.push(args);
     } else {
-        writer.push([ 5 /* complex */, compiled ]);
+        const args = [ 5 /* complex */, compiled ];
+        if ( writer.properties.get('userFilters') === true ) {
+            args.push(parser.raw);
+        }
+        writer.push(args);
     }
 };
 
@@ -445,7 +467,11 @@ CosmeticFilteringEngine.prototype.compileGenericUnhideSelector = function(
     //   hostnames). No distinction is made between declarative and
     //   procedural selectors, since they really exist only to cancel
     //   out other cosmetic filters.
-    writer.push([ 8, '', `-${compiled}` ]);
+    const args = [ 8, '', `-${compiled}` ];
+    if ( writer.properties.get('userFilters') === true ) {
+        args.push(parser.raw);
+    }
+    writer.push(args);
 };
 
 /******************************************************************************/
@@ -469,7 +495,11 @@ CosmeticFilteringEngine.prototype.compileSpecificSelector = function(
 
     writer.select('COSMETIC_FILTERS:SPECIFIC');
     const prefix = ((exception ? 1 : 0) ^ (not ? 1 : 0)) ? '-' : '+';
-    writer.push([ 8, hostname, `${prefix}${compiled}` ]);
+    const args = [ 8, hostname, `${prefix}${compiled}` ];
+    if ( writer.properties.get('userFilters') === true ) {
+        args.push(parser.raw);
+    }
+    writer.push(args);
 };
 
 /******************************************************************************/
@@ -497,6 +527,18 @@ CosmeticFilteringEngine.prototype.fromCompiledContent = function(
     const lowlyGeneric = isUserFilter
         ? this.userLowlyGeneric
         : this.lowlyGeneric;
+
+    const addMetadata = (map, key, raw) => {
+        if ( isUserFilter === false || typeof raw !== 'string' ) { return; }
+        const value = raw.trim();
+        if ( value === '' ) { return; }
+        let values = map.get(key);
+        if ( values === undefined ) {
+            values = new Set();
+            map.set(key, values);
+        }
+        values.add(value);
+    };
 
     // Specific cosmetic filter section
     reader.select('COSMETIC_FILTERS:SPECIFIC');
@@ -526,10 +568,20 @@ CosmeticFilteringEngine.prototype.fromCompiledContent = function(
                     } else {
                         highlyGeneric.complex.dict.add(selector);
                     }
+                    addMetadata(
+                        this.userHighlyGenericMetadata,
+                        selector,
+                        args[3]
+                    );
                     break;
                 }
             }
             specificFilters.store(args[1], args[2]);
+            addMetadata(
+                this.userSpecificFilterMetadata,
+                `${args[1]}\x00${args[2]}`,
+                args[3]
+            );
             break;
         }
         default:
@@ -563,17 +615,24 @@ CosmeticFilteringEngine.prototype.fromCompiledContent = function(
             } else {
                 lowlyGeneric.set(args[1], args[2]);
             }
+            addMetadata(
+                this.userLowlyGenericMetadata,
+                `${args[1]}\x00${args[2]}`,
+                args[3]
+            );
             break;
         }
         // High-high generic hide/simple selectors
         // div[id^="allo"]
         case 4:
             highlyGeneric.simple.dict.add(args[1]);
+            addMetadata(this.userHighlyGenericMetadata, args[1], args[2]);
             break;
         // High-high generic hide/complex selectors
         // div[id^="allo"] > span
         case 5:
             highlyGeneric.complex.dict.add(args[1]);
+            addMetadata(this.userHighlyGenericMetadata, args[1], args[2]);
             break;
         default:
             this.discardedCount += 1;
@@ -611,6 +670,18 @@ CosmeticFilteringEngine.prototype.toSelfie = function() {
         userHighSimpleGenericHideStr: this.userHighlyGeneric.simple.str,
         userHighComplexGenericHideDict: this.userHighlyGeneric.complex.dict,
         userHighComplexGenericHideStr: this.userHighlyGeneric.complex.str,
+        userSpecificFilterMetadata: Array.from(
+            this.userSpecificFilterMetadata,
+            ([key, values]) => [ key, Array.from(values) ]
+        ),
+        userLowlyGenericMetadata: Array.from(
+            this.userLowlyGenericMetadata,
+            ([key, values]) => [ key, Array.from(values) ]
+        ),
+        userHighlyGenericMetadata: Array.from(
+            this.userHighlyGenericMetadata,
+            ([key, values]) => [ key, Array.from(values) ]
+        ),
     };
 };
 
@@ -634,6 +705,24 @@ CosmeticFilteringEngine.prototype.fromSelfie = function(selfie) {
     this.userHighlyGeneric.simple.str = selfie.userHighSimpleGenericHideStr;
     this.userHighlyGeneric.complex.dict = selfie.userHighComplexGenericHideDict;
     this.userHighlyGeneric.complex.str = selfie.userHighComplexGenericHideStr;
+    this.userSpecificFilterMetadata = new Map(
+        (selfie.userSpecificFilterMetadata || []).map(([key, values]) => [
+            key,
+            new Set(values),
+        ])
+    );
+    this.userLowlyGenericMetadata = new Map(
+        (selfie.userLowlyGenericMetadata || []).map(([key, values]) => [
+            key,
+            new Set(values),
+        ])
+    );
+    this.userHighlyGenericMetadata = new Map(
+        (selfie.userHighlyGenericMetadata || []).map(([key, values]) => [
+            key,
+            new Set(values),
+        ])
+    );
     this.frozen = true;
 };
 
@@ -744,21 +833,34 @@ CosmeticFilteringEngine.prototype.retrieveGenericSelectors = function(request) {
     }
 
     const selectorsSet = new Set();
+    const userFilterSelectors = new Map();
     const hashes = [];
     const safeOnly = request.safeOnly === true;
     for ( const hash of request.hashes ) {
         let found = false;
-        const addBucket = bucket => {
+        const addBucket = (bucket, isUserFilter = false) => {
             if ( bucket === undefined ) { return; }
             found = true;
             for ( const selector of bucket.split(',\n') ) {
                 if ( safeOnly && selector === keyFromSelector(selector) ) { continue; }
                 selectorsSet.add(selector);
+                if ( isUserFilter ) {
+                    const raws = this.userLowlyGenericMetadata.get(
+                        `${hash}\x00${selector}`
+                    );
+                    if ( raws === undefined ) { continue; }
+                    for ( const raw of raws ) {
+                        userFilterSelectors.set(
+                            `${raw}\x00${selector}`,
+                            { raw, selector }
+                        );
+                    }
+                }
             }
         };
         addBucket(this.lowlyGeneric.get(hash));
         if ( includeUserFilters ) {
-            addBucket(this.userLowlyGeneric.get(hash));
+            addBucket(this.userLowlyGeneric.get(hash), true);
         }
         if ( found ) { hashes.push(hash); }
     }
@@ -774,9 +876,19 @@ CosmeticFilteringEngine.prototype.retrieveGenericSelectors = function(request) {
         }
     }
 
+    for ( const [key, details] of userFilterSelectors ) {
+        if ( selectorsSet.has(details.selector) === false ) {
+            userFilterSelectors.delete(key);
+        }
+    }
+
     if ( selectorsSet.size === 0 && excepted.length === 0 ) { return; }
 
-    const out = { injectedCSS: '', excepted, };
+    const out = {
+        injectedCSS: '',
+        excepted,
+        userFilterSelectors: Array.from(userFilterSelectors.values()),
+    };
     const selectors = Array.from(selectorsSet);
 
     if ( typeof request.hostname === 'string' && request.hostname !== '' ) {
@@ -832,6 +944,33 @@ CosmeticFilteringEngine.prototype.retrieveSpecificSelectors = function(
     };
     const injectedCSS = [];
     const exceptionSet = new Set();
+    const userFilterSelectors = new Map();
+    const addUserFilterSelectors = (raws, selector) => {
+        if ( raws === undefined || selector.charCodeAt(0) === 0x7B ) {
+            return;
+        }
+        for ( const raw of raws ) {
+            userFilterSelectors.set(
+                `${raw}\x00${selector}`,
+                { raw, selector }
+            );
+        }
+    };
+    const userSpecificFilterRaws = new Map();
+    const noteUserSpecificFilter = (target, value) => {
+        const raws = this.userSpecificFilterMetadata.get(
+            `${target}\x00${value}`
+        );
+        if ( raws === undefined ) { return; }
+        let values = userSpecificFilterRaws.get(value);
+        if ( values === undefined ) {
+            values = new Set();
+            userSpecificFilterRaws.set(value, values);
+        }
+        for ( const raw of raws ) {
+            values.add(raw);
+        }
+    };
 
     if ( options.noSpecificCosmeticFiltering !== true ) {
         // Cached cosmetic filters: these are always declarative.
@@ -854,14 +993,26 @@ CosmeticFilteringEngine.prototype.retrieveSpecificSelectors = function(
         // Retrieve filters with an empty hostname
         this.specificFilters.retrieveGenerics(allSet);
         if ( includeUserFilters ) {
-            this.userSpecificFilters.retrieveSpecifics(allSet, hostname);
-            this.userSpecificFilters.retrieveSpecifics(allSet, entity);
+            this.userSpecificFilters.retrieveSpecifics(
+                allSet,
+                hostname,
+                noteUserSpecificFilter
+            );
+            this.userSpecificFilters.retrieveSpecifics(
+                allSet,
+                entity,
+                noteUserSpecificFilter
+            );
             this.userSpecificFilters.retrieveSpecificsByRegex(
                 allSet,
                 hostname,
-                request.url
+                request.url,
+                noteUserSpecificFilter
             );
-            this.userSpecificFilters.retrieveGenerics(allSet);
+            this.userSpecificFilters.retrieveGenerics(
+                allSet,
+                noteUserSpecificFilter
+            );
         }
 
         // Split filters in different groups
@@ -884,6 +1035,27 @@ CosmeticFilteringEngine.prototype.retrieveSpecificSelectors = function(
                 if ( exceptionSet.has(selector) === false ) { continue; }
                 specificSet.delete(selector);
                 out.exceptedFilters.push(selector);
+            }
+        }
+
+        for ( const selector of specificSet ) {
+            addUserFilterSelectors(
+                userSpecificFilterRaws.get(`+${selector}`),
+                selector
+            );
+        }
+
+        if ( includeUserFilters ) {
+            for ( const [hash, bucket] of this.userLowlyGeneric ) {
+                for ( const selector of bucket.split(',\n') ) {
+                    if ( exceptionSet.has(selector) ) { continue; }
+                    addUserFilterSelectors(
+                        this.userLowlyGenericMetadata.get(
+                            `${hash}\x00${selector}`
+                        ),
+                        selector
+                    );
+                }
             }
         }
 
@@ -961,8 +1133,22 @@ CosmeticFilteringEngine.prototype.retrieveSpecificSelectors = function(
             if ( str.s.length !== 0 ) {
                 injectedCSS.push(`${str.s}\n{display:none!important;}`);
             }
+            if ( userEntry !== undefined ) {
+                const activeSelectors = new Set(
+                    str.s.length === 0 ? [] : str.s.split(',\n')
+                );
+                for ( const selector of userEntry.dict ) {
+                    if ( activeSelectors.has(selector) === false ) { continue; }
+                    addUserFilterSelectors(
+                        this.userHighlyGenericMetadata.get(selector),
+                        selector
+                    );
+                }
+            }
         }
     }
+
+    out.userFilterSelectors = Array.from(userFilterSelectors.values());
 
     const details = {
         code: '',

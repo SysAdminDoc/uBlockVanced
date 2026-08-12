@@ -49,6 +49,7 @@ import { redirectEngine } from './redirect-engine.js';
 import staticExtFilteringEngine from './static-ext-filtering.js';
 import { staticFilteringReverseLookup } from './reverselookup.js';
 import staticNetFilteringEngine from './static-net-filtering.js';
+import { updateUserFilterMatchStats } from './user-filter-stats.js';
 import µb from './background.js';
 
 /******************************************************************************/
@@ -491,6 +492,75 @@ onBroadcast(msg => {
     );
 };
 
+µb.userFilterMatchStats = Object.create(null);
+µb._userFilterMatchMutex = Promise.resolve();
+
+µb.loadUserFilterMatchStats = async function() {
+    const bin = await vAPI.storage.get('userFiltersMatchStats');
+    const stats = bin instanceof Object && bin.userFiltersMatchStats;
+    this.userFilterMatchStats = stats instanceof Object && stats !== null
+        ? stats
+        : Object.create(null);
+};
+
+µb._reportUserFilterMatches = async function(details) {
+    if ( details instanceof Object === false ) { return; }
+    const reports = Array.isArray(details.filters)
+        ? details.filters
+        : [];
+    if ( reports.length === 0 ) { return; }
+
+    const result = updateUserFilterMatchStats(
+        this.userFilterMatchStats,
+        reports
+    );
+    this.userFilterMatchStats = result.stats;
+
+    if ( result.staleFilters.length === 0 ) {
+        await vAPI.storage.set({
+            userFiltersMatchStats: this.userFilterMatchStats,
+        });
+        return;
+    }
+
+    const loaded = await this.loadUserFilters();
+    if ( loaded.error || typeof loaded.content !== 'string' ) { return; }
+
+    const staleSet = new Set(result.staleFilters);
+    const date = new Date().toISOString().slice(0, 10);
+    const lines = loaded.content.split('\n');
+    let changed = false;
+    const updatedLines = lines.map(line => {
+        const raw = line.trim();
+        if ( staleSet.has(raw) === false ) { return line; }
+        changed = true;
+        return `! uBlockVanced stale filter disabled ${date}: ${line}`;
+    });
+
+    for ( const raw of staleSet ) {
+        delete this.userFilterMatchStats[raw];
+    }
+
+    if ( changed ) {
+        await this.saveUserFilters(updatedLines.join('\n'));
+        await this.loadFilterLists();
+        broadcast({ what: 'userFiltersUpdated' });
+    }
+
+    await vAPI.storage.set({
+        userFiltersMatchStats: this.userFilterMatchStats,
+    });
+};
+
+µb.reportUserFilterMatches = function(details) {
+    const task = this._reportUserFilterMatches(details);
+    this._userFilterMatchMutex = this._userFilterMatchMutex.then(
+        () => task,
+        () => task
+    );
+    return this._userFilterMatchMutex;
+};
+
 µb.getUserFilterDisabledSites = function() {
     return getUserFilterDisabledSites();
 };
@@ -694,6 +764,7 @@ onBroadcast(msg => {
     const compiledFilters = this.compileFilters(filters, {
         assetKey: this.userFiltersPath,
         trustedSource: true,
+        userFilters: true,
     });
     const snfe = staticNetFilteringEngine;
     const cfe = cosmeticFilteringEngine;
@@ -1197,6 +1268,10 @@ onBroadcast(msg => {
         writer.properties.set('name', details.assetKey);
         writer.properties.set('trustedSource', trustedSource);
     }
+    writer.properties.set(
+        'userFilters',
+        details.userFilters === true || details.assetKey === this.userFiltersPath
+    );
     const assetName = details.assetKey ? details.assetKey : '?';
     const parser = new sfp.AstFilterParser({
         trustedSource,

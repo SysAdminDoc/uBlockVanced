@@ -111,6 +111,85 @@ if ( typeof vAPI === 'object' && !vAPI.contentScript ) {
 vAPI.contentScript = true;
 
 /******************************************************************************/
+
+// Track declarative user cosmetic filters without involving the logger's
+// much heavier survey machinery. Procedural filters are intentionally omitted:
+// their match semantics cannot be represented by querySelector().
+vAPI.userFilterMatchReporter = {
+    selectors: new Map(),
+    timer: undefined,
+    lastReportAt: 0,
+
+    add: function(selectors) {
+        if ( Array.isArray(selectors) === false ) { return; }
+        for ( const details of selectors ) {
+            if ( details instanceof Object === false ) { continue; }
+            if (
+                typeof details.raw !== 'string' ||
+                typeof details.selector !== 'string' ||
+                details.raw === '' ||
+                details.selector === ''
+            ) {
+                continue;
+            }
+            this.selectors.set(
+                `${details.raw}\x00${details.selector}`,
+                { raw: details.raw, selector: details.selector }
+            );
+        }
+    },
+
+    schedule: function(delay = 3000) {
+        if ( window !== window.top || this.selectors.size === 0 ) { return; }
+        if ( this.timer !== undefined ) { return; }
+        this.timer = vAPI.setTimeout(( ) => {
+            this.timer = undefined;
+            const elapsed = Date.now() - this.lastReportAt;
+            if ( elapsed < 60000 ) {
+                this.schedule(60000 - elapsed);
+                return;
+            }
+            this.lastReportAt = Date.now();
+            const filters = [];
+            for ( const details of this.selectors.values() ) {
+                let matched = false;
+                try {
+                    matched = document.querySelector(details.selector) !== null;
+                } catch {
+                    continue;
+                }
+                filters.push({ raw: details.raw, matched });
+            }
+            if ( filters.length === 0 ) { return; }
+            vAPI.messaging.send('contentscript', {
+                what: 'reportUserFilterMatches',
+                hostname: window.location.hostname,
+                filters,
+            });
+        }, delay);
+    },
+
+    onDOMCreated: function() {
+        this.schedule();
+    },
+
+    onDOMChanged: function() {
+        this.schedule();
+    },
+
+    stop: function() {
+        if ( this.timer !== undefined ) {
+            clearTimeout(this.timer);
+            this.timer = undefined;
+        }
+    },
+};
+
+vAPI.shutdown.add(( ) => {
+    vAPI.userFilterMatchReporter.stop();
+});
+
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
@@ -1092,6 +1171,8 @@ vAPI.DOMFilterer = class {
         const result = response && response.result;
         let mustCommit = false;
         if ( result ) {
+            vAPI.userFilterMatchReporter.add(result.userFilterSelectors);
+            vAPI.userFilterMatchReporter.schedule();
             const css = result.injectedCSS;
             if ( typeof css === 'string' && css.length !== 0 ) {
                 domFilterer.addCSS(css);
@@ -1304,6 +1385,10 @@ vAPI.DOMFilterer = class {
             domFilterer.exceptCSSRules(cfeDetails.exceptedFilters);
             domFilterer.convertedProceduralFilters = cfeDetails.convertedProceduralFilters;
             vAPI.userStylesheet.apply();
+            vAPI.userFilterMatchReporter.add(cfeDetails.userFilterSelectors);
+            if ( window === window.top ) {
+                vAPI.domWatcher.addListener(vAPI.userFilterMatchReporter);
+            }
         }
 
         if ( vAPI.domSurveyor ) {

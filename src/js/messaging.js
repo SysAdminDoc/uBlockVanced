@@ -794,6 +794,12 @@ const onMessage = function(request, sender, callback) {
         cosmeticFilteringEngine.disableSurveyor(request);
         break;
 
+    case 'reportUserFilterMatches':
+        if ( sender.frameId === 0 ) {
+            µb.reportUserFilterMatches(request);
+        }
+        break;
+
     case 'getCollapsibleBlockedRequests':
         response = {
             id: request.id,
@@ -1060,6 +1066,7 @@ const backupUserData = async function() {
         urlFilteringString: permanentURLFiltering.toString(),
         hostnameSwitchesString: permanentSwitches.toString(),
         userFiltersDisabledSites: µb.getUserFilterDisabledSites(),
+        userFiltersMatchStats: µb.userFilterMatchStats,
         userFilters: userFilters.content,
     };
 
@@ -1146,6 +1153,9 @@ const restoreUserData = async function(request) {
         userFiltersDisabledSites: Array.isArray(userData.userFiltersDisabledSites)
             ? userData.userFiltersDisabledSites
             : [],
+        userFiltersMatchStats: userData.userFiltersMatchStats instanceof Object
+            ? userData.userFiltersMatchStats
+            : {},
         lastRestoreFile: request.file || '',
         lastRestoreTime: Date.now(),
         lastBackupFile: '',
