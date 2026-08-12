@@ -35,6 +35,42 @@
     "message": "My filters",
     "description": "appears as tab name in dashboard"
   },
+  "1pUserFiltersPerSiteTitle": {
+    "message": "Disable my filters on specific sites",
+    "description": "Heading for the per-site user-filter controls"
+  },
+  "1pUserFiltersPerSiteDescription": {
+    "message": "Add a hostname to stop all custom filters from applying there. Subdomains are included.",
+    "description": "Explanation for per-site user-filter controls"
+  },
+  "1pUserFiltersPerSitePlaceholder": {
+    "message": "example.com",
+    "description": "Placeholder for a hostname in the per-site user-filter controls"
+  },
+  "1pUserFiltersPerSiteAdd": {
+    "message": "Disable on site",
+    "description": "Button to disable user filters on a hostname"
+  },
+  "1pUserFiltersPerSiteRemove": {
+    "message": "Remove",
+    "description": "Button to remove a hostname from the per-site user-filter list"
+  },
+  "1pUserFiltersPerSiteEmpty": {
+    "message": "No sites configured.",
+    "description": "Empty state for the per-site user-filter list"
+  },
+  "1pUserFiltersPerSiteInvalid": {
+    "message": "Enter a valid hostname.",
+    "description": "Validation message for a per-site user-filter hostname"
+  },
+  "1pUserFiltersPerSiteSaved": {
+    "message": "Site setting saved.",
+    "description": "Status message after saving a per-site user-filter setting"
+  },
+  "1pUserFiltersPerSiteError": {
+    "message": "The site setting could not be saved.",
+    "description": "Error message for per-site user-filter controls"
+  },
   "1pEditorLead": {
     "message": "Create, import, and review your custom static filters before applying them.",
     "description": "Supporting text at the top of the 'My filters' pane"

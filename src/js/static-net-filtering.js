@@ -29,6 +29,7 @@ import BidiTrieContainer from './biditrie.js';
 import { CompiledListReader } from './static-filtering-io.js';
 import { FilteringContext } from './filtering-context.js';
 import HNTrieContainer from './hntrie.js';
+import { isUserFilterSiteDisabled } from './user-filters.js';
 import { urlSkip } from './urlskip.js';
 
 /******************************************************************************/
@@ -3139,6 +3140,41 @@ class FilterMessage {
 registerFilterClass(FilterMessage);
 
 /******************************************************************************/
+
+// User filters are compiled into the same network filter buckets as all other
+// static filters. Keep a lightweight wrapper around those units so a site can
+// disable only the user-filter source without affecting subscribed lists.
+
+class FilterUserSiteGate {
+    static match(idata) {
+        if ( isUserFilterSiteDisabled($docHostname) ) { return false; }
+        return filterMatch(filterData[idata+1]);
+    }
+
+    static matchAndFetchModifiers(idata, env) {
+        if ( isUserFilterSiteDisabled($docHostname) ) { return; }
+        filterMatchAndFetchModifiers(filterData[idata+1], env);
+    }
+
+    static create(iunit) {
+        const idata = filterDataAllocLen(2);
+        filterData[idata+0] = FilterUserSiteGate.fid;
+        filterData[idata+1] = iunit;
+        return idata;
+    }
+
+    static logData(idata, details) {
+        filterLogData(filterData[idata+1], details);
+    }
+
+    static dumpInfo(idata) {
+        return filterDumpInfo(filterData[idata+1]);
+    }
+}
+
+registerFilterClass(FilterUserSiteGate);
+
+/******************************************************************************/
 /******************************************************************************/
 
 // https://github.com/gorhill/uBlock/issues/2630
@@ -4023,8 +4059,14 @@ class FilterCompiler {
     }
 
     compileToFilter(writer) {
+        const isUserFilter = writer.properties.get('name') === 'user-filters';
+
         // Pure hostnames, use more efficient dictionary lookup
-        if ( this.isPureHostname && this.hasNoOptionUnits() ) {
+        if (
+            isUserFilter === false &&
+            this.isPureHostname &&
+            this.hasNoOptionUnits()
+        ) {
             this.tokenHash = DOT_TOKEN_HASH;
             this.compileToAtomicFilter(this.pattern, writer);
             return;
@@ -4039,7 +4081,7 @@ class FilterCompiler {
         // The semantic of "just-origin" filters is that contrary to normal
         // filters, the original filter is split into as many filters as there
         // are entries in the `domain=` option.
-        if ( this.isJustOrigin() ) {
+        if ( isUserFilter === false && this.isJustOrigin() ) {
             if ( this.pattern === '*' || this.pattern.startsWith('http*') ) {
                 this.tokenHash = ANY_TOKEN_HASH;
             } else if /* 'https:' */ ( this.pattern.startsWith('https') ) {
@@ -4188,18 +4230,26 @@ class FilterCompiler {
 
     compileToAtomicFilter(fdata, writer) {
         const catBits = this.action | this.party;
+        const isUserFilter = writer.properties.get('name') === 'user-filters';
+        const push = bits => {
+            writer.push(
+                isUserFilter
+                    ? [ bits, this.tokenHash, fdata, 1 ]
+                    : [ bits, this.tokenHash, fdata ]
+            );
+        };
         let { typeBits } = this;
 
         // Typeless
         if ( typeBits === 0 ) {
-            writer.push([ catBits, this.tokenHash, fdata ]);
+            push(catBits);
             return;
         }
         // If all network types are set, create a typeless filter. Excluded
         // network types are tested at match time, se we act as if they are
         // set.
         if ( (typeBits & allNetworkTypesBits) === allNetworkTypesBits ) {
-            writer.push([ catBits, this.tokenHash, fdata ]);
+            push(catBits);
             typeBits &= ~allNetworkTypesBits;
             if ( typeBits === 0 ) { return; }
         }
@@ -4207,11 +4257,7 @@ class FilterCompiler {
         let bitOffset = 1;
         do {
             if ( typeBits & 1 ) {
-                writer.push([
-                    catBits | (bitOffset << TYPE_REALM_OFFSET),
-                    this.tokenHash,
-                    fdata
-                ]);
+                push(catBits | (bitOffset << TYPE_REALM_OFFSET));
             }
             bitOffset += 1;
             typeBits >>>= 1;
@@ -4321,6 +4367,7 @@ StaticNetFilteringEngine.prototype.freeze = function() {
 
         const tokenHash = args[1];
         const fdata = args[2];
+        const isUserFilter = args[3] === 1;
 
         let iunit = bucket.get(tokenHash) || 0;
 
@@ -4363,7 +4410,10 @@ StaticNetFilteringEngine.prototype.freeze = function() {
 
         urlTokenizer.addKnownToken(tokenHash);
 
-        this.addFilterUnit(bits, tokenHash, filterFromCompiled(fdata));
+        iunit = isUserFilter
+            ? FilterUserSiteGate.create(filterFromCompiled(fdata))
+            : filterFromCompiled(fdata);
+        this.addFilterUnit(bits, tokenHash, iunit);
 
         // Add block-important filters to the block realm, so as to avoid
         // to unconditionally match against the block-important realm for
@@ -4375,7 +4425,7 @@ StaticNetFilteringEngine.prototype.freeze = function() {
             this.addFilterUnit(
                 bits & ~IMPORTANT_REALM,
                 tokenHash,
-                filterFromCompiled(fdata)
+                iunit
             );
         }
     }

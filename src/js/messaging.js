@@ -1059,6 +1059,7 @@ const backupUserData = async function() {
         dynamicFilteringString: permanentFirewall.toString(),
         urlFilteringString: permanentURLFiltering.toString(),
         hostnameSwitchesString: permanentSwitches.toString(),
+        userFiltersDisabledSites: µb.getUserFilterDisabledSites(),
         userFilters: userFilters.content,
     };
 
@@ -1142,6 +1143,9 @@ const restoreUserData = async function(request) {
         dynamicFilteringString: userData.dynamicFilteringString || '',
         urlFilteringString: userData.urlFilteringString || '',
         hostnameSwitchesString: userData.hostnameSwitchesString || '',
+        userFiltersDisabledSites: Array.isArray(userData.userFiltersDisabledSites)
+            ? userData.userFiltersDisabledSites
+            : [],
         lastRestoreFile: request.file || '',
         lastRestoreTime: Date.now(),
         lastBackupFile: '',
@@ -1474,6 +1478,12 @@ const onMessage = function(request, sender, callback) {
         return µb.loadUserFilters().then(result => {
             result.enabled = µb.selectedFilterLists.includes(µb.userFiltersPath);
             result.trusted = µb.isTrustedList(µb.userFiltersPath);
+            result.disabledSites = µb.getUserFilterDisabledSites();
+            callback(result);
+        });
+
+    case 'setUserFilterSite':
+        return µb.setUserFilterSite(request.hostname, request.disabled).then(result => {
             callback(result);
         });
 

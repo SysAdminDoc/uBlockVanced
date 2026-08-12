@@ -47,6 +47,18 @@
         </div>
         <p class="trustWarning" data-i18n="1pTrustWarning"></p>
     </div>
+    <section class="userFilterSites" aria-labelledby="userFilterSitesTitle">
+        <div class="userFilterSitesHeader">
+            <h2 id="userFilterSitesTitle" data-i18n="1pUserFiltersPerSiteTitle">_</h2>
+            <p data-i18n="1pUserFiltersPerSiteDescription">_</p>
+        </div>
+        <form id="userFilterSiteForm" class="userFilterSiteForm">
+            <input id="userFilterSiteInput" type="text" placeholder="1pUserFiltersPerSitePlaceholder" autocomplete="off">
+            <button class="preferred" type="submit" data-i18n="1pUserFiltersPerSiteAdd">_</button>
+        </form>
+        <ul id="userFilterSiteList" class="userFilterSiteList"></ul>
+        <p id="userFilterSiteStatus" class="userFilterSiteStatus" role="status" aria-live="polite"></p>
+    </section>
 </div>
 <div id="userFilters" class="codeMirrorContainer codeMirrorBreakAll cm-theme-override" spellcheck="false"></div>
 <div class="hidden">

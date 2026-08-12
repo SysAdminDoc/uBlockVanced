@@ -24,6 +24,7 @@
 import './codemirror/ubo-static-filtering.js';
 import { dom, qs$ } from './dom.js';
 import { i18n$ } from './i18n.js';
+import { normalizeHostname } from './user-filters.js';
 import { onBroadcast } from './broadcast.js';
 import { parseFilterExportText } from './filter-export.js';
 
@@ -93,6 +94,41 @@ let originalState = {
     trusted: false,
     filters: '',
 };
+
+function renderUserFilterSites(sites) {
+    const list = qs$('#userFilterSiteList');
+    if ( list === null ) { return; }
+    dom.clear(list);
+    if ( Array.isArray(sites) === false || sites.length === 0 ) {
+        const empty = dom.create('li');
+        empty.className = 'userFilterSiteStatus';
+        empty.textContent = i18n$('1pUserFiltersPerSiteEmpty');
+        list.append(empty);
+        return;
+    }
+    for ( const site of sites ) {
+        const item = dom.create('li');
+        item.className = 'userFilterSiteItem';
+        const label = dom.create('span');
+        label.textContent = site;
+        const button = dom.create('button');
+        button.className = 'iconified';
+        button.type = 'button';
+        button.dataset.hostname = site;
+        button.textContent = i18n$('1pUserFiltersPerSiteRemove');
+        button.setAttribute(
+            'aria-label',
+            `${i18n$('1pUserFiltersPerSiteRemove')} ${site}`
+        );
+        item.append(label, button);
+        list.append(item);
+    }
+}
+
+function setUserFilterSiteStatus(message) {
+    const status = qs$('#userFilterSiteStatus');
+    if ( status !== null ) { status.textContent = message || ''; }
+}
 
 function setStatusPill(target, message, tone) {
     const node = qs$(target);
@@ -254,11 +290,54 @@ async function renderUserFilters() {
 
     qs$('#enableMyFilters input').checked = details.enabled;
     qs$('#trustMyFilters input').checked = details.trusted;
+    renderUserFilterSites(details.disabledSites);
 
     setEditorText(details.content.trim());
     userFiltersChanged({ changed: false });
 
     rememberCurrentState();
+}
+
+async function submitUserFilterSite(ev) {
+    ev.preventDefault();
+    const input = qs$('#userFilterSiteInput');
+    const hostname = normalizeHostname(input.value);
+    if ( hostname === undefined ) {
+        setUserFilterSiteStatus(i18n$('1pUserFiltersPerSiteInvalid'));
+        input.focus();
+        return;
+    }
+    const button = qs$('#userFilterSiteForm button');
+    if ( button !== null ) { button.disabled = true; }
+    const result = await vAPI.messaging.send('dashboard', {
+        what: 'setUserFilterSite',
+        hostname,
+        disabled: true,
+    });
+    if ( result instanceof Object && result.error === undefined ) {
+        input.value = '';
+        renderUserFilterSites(result.sites);
+        setUserFilterSiteStatus(i18n$('1pUserFiltersPerSiteSaved'));
+    } else {
+        setUserFilterSiteStatus(i18n$('1pUserFiltersPerSiteError'));
+    }
+    if ( button !== null ) { button.disabled = false; }
+}
+
+async function removeUserFilterSite() {
+    const hostname = this.dataset.hostname;
+    if ( typeof hostname !== 'string' ) { return; }
+    const result = await vAPI.messaging.send('dashboard', {
+        what: 'setUserFilterSite',
+        hostname,
+        disabled: false,
+    });
+    if ( result instanceof Object && result.error === undefined ) {
+        renderUserFilterSites(result.sites);
+        setUserFilterSiteStatus(i18n$('1pUserFiltersPerSiteSaved'));
+    } else {
+        setUserFilterSiteStatus(i18n$('1pUserFiltersPerSiteError'));
+    }
 }
 
 /******************************************************************************/
@@ -463,6 +542,8 @@ dom.on('#userFiltersApply', 'click', ( ) => { applyChanges(); });
 dom.on('#userFiltersRevert', 'click', revertChanges);
 dom.on('#enableMyFilters input', 'change', userFiltersChanged);
 dom.on('#trustMyFilters input', 'change', userFiltersChanged);
+dom.on('#userFilterSiteForm', 'submit', submitUserFilterSite);
+dom.on('#userFilterSiteList', 'click', 'button[data-hostname]', removeUserFilterSite);
 
 (async ( ) => {
     await renderUserFilters();
@@ -516,6 +597,9 @@ dom.on('#trustMyFilters input', 'change', userFiltersChanged);
             });
             break;
         }
+        case 'userFiltersSitesUpdated':
+            renderUserFilterSites(msg.sites);
+            break;
         default:
             break;
         }

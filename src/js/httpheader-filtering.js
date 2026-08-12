@@ -21,6 +21,7 @@
 
 import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
 import { entityFromHostname } from './uri-utils.js';
+import { isUserFilterSiteDisabled } from './user-filters.js';
 import logger from './logger.js';
 import { sessionFirewall } from './filtering-engines.js';
 import µb from './background.js';
@@ -29,6 +30,8 @@ import µb from './background.js';
 
 const duplicates = new Set();
 const filterDB = new StaticExtFilteringHostnameDB();
+const userDuplicates = new Set();
+const userFilterDB = new StaticExtFilteringHostnameDB();
 
 let acceptedCount = 0;
 let discardedCount = 0;
@@ -65,14 +68,18 @@ const httpheaderFilteringEngine = {
 
 httpheaderFilteringEngine.reset = function() {
     filterDB.clear();
+    userFilterDB.clear();
     duplicates.clear();
+    userDuplicates.clear();
     acceptedCount = 0;
     discardedCount = 0;
 };
 
 httpheaderFilteringEngine.freeze = function() {
     duplicates.clear();
+    userDuplicates.clear();
     filterDB.collectGarbage();
+    userFilterDB.collectGarbage();
 };
 
 httpheaderFilteringEngine.compile = function(parser, writer) {
@@ -108,27 +115,35 @@ httpheaderFilteringEngine.compile = function(parser, writer) {
 //                ^   ^
 //               15  -1
 
-httpheaderFilteringEngine.fromCompiledContent = function(reader) {
+httpheaderFilteringEngine.fromCompiledContent = function(reader, options = {}) {
+    const isUserFilter = options.userFilters === true;
+    const duplicateSet = isUserFilter ? userDuplicates : duplicates;
+    const targetDB = isUserFilter ? userFilterDB : filterDB;
     reader.select('HTTPHEADER_FILTERS');
 
     while ( reader.next() ) {
         acceptedCount += 1;
         const fingerprint = reader.fingerprint();
-        if ( duplicates.has(fingerprint) ) {
+        if ( duplicateSet.has(fingerprint) ) {
             discardedCount += 1;
             continue;
         }
-        duplicates.add(fingerprint);
+        duplicateSet.add(fingerprint);
         const args = reader.args();
-        filterDB.store(args[1], args[2]);
+        targetDB.store(args[1], args[2]);
     }
 };
 
 httpheaderFilteringEngine.apply = function(fctxt, headers) {
-    if ( filterDB.size === 0 ) { return; }
-
     const hostname = fctxt.getHostname();
     if ( hostname === '' ) { return; }
+    const includeUserFilters = isUserFilterSiteDisabled(hostname) === false;
+    if (
+        filterDB.size === 0 &&
+        (includeUserFilters === false || userFilterDB.size === 0)
+    ) {
+        return;
+    }
 
     const all = new Set();
     filterDB.retrieveSpecifics(all, hostname);
@@ -136,6 +151,12 @@ httpheaderFilteringEngine.apply = function(fctxt, headers) {
     filterDB.retrieveSpecifics(all, entity);
     filterDB.retrieveSpecificsByRegex(all, hostname, fctxt.url);
     filterDB.retrieveGenerics(all);
+    if ( includeUserFilters ) {
+        userFilterDB.retrieveSpecifics(all, hostname);
+        userFilterDB.retrieveSpecifics(all, entity);
+        userFilterDB.retrieveSpecificsByRegex(all, hostname, fctxt.url);
+        userFilterDB.retrieveGenerics(all);
+    }
     if ( all.size === 0 ) { return; }
 
     // https://github.com/gorhill/uBlock/issues/2835
@@ -185,11 +206,15 @@ httpheaderFilteringEngine.apply = function(fctxt, headers) {
 };
 
 httpheaderFilteringEngine.toSelfie = function() {
-    return filterDB.toSelfie();
+    return {
+        normal: filterDB.toSelfie(),
+        user: userFilterDB.toSelfie(),
+    };
 };
 
 httpheaderFilteringEngine.fromSelfie = function(selfie) {
-    filterDB.fromSelfie(selfie);
+    filterDB.fromSelfie(selfie.normal);
+    userFilterDB.fromSelfie(selfie.user);
 };
 
 /******************************************************************************/

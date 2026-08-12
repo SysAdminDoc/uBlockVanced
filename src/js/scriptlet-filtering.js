@@ -196,6 +196,7 @@ export class ScriptletFilteringEngineEx extends ScriptletFilteringEngine {
         this.bc = onBroadcast(msg => {
             switch ( msg.what ) {
             case 'filteringBehaviorChanged': {
+                this.scriptletCache.reset();
                 const direction = msg.direction || 0;
                 if ( direction > 0 ) { return; }
                 if ( direction >= 0 && msg.hostname ) {

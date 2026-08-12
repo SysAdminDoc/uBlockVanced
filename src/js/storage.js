@@ -26,6 +26,11 @@ import * as sfp from './static-filtering-parser.js';
 import { CompiledListReader, CompiledListWriter } from './static-filtering-io.js';
 import { LineIterator, orphanizeString } from './text-utils.js';
 import { broadcast, filteringBehaviorChanged, onBroadcast } from './broadcast.js';
+import {
+    getUserFilterDisabledSites,
+    normalizeHostname,
+    setUserFilterDisabledSites,
+} from './user-filters.js';
 import { i18n, i18n$ } from './i18n.js';
 import {
     permanentFirewall,
@@ -479,6 +484,44 @@ onBroadcast(msg => {
     return vAPI.storage.set({ selectedFilterLists: newKeys });
 };
 
+µb.loadUserFilterDisabledSites = async function() {
+    const bin = await vAPI.storage.get('userFiltersDisabledSites');
+    setUserFilterDisabledSites(
+        bin instanceof Object ? bin.userFiltersDisabledSites : undefined
+    );
+};
+
+µb.getUserFilterDisabledSites = function() {
+    return getUserFilterDisabledSites();
+};
+
+µb.setUserFilterSite = async function(site, disabled) {
+    const hostname = normalizeHostname(site);
+    if ( hostname === undefined ) {
+        return { error: 'Invalid hostname' };
+    }
+
+    const sites = new Set(getUserFilterDisabledSites());
+    if ( disabled === true ) {
+        sites.add(hostname);
+    } else {
+        sites.delete(hostname);
+    }
+    setUserFilterDisabledSites(Array.from(sites));
+    const disabledSites = getUserFilterDisabledSites();
+    await vAPI.storage.set({ userFiltersDisabledSites: disabledSites });
+
+    cosmeticFilteringEngine.removeFromSelectorCache(hostname);
+    filteringBehaviorChanged({ hostname });
+    broadcast({ what: 'userFiltersSitesUpdated', sites: disabledSites });
+
+    return {
+        hostname,
+        disabled: disabledSites.includes(hostname),
+        sites: disabledSites,
+    };
+};
+
 /******************************************************************************/
 
 µb.applyFilterListSelection = function(details) {
@@ -656,7 +699,7 @@ onBroadcast(msg => {
     const cfe = cosmeticFilteringEngine;
     const acceptedCount = snfe.acceptedCount + cfe.acceptedCount;
     const discardedCount = snfe.discardedCount + cfe.discardedCount;
-    this.applyCompiledFilters(compiledFilters, true);
+    this.applyCompiledFilters(compiledFilters, true, true);
     const entry = this.availableFilterLists[this.userFiltersPath];
     const deltaEntryCount =
         snfe.acceptedCount +
@@ -975,7 +1018,11 @@ onBroadcast(msg => {
         const sxfe = staticExtFilteringEngine;
         let acceptedCount = snfe.acceptedCount + sxfe.acceptedCount;
         let discardedCount = snfe.discardedCount + sxfe.discardedCount;
-        µb.applyCompiledFilters(compiled, assetKey === µb.userFiltersPath);
+        µb.applyCompiledFilters(
+            compiled,
+            assetKey === µb.userFiltersPath,
+            assetKey === µb.userFiltersPath
+        );
         if ( Object.hasOwn(µb.availableFilterLists, assetKey) ) {
             const entry = µb.availableFilterLists[assetKey];
             entry.entryCount = snfe.acceptedCount + sxfe.acceptedCount -
@@ -1218,13 +1265,14 @@ onBroadcast(msg => {
 //   Added `firstparty` argument: to avoid discarding cosmetic filters when
 //   applying 1st-party filters.
 
-µb.applyCompiledFilters = function(rawText, firstparty) {
+µb.applyCompiledFilters = function(rawText, firstparty, userFilters = false) {
     if ( rawText === '' ) { return; }
     const reader = new CompiledListReader(rawText);
     staticNetFilteringEngine.fromCompiled(reader);
     staticExtFilteringEngine.fromCompiledContent(reader, {
         skipGenericCosmetic: this.userSettings.ignoreGenericCosmeticFilters,
-        skipCosmetic: !firstparty && !this.userSettings.parseAllABPHideFilters
+        skipCosmetic: !firstparty && !this.userSettings.parseAllABPHideFilters,
+        userFilters,
     });
 };
 

@@ -3,6 +3,7 @@
 Major Element Probe expansion, infrastructure improvements, and deep audit fixes.
 
 **New features:**
+- **Per-site user filters**: My filters now supports a persistent hostname list that disables all custom network, cosmetic, scriptlet, HTML, and response-header filters for a site and its subdomains without changing subscribed lists.
 - **Searchable filter history**: Filter History section in Element Probe now has a search input. Live-filters displayed entries by filter text with count badge showing "N of M filters" during search.
 - **Catppuccin palette swapping**: All four Catppuccin palettes are now supported — Mocha (default), Frappe, Macchiato, and Latte. Set via Advanced Settings: `catppuccinPalette` to `catppuccin-frappe`, `catppuccin-macchiato`, or `catppuccin-latte`. All dark theme structural tokens, logger colors, syntax highlighting, popup rule colors, and scrollbar tokens are derived from palette-level CSS variables (`--ctp-*`) that swap cleanly between variants.
 

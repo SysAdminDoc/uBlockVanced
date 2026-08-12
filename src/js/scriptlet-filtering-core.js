@@ -21,6 +21,7 @@
 
 import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
 import { entityFromHostname } from './uri-utils.js';
+import { isUserFilterSiteDisabled } from './user-filters.js';
 import { redirectEngine as reng } from './redirect-engine.js';
 
 /******************************************************************************/
@@ -118,23 +119,29 @@ export class ScriptletFilteringEngine {
         this.acceptedCount = 0;
         this.discardedCount = 0;
         this.scriptletDB = new StaticExtFilteringHostnameDB();
+        this.userScriptletDB = new StaticExtFilteringHostnameDB();
         this.duplicates = new Set();
+        this.userDuplicates = new Set();
     }
 
     getFilterCount() {
-        return this.scriptletDB.size;
+        return this.scriptletDB.size + this.userScriptletDB.size;
     }
 
     reset() {
         this.scriptletDB.clear();
+        this.userScriptletDB.clear();
         this.duplicates.clear();
+        this.userDuplicates.clear();
         this.acceptedCount = 0;
         this.discardedCount = 0;
     }
 
     freeze() {
         this.duplicates.clear();
+        this.userDuplicates.clear();
         this.scriptletDB.collectGarbage();
+        this.userScriptletDB.collectGarbage();
     }
 
     // parser: instance of AstFilterParser from static-filtering-parser.js
@@ -171,36 +178,53 @@ export class ScriptletFilteringEngine {
     }
 
     // writer: instance of CompiledListReader from static-filtering-io.js
-    fromCompiledContent(reader) {
+    fromCompiledContent(reader, options = {}) {
+        const isUserFilter = options.userFilters === true;
+        const scriptletDB = isUserFilter
+            ? this.userScriptletDB
+            : this.scriptletDB;
+        const duplicates = isUserFilter
+            ? this.userDuplicates
+            : this.duplicates;
         reader.select('SCRIPTLET_FILTERS');
 
         while ( reader.next() ) {
             this.acceptedCount += 1;
             const fingerprint = reader.fingerprint();
-            if ( this.duplicates.has(fingerprint) ) {
+            if ( duplicates.has(fingerprint) ) {
                 this.discardedCount += 1;
                 continue;
             }
-            this.duplicates.add(fingerprint);
+            duplicates.add(fingerprint);
             const args = reader.args();
-            this.scriptletDB.store(args[1], args[2]);
+            scriptletDB.store(args[1], args[2]);
         }
     }
 
     toSelfie() {
-        return this.scriptletDB.toSelfie();
+        return {
+            normal: this.scriptletDB.toSelfie(),
+            user: this.userScriptletDB.toSelfie(),
+        };
     }
 
     fromSelfie(selfie) {
-        this.scriptletDB.fromSelfie(selfie);
+        this.scriptletDB.fromSelfie(selfie.normal);
+        this.userScriptletDB.fromSelfie(selfie.user);
         return true;
     }
 
     retrieve(request, options = {}) {
-        if ( this.scriptletDB.size === 0 ) { return; }
-
         const all = new Set();
         const { ancestors = [], domain, hostname } = request;
+        const includeUserFilters = isUserFilterSiteDisabled(hostname) === false;
+
+        if (
+            this.scriptletDB.size === 0 &&
+            (includeUserFilters === false || this.userScriptletDB.size === 0)
+        ) {
+            return;
+        }
 
         this.scriptletDB.retrieveSpecifics(all, hostname);
         const entity = entityFromHostname(hostname, domain);
@@ -216,6 +240,21 @@ export class ScriptletFilteringEngine {
             const entity = entityFromHostname(hostname, domain);
             if ( entity !== '' ) {
                 this.scriptletDB.retrieveSpecifics(all, `${entity}>>`);
+            }
+        }
+        if ( includeUserFilters ) {
+            this.userScriptletDB.retrieveSpecifics(all, hostname);
+            const entity = entityFromHostname(hostname, domain);
+            this.userScriptletDB.retrieveSpecifics(all, entity);
+            this.userScriptletDB.retrieveSpecificsByRegex(all, hostname, request.url);
+            this.userScriptletDB.retrieveGenerics(all);
+            for ( const ancestor of ancestors ) {
+                const { domain, hostname } = ancestor;
+                this.userScriptletDB.retrieveSpecifics(all, `${hostname}>>`);
+                const entity = entityFromHostname(hostname, domain);
+                if ( entity !== '' ) {
+                    this.userScriptletDB.retrieveSpecifics(all, `${entity}>>`);
+                }
             }
         }
         if ( all.size === 0 ) { return; }
