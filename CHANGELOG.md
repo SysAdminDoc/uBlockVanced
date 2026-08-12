@@ -6,6 +6,9 @@ Major Element Probe expansion, infrastructure improvements, and deep audit fixes
 - **Searchable filter history**: Filter History section in Element Probe now has a search input. Live-filters displayed entries by filter text with count badge showing "N of M filters" during search.
 - **Catppuccin palette swapping**: All four Catppuccin palettes are now supported — Mocha (default), Frappe, Macchiato, and Latte. Set via Advanced Settings: `catppuccinPalette` to `catppuccin-frappe`, `catppuccin-macchiato`, or `catppuccin-latte`. All dark theme structural tokens, logger colors, syntax highlighting, popup rule colors, and scrollbar tokens are derived from palette-level CSS variables (`--ctp-*`) that swap cleanly between variants.
 
+**Build fix:**
+- **Common asset copy**: Removed the stale `src/icons` copy step after the icon set moved to `src/img`; clean Chromium builds no longer fail on the missing directory.
+
 **Audit fixes (v0.3.0 hardening pass 2):**
 - **P1**: Picker timer-freezing now replays frozen callbacks on cleanup — no more permanently broken page timers. Capped at 500 entries with beforeunload safety net.
 - **P1**: User filter writes (append/remove) serialized through a mutex — concurrent writes no longer silently overwrite each other.

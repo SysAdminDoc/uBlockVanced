@@ -10,7 +10,6 @@ bash ./tools/make-assets.sh        "$DES"
 
 cp -R src/css                      "$DES"/
 cp -R src/img                      "$DES"/
-cp -R src/icons                    "$DES"/
 mkdir -p "$DES"/js
 cp -R src/js/*.js                  "$DES"/js/
 cp -R src/js/resources             "$DES"/js/
