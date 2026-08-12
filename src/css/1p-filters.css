@@ -127,6 +127,21 @@ body {
     display: block;
 }
 
+.userFiltersImportNotice {
+    background: rgb(var(--blue-40) / 0.12);
+    border: 1px solid rgb(var(--blue-40) / 0.22);
+    border-radius: var(--radius-medium);
+    color: var(--ink-2);
+    display: none;
+    flex: 1 1 18rem;
+    margin: 0;
+    padding: 0.42rem 0.72rem;
+}
+
+.userFiltersImportNotice.is-visible {
+    display: block;
+}
+
 #trustMyFilters.is-disabled {
     background: var(--surface-2);
     color: var(--ink-2);

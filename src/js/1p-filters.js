@@ -23,10 +23,13 @@
 
 import './codemirror/ubo-static-filtering.js';
 import { dom, qs$ } from './dom.js';
+import {
+    normalizeFilterImportText,
+    parseFilterExportText,
+} from './filter-export.js';
 import { i18n$ } from './i18n.js';
 import { normalizeHostname } from './user-filters.js';
 import { onBroadcast } from './broadcast.js';
-import { parseFilterExportText } from './filter-export.js';
 
 /******************************************************************************/
 
@@ -128,6 +131,13 @@ function renderUserFilterSites(sites) {
 function setUserFilterSiteStatus(message) {
     const status = qs$('#userFilterSiteStatus');
     if ( status !== null ) { status.textContent = message || ''; }
+}
+
+function setImportCompatibilityNotice(message) {
+    const notice = qs$('#userFiltersImportNotice');
+    if ( notice === null ) { return; }
+    notice.textContent = message || '';
+    dom.cl.toggle(notice, 'is-visible', Boolean(message));
 }
 
 function setStatusPill(target, message, tone) {
@@ -349,13 +359,22 @@ function handleImportFilePicker(ev) {
     const fr = new FileReader();
     fr.onload = function() {
         if ( typeof fr.result !== 'string' ) { return; }
-        const content = uBlockDashboard.mergeNewLines(getEditorText(), fr.result);
+        const imported = normalizeFilterImportText(fr.result);
+        const content = uBlockDashboard.mergeNewLines(
+            getEditorText(),
+            imported.text
+        );
         cmEditor.operation(( ) => {
             const cmPos = cmEditor.getCursor();
             setEditorText(content);
             cmEditor.setCursor(cmPos);
             cmEditor.focus();
         });
+        if ( imported.notes.length !== 0 ) {
+            setImportCompatibilityNotice(
+                i18n$('1pImportCompatibilityNotice')
+            );
+        }
     };
     fr.readAsText(file);
 }

@@ -1,7 +1,9 @@
-import test from 'node:test';
+import {
+    normalizeFilterImportText,
+    parseFilterExportText,
+} from '../src/js/filter-export.js';
 import assert from 'node:assert/strict';
-
-import { parseFilterExportText } from '../src/js/filter-export.js';
+import test from 'node:test';
 
 test('parseFilterExportText preserves leading comments as rule notes', () => {
     const result = parseFilterExportText([
@@ -16,6 +18,7 @@ test('parseFilterExportText preserves leading comments as rule notes', () => {
     assert.deepEqual(result.rules, [
         {
             raw: 'example.com##.player',
+            separator: '##',
             type: 'cosmetic',
             domains: 'example.com',
             selector: '.player',
@@ -26,6 +29,7 @@ test('parseFilterExportText preserves leading comments as rule notes', () => {
         },
         {
             raw: 'example.com#@#.settings',
+            separator: '#@#',
             type: 'exception',
             domains: 'example.com',
             selector: '.settings',
@@ -46,4 +50,40 @@ test('parseFilterExportText keeps trailing comments separate', () => {
     assert.deepEqual(result.unassignedNotes, [
         'Review this rule after the next list update',
     ]);
+});
+
+test('parseFilterExportText recognizes AdGuard and ABP cosmetic separators', () => {
+    const result = parseFilterExportText([
+        'example.com#?#div:contains(Ad)',
+        'example.com#$#body { remove: true; }',
+        'example.com#@?#.keep',
+    ].join('\n'));
+
+    assert.deepEqual(
+        result.rules.map(rule => [rule.type, rule.separator]),
+        [
+            [ 'cosmetic', '#?#' ],
+            [ 'cosmetic', '#$#' ],
+            [ 'exception', '#@?#' ],
+        ]
+    );
+});
+
+test('normalizeFilterImportText annotates and normalizes procedural aliases', () => {
+    const result = normalizeFilterImportText(
+        'example.com#?#div:matches-property(foo)'
+    );
+
+    assert.match(result.text, /uBlockVanced import note/);
+    assert.match(result.text, /:matches-prop\(foo\)/);
+    assert.equal(result.notes.length, 1);
+});
+
+test('normalizeFilterImportText leaves unsupported procedural syntax visible', () => {
+    const result = normalizeFilterImportText(
+        'example.com#?#div:contains-own(Ad)'
+    );
+
+    assert.match(result.text, /may not compile in uBO/);
+    assert.match(result.text, /:contains-own\(Ad\)/);
 });

@@ -79,6 +79,10 @@
     "message": "Create, import, and review your custom static filters before applying them.",
     "description": "Supporting text at the top of the 'My filters' pane"
   },
+  "1pImportCompatibilityNotice": {
+    "message": "Imported cosmetic rules were normalized where possible. Review the inserted compatibility notes for procedural syntax that may not compile in uBO.",
+    "description": "Notice shown after importing cross-engine cosmetic filter syntax"
+  },
   "1pEditorStatusSaved": {
     "message": "All changes applied",
     "description": "Status pill shown when there are no pending changes in the 'My filters' pane"
