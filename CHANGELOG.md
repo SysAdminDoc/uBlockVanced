@@ -46,7 +46,7 @@ Major Element Probe expansion, infrastructure improvements, and deep audit fixes
 - **i18n**: Element Probe panel internationalized — 65+ message keys added, lightweight `renderI18n()` renderer for DevTools panel context, all HTML static text uses `data-i18n` attributes.
 - **Modularization**: Element Probe split into ES modules — page-context scripts (1149 lines) extracted to `src/js/element-probe/page-scripts.js`. New operators can now be added by editing only the scripts module.
 - **YouTube sweep**: One-shot scan of 27 known YouTube ad container selectors (in-feed ads, overlays, companion banners, shorts, live chat, super chats, etc.) with visibility reporting. Auto-shows on YouTube pages.
-- **JSON export**: Export user filters as structured JSON with per-rule type classification (cosmetic/exception/network), domain parsing, and metadata.
+- **JSON export**: Export user filters as structured JSON with per-rule type classification (cosmetic/exception/network), domain parsing, metadata, and leading `!` comments preserved as per-rule notes.
 
 ----------
 

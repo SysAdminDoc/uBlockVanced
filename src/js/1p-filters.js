@@ -25,6 +25,7 @@ import './codemirror/ubo-static-filtering.js';
 import { dom, qs$ } from './dom.js';
 import { i18n$ } from './i18n.js';
 import { onBroadcast } from './broadcast.js';
+import { parseFilterExportText } from './filter-export.js';
 
 /******************************************************************************/
 
@@ -310,24 +311,7 @@ function exportUserFiltersToFile() {
 function exportUserFiltersToJSON() {
     const val = getEditorText();
     if ( val === '' ) { return; }
-    const lines = val.split('\n');
-    const rules = [];
-    for ( const line of lines ) {
-        const trimmed = line.trim();
-        if ( trimmed === '' || trimmed.startsWith('!') ) { continue; }
-        const entry = { raw: trimmed };
-        const cosmetic = trimmed.match(/^(.+?)(##|#@#)(.+)$/);
-        if ( cosmetic ) {
-            entry.type = cosmetic[2] === '#@#' ? 'exception' : 'cosmetic';
-            entry.domains = cosmetic[1];
-            entry.selector = cosmetic[3];
-        } else if ( trimmed.startsWith('||') || trimmed.startsWith('@@') ) {
-            entry.type = trimmed.startsWith('@@') ? 'exception' : 'network';
-        } else {
-            entry.type = 'other';
-        }
-        rules.push(entry);
-    }
+    const { rules, unassignedNotes } = parseFilterExportText(val);
     const data = {
         format: 'uBlockVanced-filters',
         version: '1.0',
@@ -335,6 +319,9 @@ function exportUserFiltersToJSON() {
         filterCount: rules.length,
         rules,
     };
+    if ( unassignedNotes.length !== 0 ) {
+        data.unassignedNotes = unassignedNotes;
+    }
     const json = JSON.stringify(data, null, 2);
     const filename = 'uBlockVanced-filters_'
         + uBlockDashboard.dateNowToSensibleString().replace(/ +/g, '_')
