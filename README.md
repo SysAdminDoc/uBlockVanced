@@ -16,6 +16,17 @@
   <img src="https://img.shields.io/badge/Theme-Catppuccin%20Mocha-cba6f7" alt="Catppuccin Mocha">
   <img src="https://img.shields.io/badge/License-GPLv3-green" alt="GPLv3">
 </p>
+
+<p align="center">
+  <a href="https://ko-fi.com/X8K126YVER">
+    <img height="42" src="https://storage.ko-fi.com/cdn/kofi2.png?v=3" alt="Buy me a coffee on Ko-fi" />
+  </a>
+</p>
+
+<p align="center">
+  <sub><em>If this project helps you, a coffee helps me keep working on it.</em></sub>
+</p>
+
 <p align="center">
 <img width="2931" height="1216" alt="2026-04-19 13_44_21-OpenCut and 5 more tabs - File Explorer" src="https://github.com/user-attachments/assets/2f90e569-98fc-44e1-b6c6-e410bb3dd5d5" />
 <img width="589" height="463" alt="2026-04-19 13_43_32-OpenCut and 5 more tabs - File Explorer" src="https://github.com/user-attachments/assets/474ec598-d6f6-402f-a940-f1f0de7c0acb" />
